@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Anushka 💕 — My Forever</title>
+  <meta name="description" content="A love letter to Anushka — from Swapnadip Ghosh, with all his heart."/>
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cinzel+Decorative:wght@400;700&family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+  <!-- ====== CANVAS PARTICLES ====== -->
+  <canvas id="heartCanvas"></canvas>
+
+  <!-- ====== LOADER ====== -->
+  <div class="loader" id="loader">
+    <div class="loader-heart">
+      <i class="fas fa-heart"></i>
+    </div>
+    <p class="loader-text">Loading Love<span class="dots">...</span></p>
+  </div>
+
+  <!-- ====== CURSOR ====== -->
+  <div class="cursor" id="cursor"></div>
+  <div class="cursor-trail" id="cursorTrail"></div>
+
+  <!-- ====== NAV ====== -->
+  <nav class="navbar" id="navbar">
+    <div class="nav-logo">
+      <i class="fas fa-heart-pulse"></i>
+      <span>Anushka</span>
+    </div>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#home" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="#about" class="nav-link"><i class="fas fa-star"></i> About Her</a></li>
+      <li><a href="#reasons" class="nav-link"><i class="fas fa-heart"></i> Why I Love You</a></li>
+      <li><a href="#timeline" class="nav-link"><i class="fas fa-infinity"></i> Our Story</a></li>
+      <li><a href="#music" class="nav-link"><i class="fas fa-music"></i> Song For You</a></li>
+      <li><a href="#propose" class="nav-link propose-nav"><i class="fas fa-ring"></i> Proposal</a></li>
+    </ul>
+    <div class="hamburger" id="hamburger">
+      <span></span><span></span><span></span>
+    </div>
+  </nav>
+
+  <!-- ====== HERO ====== -->
+  <section class="hero" id="home">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-subtitle fade-in-up" style="animation-delay:0.3s">
+        <i class="fas fa-music"></i> &nbsp;A Song From My Heart To Yours&nbsp; <i class="fas fa-music"></i>
+      </p>
+      <h1 class="hero-name fade-in-up" style="animation-delay:0.6s">Anushka</h1>
+      <p class="hero-tagline fade-in-up" style="animation-delay:0.9s">
+        Every melody I sing, every line of code I write — it all leads back to you
+      </p>
+      <div class="hero-from fade-in-up" style="animation-delay:1.2s">
+        <span>— With all the love in the universe, Swapnadip 💕</span>
+      </div>
+      <div class="hero-buttons fade-in-up" style="animation-delay:1.5s">
+        <a href="#propose" class="btn-primary">
+          <i class="fas fa-ring"></i> &nbsp;Will You Be Mine?
+        </a>
+        <a href="#about" class="btn-secondary">
+          <i class="fas fa-heart"></i> &nbsp;Explore
+        </a>
+      </div>
+    </div>
+    <div class="scroll-indicator">
+      <div class="scroll-mouse"><div class="scroll-wheel"></div></div>
+      <p>Scroll Down</p>
+    </div>
+  </section>
+
+  <!-- ====== ABOUT HER ====== -->
+  <section class="about-section" id="about">
+    <div class="section-header reveal">
+      <p class="section-label"><i class="fas fa-star"></i> The Star of My Life</p>
+      <h2 class="section-title">About Her</h2>
+      <div class="title-ornament"><i class="fas fa-heart"></i></div>
+    </div>
+    <div class="about-container">
+      <div class="about-image-wrap reveal">
+        <div class="about-image-ring"></div>
+        <div class="about-image-ring ring2"></div>
+        <div class="about-avatar">
+          <i class="fas fa-crown"></i>
+          <span class="avatar-letter">A</span>
+        </div>
+        <div class="about-badge"><i class="fas fa-heart"></i> My Queen</div>
+      </div>
+      <div class="about-text reveal">
+        <h3>Anushka — My Universe 🌸</h3>
+        <p>
+          You are not just a name to me, Anushka. You are the warmth of the morning sun,
+          the calmness of a starry night, and the poetry that lives in every breath I take.
+          Your smile? It's literally the most beautiful thing I've ever seen — more beautiful
+          than the best sunset, more magical than any song I've ever sung.
+        </p>
+        <p>
+          You are the kind of person that makes the whole world feel like a better place
+          just by being in it. Your laughter is my favorite sound. Your happiness is my
+          biggest motivation. You are my muse, my melody, and my home.
+        </p>
+        <div class="about-traits">
+          <div class="trait"><i class="fas fa-star"></i><span>Radiant</span></div>
+          <div class="trait"><i class="fas fa-heart"></i><span>Kind Soul</span></div>
+          <div class="trait"><i class="fas fa-magic"></i><span>Magical</span></div>
+          <div class="trait"><i class="fas fa-sun"></i><span>My Sunshine</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== REASONS ====== -->
+  <section class="reasons-section" id="reasons">
+    <div class="section-header reveal">
+      <p class="section-label"><i class="fas fa-heart"></i> From Swapnadip's Heart</p>
+      <h2 class="section-title">Why I Love You</h2>
+      <div class="title-ornament"><i class="fas fa-heart"></i></div>
+    </div>
+    <div class="reasons-grid">
+      <div class="reason-card reveal">
+        <div class="reason-icon"><i class="fas fa-smile-beam"></i></div>
+        <h4>Your Smile</h4>
+        <p>Your smile lights up every dark corner of my world. It's my favorite thing to wake up thinking about.</p>
+      </div>
+      <div class="reason-card reveal">
+        <div class="reason-icon"><i class="fas fa-brain"></i></div>
+        <h4>Your Mind</h4>
+        <p>The way you think, the way you see the world — it's extraordinary. You inspire me every single day.</p>
+      </div>
+      <div class="reason-card reveal">
+        <div class="reason-icon"><i class="fas fa-dove"></i></div>
+        <h4>Your Kindness</h4>
+        <p>You have the gentlest, most beautiful heart I have ever known. The world is better with your kindness in it.</p>
+      </div>
+      <div class="reason-card reveal">
+        <div class="reason-icon"><i class="fas fa-music"></i></div>
+        <h4>You're My Melody</h4>
+        <p>Every song I sing finds its soul because of you. You are the music that plays in my heart, always.</p>
+      </div>
+      <div class="reason-card reveal">
+        <div class="reason-icon"><i class="fas fa-hand-holding-heart"></i></div>
+        <h4>Your Care</h4>
+        <p>The way you care about everything and everyone around you makes me fall for you deeper every day.</p>
+      </div>
+      <div class="reason-card reveal">
+        <div class="reason-icon"><i class="fas fa-infinity"></i></div>
+        <h4>Everything About You</h4>
+        <p>I could write a thousand reasons and still not be done. I love you — completely, infinitely, forever.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== FLOATING HEARTS DIVIDER ====== -->
+  <div class="hearts-divider">
+    <i class="fas fa-heart h1"></i>
+    <i class="fas fa-heart h2"></i>
+    <i class="fas fa-heart h3"></i>
+    <i class="fas fa-heart h4"></i>
+    <i class="fas fa-heart h5"></i>
+  </div>
+
+  <!-- ====== TIMELINE ====== -->
+  <section class="timeline-section" id="timeline">
+    <div class="section-header reveal">
+      <p class="section-label"><i class="fas fa-infinity"></i> Our Journey</p>
+      <h2 class="section-title">Our Story</h2>
+      <div class="title-ornament"><i class="fas fa-heart"></i></div>
+    </div>
+    <div class="timeline">
+      <div class="timeline-item left reveal">
+        <div class="timeline-dot"><i class="fas fa-star"></i></div>
+        <div class="timeline-content">
+          <span class="timeline-date"><i class="fas fa-calendar-heart"></i> The Beginning</span>
+          <h4>The Day My World Changed</h4>
+          <p>The first time I saw you, something shifted inside me. Like a song finding its first note — everything made sense when you appeared.</p>
+        </div>
+      </div>
+      <div class="timeline-item right reveal">
+        <div class="timeline-dot"><i class="fas fa-music"></i></div>
+        <div class="timeline-content">
+          <span class="timeline-date"><i class="fas fa-calendar-heart"></i> Growing Closer</span>
+          <h4>Every Moment With You</h4>
+          <p>Every conversation, every laugh, every shared moment — I was silently falling more in love with you with each passing day.</p>
+        </div>
+      </div>
+      <div class="timeline-item left reveal">
+        <div class="timeline-dot"><i class="fas fa-heart"></i></div>
+        <div class="timeline-content">
+          <span class="timeline-date"><i class="fas fa-calendar-heart"></i> The Realization</span>
+          <h4>I Knew It Was You</h4>
+          <p>I realized that you are not just someone I like. You are the person I want to be with, to grow with, to love endlessly.</p>
+        </div>
+      </div>
+      <div class="timeline-item right reveal">
+        <div class="timeline-dot"><i class="fas fa-ring"></i></div>
+        <div class="timeline-content">
+          <span class="timeline-date"><i class="fas fa-calendar-heart"></i> Today — April 2026</span>
+          <h4>This Moment ✨</h4>
+          <p>Today, I gather all the courage in my heart — to tell you, to show you, to ask you the most important question of my life...</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== MUSIC SECTION ====== -->
+  <section class="music-section" id="music">
+    <div class="music-bg-overlay"></div>
+    <div class="section-header reveal">
+      <p class="section-label"><i class="fas fa-music"></i> Swapnadip Sings For You</p>
+      <h2 class="section-title">A Song For You</h2>
+      <div class="title-ornament"><i class="fas fa-heart"></i></div>
+    </div>
+    <div class="music-player reveal">
+      <div class="vinyl-wrap">
+        <div class="vinyl" id="vinyl">
+          <div class="vinyl-center">
+            <i class="fas fa-music"></i>
+          </div>
+        </div>
+      </div>
+      <div class="player-info">
+        <h3 class="song-title">Tumi Amar Shopno</h3>
+        <p class="song-artist"><i class="fas fa-microphone"></i> Swapnadip Ghosh — Sung just for Anushka</p>
+        <div class="lyrics-box">
+          <div class="lyrics-scroll" id="lyricsScroll">
+            <p>🎵 তুমি আমার স্বপ্ন, তুমি আমার গান,</p>
+            <p>তোমাকে ভালোবাসি, এটাই আমার প্রাণ।</p>
+            <p>প্রতিটি সুরে তোমার কথা ভাবি,</p>
+            <p>তোমাকে ছাড়া আমি কিছুই নাহি।</p>
+            <br/>
+            <p>You are my dream, you are my song,</p>
+            <p>I love you, that's where I belong.</p>
+            <p>In every melody, I think of you,</p>
+            <p>Without you, nothing feels true.</p>
+            <br/>
+            <p>🎵 আনুশকা — আমার হৃদয়ের রানী,</p>
+            <p>তোমার নামেই আমার জীবনের মানি।</p>
+            <p>Anushka — queen of my heart,</p>
+            <p>I've loved you right from the start. 🎵</p>
+          </div>
+        </div>
+        <div class="music-controls">
+          <button class="music-btn" id="playBtn" onclick="toggleMusic()">
+            <i class="fas fa-play" id="playIcon"></i>
+          </button>
+          <div class="equalizer" id="equalizer">
+            <div class="bar"></div><div class="bar"></div><div class="bar"></div>
+            <div class="bar"></div><div class="bar"></div>
+          </div>
+        </div>
+        <p class="music-note"><i class="fas fa-info-circle"></i> Add your audio file as <strong>song.mp3</strong> to the folder to play your actual song!</p>
+      </div>
+    </div>
+    <!-- Audio element -->
+    <audio id="bgAudio" loop>
+      <source src="song.mp3" type="audio/mpeg"/>
+    </audio>
+  </section>
+
+  <!-- ====== PROPOSAL SECTION ====== -->
+  <section class="propose-section" id="propose">
+    <div class="propose-bg-overlay"></div>
+    <div class="propose-particles" id="proposeParticles"></div>
+    <div class="propose-container reveal">
+      <div class="ring-animation">
+        <div class="ring-outer"><i class="fas fa-ring ring-icon"></i></div>
+        <div class="ring-glow"></div>
+      </div>
+      <p class="propose-from"><i class="fas fa-heart"></i> From Swapnadip Ghosh</p>
+      <h2 class="propose-title">Anushka,</h2>
+      <div class="propose-message">
+        <p>
+          I am just a singer who codes by night and sings by day — but every song, every line of code,
+          every dream I have — it all has your name written on it.
+        </p>
+        <p>
+          You are the most beautiful, the most kind, the most extraordinary person I have ever known.
+          And I don't want to spend a single day of my life without you in it.
+        </p>
+        <p class="propose-big-text">
+          Will you be my girlfriend?<br/>
+          <span>Will you be mine — forever? 💕</span>
+        </p>
+      </div>
+      <div class="propose-buttons" id="proposeButtons">
+        <button class="btn-yes" id="yesBtn" onclick="sayYes()">
+          <i class="fas fa-heart"></i> Yes, Forever! 💕
+        </button>
+        <button class="btn-no" id="noBtn" onmouseover="runAway(this)" ontouchstart="runAway(this)">
+          <i class="fas fa-times"></i> No
+        </button>
+      </div>
+      <div class="celebrate-message" id="celebrateMessage">
+        <div class="firework-container" id="fireworks"></div>
+        <div class="celebrate-text">
+          <i class="fas fa-heart"></i>
+          <h3>She Said YES! 💕</h3>
+          <p>My heart just exploded with happiness! I love you, Anushka, with every single beat of my heart. This is the best day of my entire life! 🥺💕</p>
+          <div class="celebrate-icons">
+            <i class="fas fa-heart"></i>
+            <i class="fas fa-music"></i>
+            <i class="fas fa-star"></i>
+            <i class="fas fa-heart"></i>
+            <i class="fas fa-ring"></i>
+            <i class="fas fa-heart"></i>
+          </div>
+          <p class="forever-text">— Swapnadip loves Anushka — Forever & Always 💕</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== FOOTER ====== -->
+  <footer class="footer">
+    <div class="footer-hearts">
+      <i class="fas fa-heart"></i>
+      <i class="fas fa-heart"></i>
+      <i class="fas fa-heart"></i>
+    </div>
+    <p class="footer-text">
+      Made with <i class="fas fa-heart footer-heart-icon"></i> &amp; Code by
+      <strong>Swapnadip Ghosh</strong> for <strong>Anushka</strong>
+    </p>
+    <p class="footer-sub">
+      <i class="fas fa-music"></i> Singer &nbsp;|&nbsp; <i class="fas fa-code"></i> Coder &nbsp;|&nbsp; <i class="fas fa-heart"></i> Your Lover
+    </p>
+    <p class="footer-copy">💕 Always &amp; Forever — 2026</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
