@@ -799,6 +799,70 @@ section { padding: 100px 5%; position: relative; }
 .footer-sub { color: var(--text-muted); margin-bottom: 20px; }
 .footer-copy { font-family: var(--font-cursive); font-size: 1.5rem; color: var(--secondary-color); }
 
+/* ====== ABOUT PHOTO ====== */
+/* (Using CSS avatar - no image needed) */
+
+/* ====== BIRTHDAY SECTION ====== */
+.birthday-section { position: relative; overflow: hidden; background: radial-gradient(circle at center, #1a0a2e 0%, var(--bg-dark) 100%); }
+.birthday-bg-particles { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
+.birthday-card { max-width: 600px; margin: 0 auto; background: var(--glass-bg); border: 1px solid var(--glass-border); padding: 50px 40px; border-radius: 30px; text-align: center; backdrop-filter: blur(15px); box-shadow: var(--glass-shadow), 0 0 40px rgba(162,57,202,0.15); }
+.birthday-avatar-wrap { width: 150px; height: 150px; margin: 0 auto 20px; position: relative; }
+.birthday-avatar { width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(135deg, var(--glass-bg), rgba(255,77,133,0.2)); border: 3px solid var(--primary-color); box-shadow: 0 0 25px rgba(255,77,133,0.4); display: flex; justify-content: center; align-items: center; }
+.birthday-avatar-letter { font-family: var(--font-cursive); font-size: 5rem; color: #fff; text-shadow: 0 0 20px var(--primary-color); }
+.birthday-crown { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); color: #ffd700; font-size: 1.5rem; text-shadow: 0 0 10px rgba(255,215,0,0.8); animation: float 3s ease-in-out infinite; z-index: 2; }
+.birthday-name { font-family: var(--font-cursive); font-size: 3rem; color: var(--primary-color); margin-bottom: 10px; }
+.birthday-date { color: var(--text-muted); font-size: 1.1rem; margin-bottom: 5px; }
+.birthday-age { color: #ffd700; font-size: 1.2rem; font-weight: bold; margin-bottom: 30px; }
+.countdown-container { display: flex; justify-content: center; gap: 15px; margin: 20px 0; flex-wrap: wrap; }
+.countdown-item { background: rgba(255,77,133,0.1); border: 1px solid rgba(255,77,133,0.3); border-radius: 15px; padding: 15px 20px; min-width: 80px; }
+.countdown-number { display: block; font-family: var(--font-heading); font-size: 2.5rem; color: #fff; line-height: 1; }
+.countdown-label { font-size: 0.75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 2px; }
+.countdown-separator { font-size: 2.5rem; color: var(--primary-color); display: flex; align-items: center; font-weight: bold; }
+.birthday-wish { margin-top: 20px; font-family: var(--font-serif); font-size: 1.1rem; color: var(--text-muted); font-style: italic; }
+
+/* ====== LOVE LETTER ====== */
+.letter-section { background: radial-gradient(circle at 30% 50%, #1a0a2e 0%, var(--bg-dark) 100%); }
+.letter-container { max-width: 700px; margin: 0 auto; text-align: center; }
+.letter-paper { background: linear-gradient(145deg, #1e0a28, #150820); border: 1px solid rgba(255,77,133,0.15); border-radius: 20px; padding: 50px 40px; position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05); }
+.letter-seal { width: 60px; height: 60px; background: linear-gradient(135deg, var(--primary-color), #c0392b); border-radius: 50%; display: flex; justify-content: center; align-items: center; margin: -80px auto 20px; font-size: 1.5rem; color: #fff; box-shadow: 0 5px 20px rgba(255,77,133,0.5); border: 3px solid rgba(255,255,255,0.2); }
+.letter-date { color: var(--text-muted); font-size: 0.9rem; text-align: right; margin-bottom: 20px; }
+.letter-greeting { font-family: var(--font-cursive); font-size: 2.5rem; color: var(--primary-color); margin-bottom: 25px; text-align: left; }
+.letter-body { text-align: left; font-family: var(--font-serif); font-size: 1.1rem; color: #ddd; line-height: 1.9; min-height: 200px; font-style: italic; }
+.letter-body .typewriter-cursor { display: inline-block; width: 2px; height: 1.2em; background: var(--primary-color); animation: blink 0.8s infinite; vertical-align: text-bottom; margin-left: 2px; }
+@keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: 0; } }
+.letter-signature { text-align: right; margin-top: 30px; color: var(--text-muted); }
+.letter-sign { font-family: var(--font-cursive); font-size: 2rem; color: var(--primary-color); margin-top: 5px; }
+.letter-replay-btn { margin-top: 20px; padding: 10px 25px; border-radius: 20px; background: var(--glass-bg); border: 1px solid var(--glass-border); color: var(--text-light); font-family: var(--font-body); font-size: 0.9rem; transition: var(--transition); display: inline-flex; align-items: center; gap: 8px; }
+.letter-replay-btn:hover { background: rgba(255,77,133,0.2); border-color: var(--primary-color); transform: translateY(-2px); }
+
+/* ====== QUOTES CAROUSEL ====== */
+.quotes-section { background: var(--bg-dark); }
+.quotes-carousel { max-width: 700px; margin: 0 auto; position: relative; min-height: 280px; }
+.quote-card { position: absolute; top: 0; left: 0; right: 0; background: var(--glass-bg); border: 1px solid var(--glass-border); border-radius: 25px; padding: 50px 40px; text-align: center; backdrop-filter: blur(10px); opacity: 0; transform: translateX(60px) scale(0.95); transition: all 0.6s cubic-bezier(0.25,0.8,0.25,1); pointer-events: none; }
+.quote-card.active { opacity: 1; transform: translateX(0) scale(1); pointer-events: auto; }
+.quote-icon { font-size: 2rem; color: var(--secondary-color); margin-bottom: 20px; opacity: 0.5; }
+.quote-text { font-family: var(--font-serif); font-size: 1.3rem; color: #eee; font-style: italic; line-height: 1.8; margin-bottom: 20px; }
+.quote-author { color: var(--primary-color); font-weight: bold; font-size: 0.95rem; }
+.quotes-dots { display: flex; justify-content: center; gap: 10px; margin-top: 300px; }
+.quotes-dots .dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,77,133,0.3); transition: var(--transition); cursor: pointer; border: none; }
+.quotes-dots .dot.active { background: var(--primary-color); box-shadow: 0 0 10px var(--primary-color); transform: scale(1.2); }
+.quotes-nav { position: absolute; top: 50%; width: 100%; display: flex; justify-content: space-between; transform: translateY(-50%); padding: 0 -20px; pointer-events: none; }
+.quote-nav-btn { width: 40px; height: 40px; border-radius: 50%; border: 1px solid var(--glass-border); background: var(--glass-bg); color: var(--text-light); display: flex; justify-content: center; align-items: center; transition: var(--transition); pointer-events: auto; margin: 0 -20px; }
+.quote-nav-btn:hover { background: rgba(255,77,133,0.2); border-color: var(--primary-color); }
+
+/* ====== CONFESSION ====== */
+.confession-section { position: relative; overflow: hidden; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 100px 5%; background: radial-gradient(circle at 50% 50%, #1a0520 0%, var(--bg-dark) 100%); }
+.confession-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('night_sky_bg.png') no-repeat center center/cover; opacity: 0.15; }
+.confession-container { max-width: 750px; background: var(--glass-bg); border: 1px solid rgba(255,77,133,0.15); border-radius: 30px; padding: 60px 45px; backdrop-filter: blur(20px); box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 60px rgba(255,77,133,0.08); position: relative; z-index: 2; }
+.confession-icon { text-align: center; font-size: 3rem; color: var(--primary-color); margin-bottom: 15px; animation: heartbeat 2s infinite; }
+.confession-title { font-family: var(--font-heading); font-size: 3rem; text-align: center; color: #fff; margin-bottom: 30px; }
+.confession-content p { font-family: var(--font-serif); font-size: 1.15rem; color: #ddd; line-height: 1.9; margin-bottom: 20px; text-align: center; }
+.confession-content strong { color: var(--primary-color); font-style: italic; }
+.confession-promise { font-size: 1.4rem !important; color: #fff !important; font-weight: bold; padding: 20px; background: rgba(255,77,133,0.08); border-radius: 15px; border: 1px solid rgba(255,77,133,0.2); margin-top: 30px !important; }
+.confession-sign { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,77,133,0.15); }
+.confession-sign p:first-child { font-family: var(--font-cursive); font-size: 2.2rem; color: var(--primary-color); }
+.confession-subtitle { color: var(--text-muted); margin-top: 5px; }
+
 /* ====== REVEAL ANIMATIONS ====== */
 .reveal { opacity: 0; transform: translateY(50px); transition: all 0.8s ease-out; }
 .reveal.active { opacity: 1; transform: translateY(0); }
@@ -812,14 +876,16 @@ section { padding: 100px 5%; position: relative; }
   .timeline-item { width: 100%; padding-left: 80px; padding-right: 20px; }
   .timeline-item.right { left: 0; }
   .timeline-item.left .timeline-dot, .timeline-item.right .timeline-dot { left: 11px; }
+  .quotes-carousel { min-height: 350px; }
+  .quotes-dots { margin-top: 370px; }
 }
 @media (max-width: 768px) {
   .hero-name { font-size: 5rem; }
   .nav-links {
-    position: fixed; top: 0; right: -100%; width: 70%; height: 100vh;
+    position: fixed; top: 0; right: -100%; width: 80%; height: 100vh;
     background: rgba(15, 5, 20, 0.95); backdrop-filter: blur(10px);
     flex-direction: column; justify-content: center; align-items: center;
-    transition: 0.5s ease-in-out;
+    transition: 0.5s ease-in-out; gap: 15px;
   }
   .nav-links.active { right: 0; }
   .hamburger { display: flex; z-index: 1001; }
@@ -827,4 +893,12 @@ section { padding: 100px 5%; position: relative; }
   .hamburger.active span:nth-child(2) { opacity: 0; }
   .hamburger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
   .propose-title { font-size: 3.5rem; }
+  .section-title { font-size: 2.5rem; }
+  .letter-paper { padding: 40px 25px; }
+  .letter-greeting { font-size: 2rem; }
+  .confession-container { padding: 40px 25px; }
+  .confession-title { font-size: 2.2rem; }
+  .countdown-number { font-size: 1.8rem; }
+  .quote-card { padding: 40px 25px; }
+  .quote-text { font-size: 1.1rem; }
 }

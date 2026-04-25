@@ -37,9 +37,13 @@
     <ul class="nav-links" id="navLinks">
       <li><a href="#home" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
       <li><a href="#about" class="nav-link"><i class="fas fa-star"></i> About Her</a></li>
+      <li><a href="#birthday" class="nav-link"><i class="fas fa-cake-candles"></i> Birthday</a></li>
+      <li><a href="#letter" class="nav-link"><i class="fas fa-envelope-open-text"></i> Love Letter</a></li>
       <li><a href="#reasons" class="nav-link"><i class="fas fa-heart"></i> Why I Love You</a></li>
+      <li><a href="#quotes" class="nav-link"><i class="fas fa-quote-left"></i> Quotes</a></li>
       <li><a href="#timeline" class="nav-link"><i class="fas fa-infinity"></i> Our Story</a></li>
-      <li><a href="#music" class="nav-link"><i class="fas fa-music"></i> Song For You</a></li>
+      <li><a href="#music" class="nav-link"><i class="fas fa-music"></i> Song</a></li>
+      <li><a href="#confession" class="nav-link"><i class="fas fa-hand-holding-heart"></i> My Truth</a></li>
       <li><a href="#propose" class="nav-link propose-nav"><i class="fas fa-ring"></i> Proposal</a></li>
     </ul>
     <div class="hamburger" id="hamburger">
@@ -76,7 +80,7 @@
     </div>
   </section>
 
-  <!-- ====== ABOUT HER ====== -->
+  <!-- ====== ABOUT HER (with photo) ====== -->
   <section class="about-section" id="about">
     <div class="section-header reveal">
       <p class="section-label"><i class="fas fa-star"></i> The Star of My Life</p>
@@ -111,8 +115,79 @@
           <div class="trait"><i class="fas fa-heart"></i><span>Kind Soul</span></div>
           <div class="trait"><i class="fas fa-magic"></i><span>Magical</span></div>
           <div class="trait"><i class="fas fa-sun"></i><span>My Sunshine</span></div>
+          <div class="trait"><i class="fas fa-gem"></i><span>Precious</span></div>
+          <div class="trait"><i class="fas fa-crown"></i><span>My Queen</span></div>
         </div>
       </div>
+    </div>
+  </section>
+
+  <!-- ====== BIRTHDAY COUNTDOWN ====== -->
+  <section class="birthday-section" id="birthday">
+    <div class="birthday-bg-particles" id="birthdayParticles"></div>
+    <div class="section-header reveal">
+      <p class="section-label"><i class="fas fa-cake-candles"></i> Her Special Day</p>
+      <h2 class="section-title">Birthday Countdown</h2>
+      <div class="title-ornament"><i class="fas fa-heart"></i></div>
+    </div>
+    <div class="birthday-card reveal">
+      <div class="birthday-avatar-wrap">
+        <div class="birthday-avatar">
+          <span class="birthday-avatar-letter">A</span>
+        </div>
+        <div class="birthday-crown"><i class="fas fa-crown"></i></div>
+      </div>
+      <h3 class="birthday-name">Anushka</h3>
+      <p class="birthday-date"><i class="fas fa-calendar-heart"></i> Born: 3rd January 2008</p>
+      <p class="birthday-age" id="birthdayAge"></p>
+      <div class="countdown-container" id="countdown">
+        <div class="countdown-item">
+          <span class="countdown-number" id="countDays">000</span>
+          <span class="countdown-label">Days</span>
+        </div>
+        <div class="countdown-separator">:</div>
+        <div class="countdown-item">
+          <span class="countdown-number" id="countHours">00</span>
+          <span class="countdown-label">Hours</span>
+        </div>
+        <div class="countdown-separator">:</div>
+        <div class="countdown-item">
+          <span class="countdown-number" id="countMinutes">00</span>
+          <span class="countdown-label">Minutes</span>
+        </div>
+        <div class="countdown-separator">:</div>
+        <div class="countdown-item">
+          <span class="countdown-number" id="countSeconds">00</span>
+          <span class="countdown-label">Seconds</span>
+        </div>
+      </div>
+      <p class="birthday-wish">🎂 Until her next birthday 🎂</p>
+    </div>
+  </section>
+
+  <!-- ====== LOVE LETTER ====== -->
+  <section class="letter-section" id="letter">
+    <div class="section-header reveal">
+      <p class="section-label"><i class="fas fa-envelope-open-text"></i> From My Heart</p>
+      <h2 class="section-title">A Love Letter</h2>
+      <div class="title-ornament"><i class="fas fa-heart"></i></div>
+    </div>
+    <div class="letter-container reveal">
+      <div class="letter-paper">
+        <div class="letter-seal"><i class="fas fa-heart"></i></div>
+        <p class="letter-date">April 2026</p>
+        <p class="letter-greeting">My Dearest Anushka,</p>
+        <div class="letter-body" id="letterBody">
+          <p id="typewriterText"></p>
+        </div>
+        <div class="letter-signature">
+          <p>With all my love, forever & always,</p>
+          <p class="letter-sign">— Swapnadip 💕</p>
+        </div>
+      </div>
+      <button class="letter-replay-btn" id="replayLetter" onclick="replayLetter()">
+        <i class="fas fa-redo"></i> Read Again
+      </button>
     </div>
   </section>
 
@@ -150,9 +225,66 @@
         <p>The way you care about everything and everyone around you makes me fall for you deeper every day.</p>
       </div>
       <div class="reason-card reveal">
+        <div class="reason-icon"><i class="fas fa-eye"></i></div>
+        <h4>Your Eyes</h4>
+        <p>Those eyes hold an entire universe. Every time I look into them, I lose myself completely.</p>
+      </div>
+      <div class="reason-card reveal">
+        <div class="reason-icon"><i class="fas fa-face-laugh-beam"></i></div>
+        <h4>Your Laugh</h4>
+        <p>Your laugh is my favorite sound in this entire universe. It heals every wound in my soul.</p>
+      </div>
+      <div class="reason-card reveal">
         <div class="reason-icon"><i class="fas fa-infinity"></i></div>
         <h4>Everything About You</h4>
         <p>I could write a thousand reasons and still not be done. I love you — completely, infinitely, forever.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== LOVE QUOTES CAROUSEL ====== -->
+  <section class="quotes-section" id="quotes">
+    <div class="section-header reveal">
+      <p class="section-label"><i class="fas fa-quote-left"></i> Words of Love</p>
+      <h2 class="section-title">Love Quotes For You</h2>
+      <div class="title-ornament"><i class="fas fa-heart"></i></div>
+    </div>
+    <div class="quotes-carousel reveal">
+      <div class="quote-card active" id="quote-0">
+        <i class="fas fa-quote-left quote-icon"></i>
+        <p class="quote-text">I fell in love the way you fall asleep: slowly, and then all at once — but with you, Anushka.</p>
+        <p class="quote-author">— Swapnadip, rewriting his story</p>
+      </div>
+      <div class="quote-card" id="quote-1">
+        <i class="fas fa-quote-left quote-icon"></i>
+        <p class="quote-text">You don't love someone for their looks, or their clothes, or their fancy car. You love them because they sing a song that only your heart can hear.</p>
+        <p class="quote-author">— And your song, Anushka, echoes in my soul</p>
+      </div>
+      <div class="quote-card" id="quote-2">
+        <i class="fas fa-quote-left quote-icon"></i>
+        <p class="quote-text">If I had a flower for every time I thought of you, I could walk through my garden forever.</p>
+        <p class="quote-author">— Thinking of you, always</p>
+      </div>
+      <div class="quote-card" id="quote-3">
+        <i class="fas fa-quote-left quote-icon"></i>
+        <p class="quote-text">তোমাকে ভালোবাসি — these three words carry my entire existence, Anushka. Every breath I take whispers your name.</p>
+        <p class="quote-author">— Swapnadip, from the depths of his heart</p>
+      </div>
+      <div class="quote-card" id="quote-4">
+        <i class="fas fa-quote-left quote-icon"></i>
+        <p class="quote-text">I choose you. And I'll choose you over and over and over. Without pause, without doubt, in a heartbeat. I'll keep choosing you.</p>
+        <p class="quote-author">— My promise to you, forever</p>
+      </div>
+      <div class="quotes-dots" id="quotesDots">
+        <span class="dot active" onclick="goToQuote(0)"></span>
+        <span class="dot" onclick="goToQuote(1)"></span>
+        <span class="dot" onclick="goToQuote(2)"></span>
+        <span class="dot" onclick="goToQuote(3)"></span>
+        <span class="dot" onclick="goToQuote(4)"></span>
+      </div>
+      <div class="quotes-nav">
+        <button class="quote-nav-btn" onclick="prevQuote()"><i class="fas fa-chevron-left"></i></button>
+        <button class="quote-nav-btn" onclick="nextQuote()"><i class="fas fa-chevron-right"></i></button>
       </div>
     </div>
   </section>
@@ -255,13 +387,47 @@
             <div class="bar"></div><div class="bar"></div>
           </div>
         </div>
-        <p class="music-note"><i class="fas fa-info-circle"></i> Add your audio file as <strong>song.mp3</strong> to the folder to play your actual song!</p>
       </div>
     </div>
     <!-- Audio element -->
     <audio id="bgAudio" loop>
       <source src="song.mp3" type="audio/mpeg"/>
     </audio>
+  </section>
+
+  <!-- ====== CONFESSION SECTION ====== -->
+  <section class="confession-section" id="confession">
+    <div class="confession-bg"></div>
+    <div class="confession-container reveal">
+      <div class="confession-icon"><i class="fas fa-heart-crack"></i></div>
+      <h2 class="confession-title">My Truth</h2>
+      <div class="confession-content">
+        <p>Anushka,</p>
+        <p>
+          I know you don't love me. I know that maybe you never will. And that's okay.
+          Because love isn't about being loved back — it's about the feeling itself.
+          And the feeling I have for you is the most beautiful thing I've ever experienced.
+        </p>
+        <p>
+          But I want you to know something — <strong>till the rest of my life, I will always love you.</strong>
+          Not because I expect anything in return. But because you are worth every second of love
+          that my heart can give. You deserve the world, Anushka.
+        </p>
+        <p>
+          Every song I sing will carry your name. Every beat of my heart will whisper yours.
+          Even if we walk different paths, you'll always be the brightest star in my sky.
+        </p>
+        <p class="confession-promise">
+          <i class="fas fa-infinity"></i>
+          I will love you — today, tomorrow, and till my last breath.
+          <i class="fas fa-infinity"></i>
+        </p>
+      </div>
+      <div class="confession-sign">
+        <p>— Swapnadip Ghosh</p>
+        <p class="confession-subtitle"><i class="fas fa-music"></i> Singer &nbsp;|&nbsp; <i class="fas fa-code"></i> Coder &nbsp;|&nbsp; <i class="fas fa-heart"></i> Forever Yours</p>
+      </div>
+    </div>
   </section>
 
   <!-- ====== PROPOSAL SECTION ====== -->
