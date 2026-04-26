@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" style="stop-color:#2a081a;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#0f0514;stop-opacity:1"/>
+    </radialGradient>
+    <linearGradient id="heartGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ff4d85;stop-opacity:1"/>
+      <stop offset="100%" style="stop-color:#a239ca;stop-opacity:1"/>
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2.5" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="50" fill="url(#bgGrad)"/>
+  <!-- Heart shape -->
+  <path d="M50 75 C50 75 20 55 20 35 C20 22 30 15 40 18 C44 19 48 22 50 26 C52 22 56 19 60 18 C70 15 80 22 80 35 C80 55 50 75 50 75Z"
+        fill="url(#heartGrad)" filter="url(#glow)"/>
+  <!-- Letter A in center -->
+  <text x="50" y="52" font-family="Georgia,serif" font-size="22" font-weight="bold"
+        fill="white" text-anchor="middle" dominant-baseline="middle"
+        style="filter:drop-shadow(0 0 3px rgba(255,77,133,0.8))">A</text>
+</svg>
