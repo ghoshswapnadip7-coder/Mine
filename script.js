@@ -13,14 +13,27 @@ window.addEventListener('load', () => {
 const cursor = document.getElementById('cursor');
 const cursorTrail = document.getElementById('cursorTrail');
 
+let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+let cursorX = mouseX, cursorY = mouseY;
+let trailX = mouseX, trailY = mouseY;
+
 document.addEventListener('mousemove', (e) => {
-  cursor.style.left = e.clientX + 'px';
-  cursor.style.top = e.clientY + 'px';
-  setTimeout(() => {
-    cursorTrail.style.left = e.clientX + 'px';
-    cursorTrail.style.top = e.clientY + 'px';
-  }, 100);
-});
+  mouseX = e.clientX;
+  mouseY = e.clientY;
+}, { passive: true });
+
+function animateCursor() {
+  cursorX += (mouseX - cursorX) * 0.5;
+  cursorY += (mouseY - cursorY) * 0.5;
+  trailX += (mouseX - trailX) * 0.15;
+  trailY += (mouseY - trailY) * 0.15;
+  
+  if (cursor) cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+  if (cursorTrail) cursorTrail.style.transform = `translate3d(${trailX}px, ${trailY}px, 0) translate(-50%, -50%)`;
+  
+  requestAnimationFrame(animateCursor);
+}
+requestAnimationFrame(animateCursor);
 
 const interactiveElements = document.querySelectorAll('a, button, .nav-logo, .trait, .dot, .quote-nav-btn');
 interactiveElements.forEach(el => {
@@ -33,9 +46,16 @@ const navbar = document.getElementById('navbar');
 const hamburger = document.getElementById('hamburger');
 const navLinks = document.getElementById('navLinks');
 
+let isScrolling = false;
 window.addEventListener('scroll', () => {
-  navbar.classList.toggle('scrolled', window.scrollY > 50);
-});
+  if (!isScrolling) {
+    window.requestAnimationFrame(() => {
+      navbar.classList.toggle('scrolled', window.scrollY > 50);
+      isScrolling = false;
+    });
+    isScrolling = true;
+  }
+}, { passive: true });
 
 hamburger.addEventListener('click', () => {
   hamburger.classList.toggle('active');
@@ -50,15 +70,16 @@ navLinks.querySelectorAll('a').forEach(link => {
 });
 
 // ====== REVEAL ANIMATIONS ======
-function reveal() {
-  document.querySelectorAll('.reveal').forEach(el => {
-    if (el.getBoundingClientRect().top < window.innerHeight - 100) {
-      el.classList.add('active');
+const revealElements = document.querySelectorAll('.reveal');
+const revealObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('active');
     }
   });
-}
-window.addEventListener('scroll', reveal);
-reveal();
+}, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+
+revealElements.forEach(el => revealObserver.observe(el));
 
 // ====== CANVAS HEARTS (Upgraded with stars) ======
 const canvas = document.getElementById('heartCanvas');
@@ -256,13 +277,15 @@ const vinyl = document.getElementById('vinyl');
 const equalizer = document.getElementById('equalizer');
 const lyricsScroll = document.getElementById('lyricsScroll');
 
+let lyricsAnimationId;
 function toggleMusic() {
   if (isPlaying) {
     bgAudio.pause();
     playIcon.className = 'fas fa-play';
     vinyl.classList.remove('playing');
     equalizer.classList.remove('active');
-    lyricsScroll.style.transform = 'translateY(0)';
+    cancelAnimationFrame(lyricsAnimationId);
+    lyricsScroll.style.transform = 'translate3d(0, 0, 0)';
   } else {
     bgAudio.play().catch(e => console.log("Audio play blocked", e));
     playIcon.className = 'fas fa-pause';
@@ -276,12 +299,14 @@ function toggleMusic() {
 function scrollLyrics() {
   if (!isPlaying) return;
   let pos = 0;
-  const interval = setInterval(() => {
-    if (!isPlaying) { clearInterval(interval); return; }
-    pos -= 0.5;
-    lyricsScroll.style.transform = `translateY(${pos}px)`;
+  function animate() {
+    if (!isPlaying) return;
+    pos -= 0.2;
+    lyricsScroll.style.transform = `translate3d(0, ${pos}px, 0)`;
     if (pos < -200) pos = 50;
-  }, 100);
+    lyricsAnimationId = requestAnimationFrame(animate);
+  }
+  lyricsAnimationId = requestAnimationFrame(animate);
 }
 
 // ====== PROPOSAL LOGIC ======
