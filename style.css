@@ -20,7 +20,7 @@
   padding: 0;
   box-sizing: border-box;
   scroll-behavior: smooth;
-  cursor: none; /* Custom cursor */
+  cursor: none !important;
 }
 
 body {
@@ -80,6 +80,13 @@ body {
   z-index: 9998;
   box-shadow: 0 0 8px var(--primary-color);
   will-change: transform;
+  /* Hidden: custom cursor disabled in favour of native cursor */
+  display: none !important;
+}
+
+/* Custom cursor ring also hidden */
+.cursor {
+  display: none !important;
 }
 
 /* ====== LOADER ====== */
@@ -719,26 +726,37 @@ section { padding: 100px 5%; position: relative; }
 .song-title { font-family: var(--font-heading); font-size: 2rem; color: #fff; margin-bottom: 5px; }
 .song-artist { color: var(--primary-color); font-weight: bold; margin-bottom: 20px; font-size: 1.1rem; }
 .lyrics-box {
-  background: rgba(0,0,0,0.3);
-  border-radius: 10px;
-  padding: 15px;
-  height: 120px;
-  overflow-y: hidden;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(12px);
+  border-radius: 20px;
+  padding: 22px;
+  height: 250px;
+  overflow-y: auto;
   position: relative;
   margin-bottom: 25px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 105, 180, 0.25);
+  box-shadow: 0 0 25px rgba(255, 105, 180, 0.25), inset 0 0 15px rgba(255, 105, 180, 0.15);
+  transition: 0.4s ease;
+  scroll-behavior: auto; /* Required for requestAnimationFrame scrolling to avoid jumpiness */
 }
-.lyrics-box::after {
-  content: '';
-  position: absolute;
-  bottom: 0; left: 0; width: 100%; height: 30px;
-  background: linear-gradient(transparent, rgba(15, 5, 20, 0.9));
+.lyrics-box:hover {
+  box-shadow: 0 0 40px rgba(255, 105, 180, 0.5), inset 0 0 20px rgba(255, 105, 180, 0.25);
+}
+.lyrics-box::-webkit-scrollbar {
+  width: 6px;
+}
+.lyrics-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+.lyrics-box::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(255,105,180,0.9), rgba(255,105,180,0.4));
+  border-radius: 10px;
 }
 .lyrics-scroll {
-  transition: transform 0.5s linear;
   text-align: center;
   font-style: italic;
   color: #ddd;
+  padding-bottom: 20px;
 }
 .music-controls { display: flex; align-items: center; gap: 30px; }
 .music-btn {
@@ -984,6 +1002,13 @@ section { padding: 100px 5%; position: relative; }
   .propose-title { font-size: 3.5rem; }
   .section-title { font-size: 2.5rem; }
   .bengali-title { font-size: 1.8rem !important; }
+  
+  /* Music Section Phone Adjustments */
+  .music-player { padding: 25px 20px; gap: 20px; flex-direction: column; text-align: center; }
+  .vinyl-wrap { width: 180px; height: 180px; margin: 0 auto; }
+  .lyrics-box { height: 200px; padding: 15px; }
+  .music-controls { justify-content: center; }
+  
   .story-container { padding: 30px 20px; }
   .letter-paper { padding: 40px 25px; }
   .letter-greeting { font-size: 2rem; }
@@ -992,4 +1017,624 @@ section { padding: 100px 5%; position: relative; }
   .countdown-number { font-size: 1.8rem; }
   .quote-card { padding: 40px 25px; }
   .quote-text { font-size: 1.1rem; }
+  .final-choice-container { padding: 40px 20px; }
+  .final-choice-title { font-size: 2rem; }
+  .btn-keep, .btn-fade { width: 100%; }
+}
+
+/* ====== FINAL CHOICE SECTION ====== */
+.final-choice-section { position: relative; padding: 100px 5%; background: radial-gradient(circle at center, #1a0a2e 0%, var(--bg-dark) 100%); text-align: center; overflow: hidden; }
+.final-choice-container { max-width: 700px; margin: 0 auto; background: var(--glass-bg); border: 1px solid rgba(255, 77, 133, 0.2); padding: 50px 40px; border-radius: 20px; box-shadow: 0 15px 35px rgba(0,0,0,0.5), 0 0 20px rgba(255, 77, 133, 0.1); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); position: relative; z-index: 2; }
+.final-choice-title { font-family: var(--font-heading); font-size: 3rem; color: #fff; margin-bottom: 20px; text-shadow: 0 0 15px rgba(255, 77, 133, 0.4); }
+.final-choice-content p { font-family: var(--font-serif); font-size: 1.2rem; color: #ddd; line-height: 1.8; margin-bottom: 30px; font-style: italic; }
+.final-buttons { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
+.btn-keep, .btn-fade { padding: 12px 30px; border-radius: 25px; font-family: var(--font-body); font-size: 1.1rem; border: none; cursor: pointer; transition: var(--transition); font-weight: bold; }
+.btn-keep { background: linear-gradient(45deg, #a239ca, #ff4d85); color: #fff; box-shadow: 0 5px 15px rgba(162, 57, 202, 0.4); }
+.btn-keep:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(162, 57, 202, 0.6); }
+.btn-fade { background: transparent; border: 1px solid rgba(255, 255, 255, 0.3); color: var(--text-muted); }
+.btn-fade:hover { background: rgba(255, 255, 255, 0.05); color: #fff; border-color: rgba(255, 255, 255, 0.6); transform: translateY(-2px); }
+.keep-message { margin-top: 20px; animation: popIn 0.8s forwards; }
+.keep-message p { font-family: var(--font-serif); font-size: 1.3rem; color: var(--primary-color); font-style: italic; line-height: 1.6; text-shadow: 0 0 10px rgba(255, 77, 133, 0.3); }
+
+/* ====== FADE OUT SCREEN ====== */
+.fade-out-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 9999; display: flex; justify-content: center; align-items: center; text-align: center; opacity: 0; pointer-events: none; transition: opacity 4s ease; }
+.fade-out-screen.active { opacity: 1; pointer-events: auto; }
+.fade-out-text { padding: 40px; }
+.fade-out-text p { font-family: var(--font-serif); font-size: 1.2rem; color: #aaa; line-height: 1.8; margin-bottom: 25px; opacity: 0; transform: translateY(20px); transition: opacity 2s ease, transform 2s ease; }
+.fade-out-text p.visible { opacity: 1; transform: translateY(0); }
+.fade-out-text p:last-child { margin-bottom: 0; color: #fff; font-style: italic; }
+
+/* ====== VIEW ONCE SCREEN ====== */
+.view-once-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0a030f; z-index: 20000; display: flex; justify-content: center; align-items: center; text-align: center; }
+.view-once-content { padding: 40px; animation: popIn 1s forwards; }
+.view-once-content p { font-family: var(--font-serif); font-size: 1.5rem; color: #ddd; line-height: 1.8; margin-bottom: 20px; font-style: italic; }
+.view-once-content p:nth-child(2) { color: var(--primary-color); margin-bottom: 40px; }
+.btn-open-again { background: transparent; border: 1px solid rgba(255, 77, 133, 0.5); color: #fff; padding: 12px 30px; border-radius: 30px; font-family: var(--font-body); font-size: 1.1rem; cursor: pointer; transition: var(--transition); }
+.btn-open-again:hover { background: rgba(255, 77, 133, 0.2); border-color: var(--primary-color); transform: translateY(-3px); box-shadow: 0 5px 15px rgba(255, 77, 133, 0.3); }
+
+
+/* ===== Cinematic Lyrics Box ===== */
+/* Moved to the main music section styles */
+
+/* Lyrics text cinematic spacing */
+.lyrics-scroll p {
+  font-size: 15px;
+  line-height: 1.9;
+  letter-spacing: 0.4px;
+
+  color: rgba(255,255,255,0.92);
+
+  margin: 6px 0;
+
+  text-shadow:
+      0 0 6px rgba(255,105,180,0.4);
+}
+
+.cinematic-line {
+    opacity: 0;
+    transform: translateY(40px);
+    animation: fadeLine 1.2s ease forwards;
+    margin: 14px 0;
+    font-size: 18px;
+    line-height: 1.8;
+}
+
+.cinematic-line:nth-child(1) { animation-delay: 0.4s; }
+.cinematic-line:nth-child(2) { animation-delay: 0.8s; }
+.cinematic-line:nth-child(3) { animation-delay: 1.2s; }
+.cinematic-line:nth-child(4) { animation-delay: 1.6s; }
+.cinematic-line:nth-child(5) { animation-delay: 2.0s; }
+.cinematic-line:nth-child(6) { animation-delay: 2.4s; }
+.cinematic-line:nth-child(7) { animation-delay: 2.8s; }
+.cinematic-line:nth-child(8) { animation-delay: 3.2s; }
+.cinematic-line:nth-child(9) { animation-delay: 3.6s; }
+.cinematic-line:nth-child(10) { animation-delay: 4.0s; }
+.cinematic-line:nth-child(11) { animation-delay: 4.4s; }
+.cinematic-line:nth-child(12) { animation-delay: 4.8s; }
+.cinematic-line:nth-child(13) { animation-delay: 5.2s; }
+.cinematic-line:nth-child(14) { animation-delay: 5.6s; }
+.cinematic-line:nth-child(15) { animation-delay: 6.0s; }
+.cinematic-line:nth-child(16) { animation-delay: 6.4s; }
+.cinematic-line:nth-child(17) { animation-delay: 6.8s; }
+.cinematic-line:nth-child(18) { animation-delay: 7.2s; }
+.cinematic-line:nth-child(19) { animation-delay: 7.6s; }
+.cinematic-line:nth-child(20) { animation-delay: 8.0s; }
+.cinematic-line:nth-child(21) { animation-delay: 8.4s; }
+.cinematic-line:nth-child(22) { animation-delay: 8.8s; }
+.cinematic-line:nth-child(23) { animation-delay: 9.2s; }
+.cinematic-line:nth-child(24) { animation-delay: 9.6s; }
+.cinematic-line:nth-child(25) { animation-delay: 10.0s; }
+.cinematic-line:nth-child(26) { animation-delay: 10.4s; }
+.cinematic-line:nth-child(27) { animation-delay: 10.8s; }
+.cinematic-line:nth-child(28) { animation-delay: 11.2s; }
+.cinematic-line:nth-child(29) { animation-delay: 11.6s; }
+.cinematic-line:nth-child(30) { animation-delay: 12.0s; }
+
+@keyframes fadeLine {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.destroy-screen {
+    position: fixed;
+    inset: 0;
+    background: black;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 40px;
+    font-size: 20px;
+    line-height: 1.8;
+    animation: fadeIn 2s ease;
+    z-index: 999999;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* ====================================================
+   ONE LAST SMILE — FINAL SCREEN
+   ==================================================== */
+
+/* --- Blackout overlay (cinematic exit) --- */
+#olsBlackout {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 999998; /* below cursor (999999), above everything else */
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#olsBlackout.active {
+  opacity: 1;
+  pointer-events: all;
+}
+
+/* Pink center glow that appears during blackout */
+#olsBlackout::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) scale(0);
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,78,205,0.55) 0%, transparent 70%);
+  filter: blur(28px);
+  transition: transform 1s cubic-bezier(0.4, 0, 0.2, 1), opacity 1s ease;
+  opacity: 0;
+}
+#olsBlackout.glow-pulse::after {
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 1;
+}
+
+/* --- Final screen layout --- */
+#bdScreenFinal {
+  overflow: hidden;
+}
+
+/* Ambient glow blob — slow drift behind text */
+.ols-glow-blob {
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  width: 480px;
+  height: 480px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at center,
+    rgba(255, 78, 205, 0.18) 0%,
+    rgba(168, 85, 247, 0.12) 45%,
+    transparent 70%);
+  filter: blur(40px);
+  pointer-events: none;
+  animation: olsBlobDrift 8s ease-in-out infinite alternate;
+}
+@keyframes olsBlobDrift {
+  0%   { transform: translate(-50%, -50%) scale(1);    opacity: 0.7; }
+  50%  { transform: translate(-48%, -52%) scale(1.08); opacity: 1;   }
+  100% { transform: translate(-52%, -48%) scale(0.95); opacity: 0.6; }
+}
+
+/* Vignette — darkened edges for cinematic feel */
+.ols-vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center,
+    transparent 40%,
+    rgba(0, 0, 0, 0.55) 100%);
+}
+
+/* Content wrapper */
+.ols-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0;
+}
+
+/* --- Line-by-line staggered animation --- */
+/* Each .ols-line starts hidden (opacity+blur+translateY) */
+.ols-line {
+  opacity: 0;
+  filter: blur(6px);
+  transform: translateY(14px);
+  transition: none; /* transitions set by JS when screen becomes active */
+}
+
+/* Triggered by JS adding .ols-active to #bdScreenFinal */
+#bdScreenFinal.ols-active .ols-line-1 {
+  opacity: 1; filter: blur(0); transform: translateY(0) scale(1);
+  transition: opacity 1.1s ease 0.3s, filter 1.1s ease 0.3s, transform 1.1s ease 0.3s;
+}
+#bdScreenFinal.ols-active .ols-line-2 {
+  opacity: 1; filter: blur(0); transform: translateY(0);
+  transition: opacity 1s ease 0.9s, filter 1s ease 0.9s, transform 1s ease 0.9s;
+}
+#bdScreenFinal.ols-active .ols-line-3 {
+  opacity: 1; filter: blur(0); transform: translateY(0);
+  transition: opacity 1s ease 1.5s, filter 1s ease 1.5s, transform 1s ease 1.5s;
+}
+#bdScreenFinal.ols-active .ols-line-4 {
+  opacity: 1; filter: blur(0); transform: translateY(0);
+  transition: opacity 0.9s ease 2.1s, filter 0.9s ease 2.1s, transform 0.9s ease 2.1s;
+}
+#bdScreenFinal.ols-active .ols-line-5 {
+  opacity: 1; filter: blur(0); transform: translateY(0);
+  transition: opacity 0.8s ease 2.8s, filter 0.8s ease 2.8s, transform 0.8s ease 2.8s;
+}
+
+/* Ornament override for final screen */
+.ols-ornament {
+  margin-bottom: 2.2rem;
+  font-size: 0.7rem;
+  letter-spacing: 5px;
+  color: rgba(255, 78, 205, 0.55);
+}
+
+/* Heading — extra glow for final screen */
+.ols-heading {
+  font-size: clamp(3rem, 9vw, 6.5rem) !important;
+  letter-spacing: -0.5px;
+  margin-bottom: 2rem;
+  text-shadow: 0 0 40px rgba(255, 78, 205, 0.4),
+               0 0 80px rgba(168, 85, 247, 0.2);
+}
+
+/* Sub text — slightly smaller, softer */
+.ols-sub {
+  font-size: clamp(1.05rem, 2.2vw, 1.3rem) !important;
+  margin-bottom: 0.8rem;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+/* Supporting line */
+.ols-support {
+  font-size: clamp(0.95rem, 1.8vw, 1.15rem) !important;
+  margin-bottom: 2.6rem;
+  color: rgba(255, 255, 255, 0.45);
+  font-style: italic;
+}
+
+/* Button override */
+.ols-btn {
+  padding: 16px 54px !important;
+  font-size: 1.1rem !important;
+  letter-spacing: 0.8px;
+  margin-bottom: 3rem;
+}
+
+/* Signature */
+.ols-signature {
+  font-family: var(--font-cursive);
+  font-size: 1.3rem;
+  color: rgba(255, 78, 205, 0.35);
+  letter-spacing: 1px;
+  margin: 0;
+}
+
+/* Slight zoom-in animation on final screen content */
+@keyframes olsZoom {
+  from { transform: scale(0.97); }
+  to   { transform: scale(1); }
+}
+#bdScreenFinal.ols-active .ols-content {
+  animation: olsZoom 3s cubic-bezier(0.4, 0, 0.2, 1) both;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .ols-heading   { font-size: 2.8rem !important; }
+  .ols-glow-blob { width: 280px; height: 280px; }
+  .ols-btn       { padding: 14px 36px !important; }
+}
+
+/* ====================================================
+   BIRTHDAY GIFT FLOW — CINEMATIC OVERLAY
+   ==================================================== */
+
+/* --- Container --- */
+#birthdayFlow {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: var(--bg-dark);
+  overflow: hidden;
+  transition: opacity 1.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+#birthdayFlow.bd-exiting {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* --- Particle canvas behind screens --- */
+#bdCanvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* --- Individual screens --- */
+.bd-screen {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 2.5rem 1.5rem;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.85s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(18px) scale(0.98);
+}
+
+.bd-screen.active {
+  opacity: 1;
+  pointer-events: all;
+  transform: translateY(0) scale(1);
+}
+
+.bd-screen.exiting {
+  opacity: 0;
+  transform: translateY(-18px) scale(0.98);
+  pointer-events: none;
+}
+
+/* --- Decorative top icon --- */
+.bd-icon {
+  font-size: 2.8rem;
+  margin-bottom: 1.4rem;
+  color: var(--primary-color);
+  text-shadow: 0 0 22px rgba(255, 77, 133, 0.7);
+  animation: bdIconPulse 2.8s ease-in-out infinite;
+}
+
+@keyframes bdIconPulse {
+  0%, 100% { transform: scale(1);   text-shadow: 0 0 22px rgba(255,77,133,0.7); }
+  50%       { transform: scale(1.15); text-shadow: 0 0 40px rgba(255,77,133,1);   }
+}
+
+/* --- Main heading --- */
+.bd-heading {
+  font-family: var(--font-cursive);
+  font-size: clamp(2.6rem, 7vw, 5rem);
+  background: linear-gradient(135deg, #ffb3c6 0%, var(--primary-color) 50%, var(--secondary-color) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.15;
+  margin-bottom: 1.6rem;
+  text-shadow: none;
+  max-width: 780px;
+}
+
+/* --- Body text --- */
+.bd-text {
+  font-family: var(--font-serif);
+  font-size: clamp(1.1rem, 2.5vw, 1.45rem);
+  color: var(--text-muted);
+  line-height: 1.85;
+  max-width: 660px;
+  margin: 0 auto 2.4rem;
+  font-style: italic;
+}
+
+.bd-text + .bd-text {
+  margin-top: -1.6rem;
+}
+
+/* --- Next / action button --- */
+.bd-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 40px;
+  border: none;
+  border-radius: 50px;
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  cursor: none;
+  color: #fff;
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  box-shadow: 0 8px 24px rgba(255, 77, 133, 0.35),
+              0 0 0 0 rgba(255, 77, 133, 0);
+  transition: transform 0.3s ease,
+              box-shadow 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.bd-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  border-radius: inherit;
+}
+
+.bd-btn:hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow: 0 14px 32px rgba(255, 77, 133, 0.55),
+              0 0 30px rgba(162, 57, 202, 0.3);
+}
+
+.bd-btn:hover::before { opacity: 1; }
+
+.bd-btn span { position: relative; z-index: 1; }
+.bd-btn i    { position: relative; z-index: 1; transition: transform 0.3s ease; }
+.bd-btn:hover i { transform: translateX(4px); }
+
+/* --- Screen-specific accent ornament --- */
+.bd-ornament {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 1.8rem;
+  color: var(--secondary-color);
+  opacity: 0.6;
+  font-size: 0.75rem;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.bd-ornament::before,
+.bd-ornament::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  max-width: 80px;
+  background: linear-gradient(90deg, transparent, var(--secondary-color), transparent);
+}
+
+/* --- Final screen special styles --- */
+#bdScreenFinal .bd-heading {
+  font-family: var(--font-heading);
+  font-size: clamp(2rem, 5vw, 3.2rem);
+}
+
+.bd-enter-btn {
+  padding: 16px 52px;
+  font-size: 1.15rem;
+  animation: bdGlowPulse 2s ease-in-out infinite;
+}
+
+@keyframes bdGlowPulse {
+  0%, 100% { box-shadow: 0 8px 24px rgba(255,77,133,0.35), 0 0 0 0 rgba(255,77,133,0); }
+  50%       { box-shadow: 0 12px 32px rgba(255,77,133,0.6), 0 0 20px rgba(162,57,202,0.4); }
+}
+
+/* --- Step counter dots --- */
+#bdDots {
+  position: absolute;
+  bottom: 36px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 2;
+}
+
+.bd-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transition: background 0.4s ease, transform 0.4s ease;
+}
+
+.bd-dot.active {
+  background: var(--primary-color);
+  transform: scale(1.4);
+  box-shadow: 0 0 8px var(--primary-color);
+}
+
+/* --- Music tap prompt --- */
+#bdMusicPrompt {
+  position: absolute;
+  top: 22px;
+  right: 24px;
+  z-index: 3;
+  display: none;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
+  padding: 10px 22px;
+  border-radius: 30px;
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  cursor: none;
+  transition: var(--transition);
+  animation: bdSlideDown 0.6s ease forwards;
+}
+
+#bdMusicPrompt:hover {
+  background: rgba(255, 77, 133, 0.15);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+
+@keyframes bdSlideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* --- Responsive --- */
+@media (max-width: 600px) {
+  .bd-heading { font-size: 2.2rem; }
+  .bd-text    { font-size: 1.05rem; }
+  .bd-btn     { padding: 13px 32px; font-size: 0.95rem; }
+  #bdDots     { bottom: 24px; }
+}
+
+/* ====================================================
+   CUSTOM CURSOR — glowing pink/purple circle
+   Placed at z-index 999999 so it sits above the
+   birthday overlay (#birthdayFlow z-index: 99999)
+   ==================================================== */
+
+/* Hide native cursor on all elements */
+html, body, * {
+  cursor: none !important;
+}
+
+/* The glow circle element */
+.custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 999999;
+  background: radial-gradient(circle at 40% 40%, #ff4ecd, #a855f7);
+  box-shadow:
+    0 0 10px #ff4ecd,
+    0 0 22px #a855f7,
+    0 0 44px rgba(168, 85, 247, 0.6);
+  will-change: transform;
+  opacity: 0;          /* starts invisible; JS reveals on first mousemove */
+  /* Only transition glow and opacity — size + position handled by JS */
+  transition: box-shadow 0.2s ease, opacity 0.3s ease;
+}
+
+/* Hover: JS lerps scale to 1.7×; CSS only intensifies the glow */
+.custom-cursor.hovering {
+  box-shadow:
+    0 0 14px #ff4ecd,
+    0 0 32px #a855f7,
+    0 0 64px rgba(168, 85, 247, 0.85);
+}
+
+/* Mobile / touch devices — restore native cursor, hide glow dot */
+@media (hover: none) and (pointer: coarse) {
+  html, body, * { cursor: auto !important; }
+  .custom-cursor { display: none !important; }
+}
+
+/* ====================================================
+   BIRTHDAY FLOW — button hover glow polish
+   ==================================================== */
+.bd-btn {
+  transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease !important;
+}
+
+.bd-btn:hover,
+.bd-btn:focus-visible {
+  transform: translateY(-3px) scale(1.05) !important;
+  box-shadow: 0 12px 32px rgba(255, 77, 133, 0.55),
+              0 0 20px rgba(162, 57, 202, 0.35) !important;
+  outline: none;
+}
+
+.bd-btn:active {
+  transform: translateY(-1px) scale(1.02) !important;
+}
+
+/* Tap highlight off on mobile */
+.bd-btn {
+  -webkit-tap-highlight-color: transparent;
 }

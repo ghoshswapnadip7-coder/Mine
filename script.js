@@ -1,3 +1,25 @@
+// ====== AUTO CLEAR OLD LOCK DATA ======
+localStorage.removeItem('siteDestroyed');
+
+// ====== DESTROY AND VIEW ONCE LOGIC ======
+const destroyScreen = document.getElementById('destroyScreen');
+const viewOnceScreen = document.getElementById('viewOnceScreen');
+
+if (false && localStorage.getItem('siteDestroyed') === 'true') {
+  if (destroyScreen) destroyScreen.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+} else if (localStorage.getItem('hasVisited') === 'true' && !sessionStorage.getItem('allowAccess')) {
+  if (viewOnceScreen) viewOnceScreen.style.display = 'flex';
+  document.body.style.overflow = 'hidden';
+} else {
+  localStorage.setItem('hasVisited', 'true');
+}
+
+function openAgain() {
+  sessionStorage.setItem('allowAccess', 'true');
+  location.reload();
+}
+
 // ====== LOADER ======
 window.addEventListener('load', () => {
   setTimeout(() => {
@@ -17,29 +39,36 @@ let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
 let cursorX = mouseX, cursorY = mouseY;
 let trailX = mouseX, trailY = mouseY;
 
-document.addEventListener('mousemove', (e) => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-}, { passive: true });
+const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-function animateCursor() {
-  cursorX += (mouseX - cursorX) * 0.5;
-  cursorY += (mouseY - cursorY) * 0.5;
-  trailX += (mouseX - trailX) * 0.15;
-  trailY += (mouseY - trailY) * 0.15;
-  
-  if (cursor) cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
-  if (cursorTrail) cursorTrail.style.transform = `translate3d(${trailX}px, ${trailY}px, 0) translate(-50%, -50%)`;
-  
+if (!isTouchDevice) {
+  document.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  }, { passive: true });
+
+  function animateCursor() {
+    cursorX += (mouseX - cursorX) * 0.5;
+    cursorY += (mouseY - cursorY) * 0.5;
+    trailX += (mouseX - trailX) * 0.15;
+    trailY += (mouseY - trailY) * 0.15;
+    
+    if (cursor) cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+    if (cursorTrail) cursorTrail.style.transform = `translate3d(${trailX}px, ${trailY}px, 0) translate(-50%, -50%)`;
+    
+    requestAnimationFrame(animateCursor);
+  }
   requestAnimationFrame(animateCursor);
-}
-requestAnimationFrame(animateCursor);
 
-const interactiveElements = document.querySelectorAll('a, button, .nav-logo, .trait, .dot, .quote-nav-btn');
-interactiveElements.forEach(el => {
-  el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
-  el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
-});
+  const interactiveElements = document.querySelectorAll('a, button, .nav-logo, .trait, .dot, .quote-nav-btn');
+  interactiveElements.forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
+  });
+} else {
+  if (cursor) cursor.style.display = 'none';
+  if (cursorTrail) cursorTrail.style.display = 'none';
+}
 
 // ====== NAVBAR & HAMBURGER ======
 const navbar = document.getElementById('navbar');
@@ -175,17 +204,17 @@ updateCountdown();
 setInterval(updateCountdown, 1000);
 
 // ====== LOVE LETTER TYPEWRITER ======
-const letterText = `There are so many things I want to say to you, but words always feel too small for what I feel.
+const letterText = `Anushka,
 
-From the moment you came into my world, everything changed. The songs I sing suddenly had meaning. The code I write suddenly had purpose. Because everything I do, I do thinking of you.
+I've held onto these words for so long, partly because I didn't know how to say them, and partly because I didn't want to ruin whatever small space I had in your life.
 
-I know the world is big and complicated, and I know I'm just a simple boy who sings and codes. But my love for you? It's anything but simple. It's vast like the ocean, deep like the night sky, and eternal like the stars.
+It all started in Class 9. I remember seeing you standing in front of Ayan sir's batch. It wasn't anything cinematic, just a quiet moment that somehow anchored itself in my mind. By the time Class 10 results came out, we were talking. Those conversations stretched into hours, and without me even noticing, you became the quiet comfort of my everyday life. 
 
-You may not feel the same way about me, and I understand that. But I want you to know — you are loved. Deeply. Unconditionally. Forever.
+When I finally told you how I felt, the misunderstanding that followed hurt more than I can explain. The distance grew. I remember that day you were eating fuchka with the others, and I was sitting across the road, shaking, unable to stand, crying silently onto a friend's shoulder. The tightness in my chest was unbearable. I tried so hard to move on after that, but I never truly forgot you.
 
-You are the most beautiful soul I have ever encountered. And till my last breath, your name will be the song my heart sings.
+Then the gym brought us close again. It was the only place I could see you every day, and I held onto that routine because, outside of it, you never really needed me. I know you know how I feel. And I know sometimes my presence bothers you, like when you complained about me just looking at you. I never meant to make you uncomfortable.
 
-I love you, Anushka. Today, tomorrow, and for every day after that. 💕`;
+I just loved you—silently and patiently. I never asked you to love me back. I only wished to stay somewhere in your world.`;
 
 let letterIndex = 0;
 let letterStarted = false;
@@ -275,9 +304,28 @@ const bgAudio = document.getElementById('bgAudio');
 const playIcon = document.getElementById('playIcon');
 const vinyl = document.getElementById('vinyl');
 const equalizer = document.getElementById('equalizer');
-const lyricsScroll = document.getElementById('lyricsScroll');
+const lyricsBox = document.querySelector('.lyrics-box');
 
 let lyricsAnimationId;
+let exactScrollTop = 0;
+let isUserScrolling = false;
+let userScrollTimeout;
+
+if (lyricsBox) {
+  lyricsBox.addEventListener('wheel', handleUserScroll, {passive: true});
+  lyricsBox.addEventListener('touchstart', handleUserScroll, {passive: true});
+  lyricsBox.addEventListener('touchmove', handleUserScroll, {passive: true});
+}
+
+function handleUserScroll() {
+  isUserScrolling = true;
+  if (lyricsBox) exactScrollTop = lyricsBox.scrollTop;
+  clearTimeout(userScrollTimeout);
+  userScrollTimeout = setTimeout(() => {
+    isUserScrolling = false;
+  }, 2500); // Resume auto-scroll after 2.5s of inactivity
+}
+
 function toggleMusic() {
   if (isPlaying) {
     bgAudio.pause();
@@ -285,25 +333,37 @@ function toggleMusic() {
     vinyl.classList.remove('playing');
     equalizer.classList.remove('active');
     cancelAnimationFrame(lyricsAnimationId);
-    lyricsScroll.style.transform = 'translate3d(0, 0, 0)';
   } else {
     bgAudio.play().catch(e => console.log("Audio play blocked", e));
     playIcon.className = 'fas fa-pause';
     vinyl.classList.add('playing');
     equalizer.classList.add('active');
+    if (lyricsBox) exactScrollTop = lyricsBox.scrollTop;
     scrollLyrics();
   }
   isPlaying = !isPlaying;
 }
 
 function scrollLyrics() {
-  if (!isPlaying) return;
-  let pos = 0;
+  if (!isPlaying || !lyricsBox) return;
+
   function animate() {
     if (!isPlaying) return;
-    pos -= 0.2;
-    lyricsScroll.style.transform = `translate3d(0, ${pos}px, 0)`;
-    if (pos < -200) pos = 50;
+    
+    if (!isUserScrolling) {
+      exactScrollTop += 0.3; // Cinematic scroll speed
+      
+      // Loop back if reached the bottom
+      if (exactScrollTop + lyricsBox.clientHeight >= lyricsBox.scrollHeight - 2) {
+        exactScrollTop = 0;
+      }
+      
+      lyricsBox.scrollTop = exactScrollTop;
+    } else {
+      // Keep exactScrollTop in sync when user is scrolling
+      exactScrollTop = lyricsBox.scrollTop;
+    }
+    
     lyricsAnimationId = requestAnimationFrame(animate);
   }
   lyricsAnimationId = requestAnimationFrame(animate);
@@ -349,4 +409,134 @@ function createFireworks(container) {
     setTimeout(() => { h.style.top = '100%'; h.style.opacity = '0'; }, 50);
     setTimeout(() => h.remove(), 3050);
   }, 300);
+}
+
+// ====== FINAL CHOICE LOGIC ======
+function keepStory() {
+  const finalButtons = document.getElementById('finalButtons');
+  const finalContentP = document.querySelector('#finalChoiceContent p');
+  const keepMessage = document.getElementById('keepMessage');
+  
+  if (finalButtons) finalButtons.style.display = 'none';
+  if (finalContentP) finalContentP.style.display = 'none';
+  if (keepMessage) keepMessage.style.display = 'block';
+}
+
+function fadeAway() {
+  // Set permanent lock (Temporarily disabled for testing)
+  // localStorage.setItem('siteDestroyed', 'true');
+
+  // Show the fade screen
+  const fadeScreen = document.getElementById('fadeOutScreen');
+  if (fadeScreen) fadeScreen.classList.add('active');
+  
+  // Fade out hearts
+  const canvas = document.getElementById('heartCanvas');
+  if (canvas) {
+    canvas.style.transition = 'opacity 3s ease';
+    canvas.style.opacity = '0';
+  }
+  
+  // Stop music
+  if (isPlaying) {
+    toggleMusic(); // Stops and resets vinyl/equalizer
+  } else {
+    const bgAudio = document.getElementById('bgAudio');
+    if (bgAudio) bgAudio.pause();
+  }
+  
+  // Disable scrolling
+  document.body.style.overflow = 'hidden';
+  
+  // Show messages sequentially
+  setTimeout(() => {
+    const p1 = document.getElementById('fadeText1');
+    const p2 = document.getElementById('fadeText2');
+    const p3 = document.getElementById('fadeText3');
+    
+    if (p1) setTimeout(() => p1.classList.add('visible'), 500);
+    if (p2) setTimeout(() => p2.classList.add('visible'), 3500);
+    if (p3) setTimeout(() => p3.classList.add('visible'), 7000);
+  }, 4000); // Wait until screen is mostly faded to black
+}
+// Auto Scroll Lyrics logic integrated into music player
+
+// ====== SYNC WITH BIRTHDAY FLOW MUSIC START ======
+window.addEventListener('bdMusicStarted', function () {
+  // Birthday overlay already called audio.play() and updated UI icons.
+  // Mark isPlaying=true so toggleMusic() won't double-play.
+  isPlaying = true;
+  // Start lyrics scroll animation since music is playing
+  if (lyricsBox) {
+    exactScrollTop = lyricsBox.scrollTop;
+    scrollLyrics();
+  }
+});
+
+// ====== EMAIL NOTIFICATION SYSTEM ======
+function sendDecisionEmail(type) {
+  let templateID;
+
+  if (type === "keep") {
+    templateID = "template_4j2me57";
+    console.log("KEEP email triggered");
+  }
+
+  if (type === "fade") {
+    templateID = "template_lsiglrr";
+    console.log("FADE email triggered");
+  }
+
+  if (window.emailjs) {
+    emailjs.send(
+      "service_k6r37m4",
+      templateID,
+      {
+        decision: type,
+        time: new Date().toLocaleString()
+      }
+    )
+    .then(function(response) {
+      console.log("Email sent successfully!");
+    })
+    .catch(function(error) {
+      console.log("Email failed", error);
+    });
+  } else {
+    console.log("EmailJS is not loaded.");
+  }
+}
+
+function showEmailConfirmation() {
+  let msg = document.getElementById("emailConfirmMsg");
+  if (!msg) {
+    msg = document.createElement("div");
+    msg.id = "emailConfirmMsg";
+    msg.textContent = "For a moment, something changed.";
+    msg.style.cssText = "position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%); background: rgba(0, 0, 0, 0.7); color: rgba(255, 255, 255, 0.9); padding: 12px 24px; border-radius: 30px; font-size: 0.95rem; z-index: 10000; opacity: 0; transition: opacity 1.5s ease; font-style: italic; border: 1px solid rgba(255, 255, 255, 0.15); backdrop-filter: blur(5px); pointer-events: none;";
+    document.body.appendChild(msg);
+  }
+  
+  // Trigger reflow and fade in
+  setTimeout(() => {
+    if (msg) msg.style.opacity = "1";
+  }, 50);
+}
+
+const keepBtn = document.getElementById("keepBtn");
+if (keepBtn) {
+  keepBtn.addEventListener("click", function () {
+    sendDecisionEmail("keep");
+    localStorage.setItem("decision", "keep");
+    showEmailConfirmation();
+  });
+}
+
+const fadeBtn = document.getElementById("fadeBtn");
+if (fadeBtn) {
+  fadeBtn.addEventListener("click", function () {
+    sendDecisionEmail("fade");
+    localStorage.setItem("decision", "fade");
+    showEmailConfirmation();
+  });
 }

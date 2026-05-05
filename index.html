@@ -25,8 +25,281 @@
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link rel="stylesheet" href="style.css"/>
+  <style>
+    /* ====================================================
+       DUAL-LAYER CURSOR — outer ring + inner dot
+       Both sit above every overlay (z-index ≥ 999999)
+       ==================================================== */
+
+    /* Hide native cursor everywhere */
+    html, body, * {
+      cursor: none !important;
+    }
+
+    /* ── Outer ring (trailing, glowing, transparent center) ── */
+    #customCursor {
+      position: fixed;
+      top: 0; left: 0;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 999999;
+      background: transparent;
+      border: 2px solid rgba(255, 45, 117, 0.85);
+      box-shadow:
+        0 0  8px rgba(255,  45, 117, 0.55),
+        0 0 18px rgba(255,  45, 117, 0.25),
+        0 0 28px rgba(168,  85, 247, 0.20),
+        inset 0 0 6px rgba(255, 45, 117, 0.08);
+      will-change: transform;
+      opacity: 0;
+      /* Only glow + opacity via CSS transition; size/position in JS */
+      transition: border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
+    }
+
+    /* Ring hover — brighter glow, wider border */
+    #customCursor.ring-hovering {
+      border-color: rgba(255, 45, 117, 1);
+      box-shadow:
+        0 0 14px rgba(255,  45, 117, 0.85),
+        0 0 30px rgba(255,  45, 117, 0.45),
+        0 0 50px rgba(168,  85, 247, 0.40);
+    }
+
+    /* ── Inner dot (near-instant, solid pink) ── */
+    #cursorDot {
+      position: fixed;
+      top: 0; left: 0;
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 1000000;   /* always above ring */
+      background: #ff2d75;
+      box-shadow:
+        0 0  6px rgba(255, 45, 117, 0.9),
+        0 0 12px rgba(255, 45, 117, 0.45);
+      will-change: transform;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    /* Dot hover — slightly larger */
+    #cursorDot.dot-hovering {
+      box-shadow:
+        0 0 10px rgba(255, 45, 117, 1),
+        0 0 22px rgba(255, 45, 117, 0.55);
+    }
+
+    /* Mobile / touch — restore native cursor, hide both layers */
+    @media (hover: none) and (pointer: coarse) {
+      html, body, * { cursor: auto !important; }
+      #customCursor, #cursorDot { display: none !important; }
+    }
+  </style>
 </head>
 <body>
+
+  <!-- Dual-layer cursor: outer trailing ring + inner instant dot -->
+  <div id="customCursor"></div>   <!-- outer ring -->
+  <div id="cursorDot"></div>      <!-- inner dot  -->
+
+
+  <!-- ====================================================
+       BIRTHDAY GIFT FLOW — CINEMATIC OVERLAY
+       Sits on top of everything. Fades out on "Enter".
+       ==================================================== -->
+  <div id="birthdayFlow">
+
+    <!-- Particle background for birthday screens -->
+    <canvas id="bdCanvas"></canvas>
+
+    <!-- Music tap-to-play fallback prompt -->
+    <button id="bdMusicPrompt" onclick="bdTapPlay()">
+      <i class="fas fa-music"></i>&nbsp; Tap to start music
+    </button>
+
+    <!-- === SCREEN 1 === -->
+    <div class="bd-screen active" id="bdScreen1">
+      <i class="bd-icon fas fa-gift"></i>
+      <div class="bd-ornament">3 January</div>
+      <h1 class="bd-heading">Hey&hellip; today is your day.</h1>
+      <p class="bd-text">
+        I didn&rsquo;t want to just text you like everyone else.<br>
+        So I made something.
+      </p>
+      <button class="bd-btn" onclick="bdStart()">
+        <span>Start</span> <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- === SCREEN 2 === -->
+    <div class="bd-screen" id="bdScreen2">
+      <i class="bd-icon fas fa-cake-candles"></i>
+      <div class="bd-ornament">For You</div>
+      <h2 class="bd-heading">Happy Birthday, Anushka.</h2>
+      <p class="bd-text">
+        Not just another year&hellip;<br>
+        but another version of you<br>
+        the world gets to become.
+      </p>
+      <button class="bd-btn" onclick="bdNext(2)">
+        <span>Next</span> <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- === SCREEN 3 === -->
+    <div class="bd-screen" id="bdScreen3">
+      <i class="bd-icon fas fa-heart"></i>
+      <div class="bd-ornament">Honestly</div>
+      <h2 class="bd-heading">You matter more than you probably realize.</h2>
+      <p class="bd-text">
+        I don&rsquo;t say this often.<br>
+        But it&rsquo;s true, and it needed to be said.
+      </p>
+      <button class="bd-btn" onclick="bdNext(3)">
+        <span>Continue</span> <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- === SCREEN 4 === -->
+    <div class="bd-screen" id="bdScreen4">
+      <i class="bd-icon fas fa-sun"></i>
+      <div class="bd-ornament">Today</div>
+      <h2 class="bd-heading">Today isn&rsquo;t about anything complicated.</h2>
+      <p class="bd-text">
+        No past. No confusion.
+      </p>
+      <p class="bd-text">
+        Just you.
+      </p>
+      <button class="bd-btn" onclick="bdNext(4)">
+        <span>Next</span> <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- === SCREEN 5 === -->
+    <div class="bd-screen" id="bdScreen5">
+      <i class="bd-icon fas fa-envelope-open-heart"></i>
+      <div class="bd-ornament">A Gift</div>
+      <h2 class="bd-heading">This is just something I wanted to give you.</h2>
+      <p class="bd-text">
+        No expectations attached to it.
+      </p>
+      <button class="bd-btn" onclick="bdNext(5)">
+        <span>See More</span> <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- === SCREEN 6 === -->
+    <div class="bd-screen" id="bdScreen6">
+      <i class="bd-icon fas fa-star"></i>
+      <div class="bd-ornament">Real Things</div>
+      <h2 class="bd-heading">Some things don&rsquo;t need to be loud to be real.</h2>
+      <p class="bd-text">
+        Quiet can still mean genuine.
+      </p>
+      <button class="bd-btn" onclick="bdNext(6)">
+        <span>Continue</span> <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- === SCREEN 7 === -->
+    <div class="bd-screen" id="bdScreen7">
+      <i class="bd-icon fas fa-dove"></i>
+      <div class="bd-ornament">Always</div>
+      <h2 class="bd-heading">So yeah&hellip; Happy Birthday.</h2>
+      <p class="bd-text">
+        I hope life gives you everything you deserve.<br>
+        And I genuinely mean that.
+      </p>
+      <button class="bd-btn" onclick="bdNext(7)">
+        <span>Finish</span> <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+
+    <!-- === FINAL SCREEN — "One Last Smile" === -->
+    <div class="bd-screen" id="bdScreenFinal">
+
+      <!-- Ambient glow blob (pure CSS, no extra JS) -->
+      <div class="ols-glow-blob"></div>
+
+      <!-- Vignette overlay -->
+      <div class="ols-vignette"></div>
+
+      <div class="ols-content">
+        <!-- Small ornament -->
+        <div class="bd-ornament ols-ornament">OneLastSmile</div>
+
+        <!-- Main heading -->
+        <h2 class="bd-heading ols-heading ols-line ols-line-1">
+          One Last Smile.
+        </h2>
+
+        <!-- Subheading -->
+        <p class="bd-text ols-sub ols-line ols-line-2">
+          This was never just a page&hellip;<br>
+          It was everything I couldn&rsquo;t say.
+        </p>
+
+        <!-- Supporting line -->
+        <p class="bd-text ols-support ols-line ols-line-3">
+          If this is where it ends,<br>
+          let it end with a smile.
+        </p>
+
+        <!-- CTA button -->
+        <button class="bd-btn bd-enter-btn ols-btn ols-line ols-line-4"
+                id="enterBtn" onclick="bdEnter()">
+          <span>One Last Smile</span>
+          <i class="fas fa-arrow-right"></i>
+        </button>
+
+        <!-- Signature -->
+        <p class="ols-signature ols-line ols-line-5">&mdash; OneLastSmile</p>
+      </div>
+
+    </div>
+
+    <!-- Step dots (screens 1–7, final not counted) -->
+    <div id="bdDots">
+      <span class="bd-dot active"></span>
+      <span class="bd-dot"></span>
+      <span class="bd-dot"></span>
+      <span class="bd-dot"></span>
+      <span class="bd-dot"></span>
+      <span class="bd-dot"></span>
+      <span class="bd-dot"></span>
+    </div>
+
+  </div><!-- /birthdayFlow -->
+
+  <!-- Full-screen blackout used for the cinematic exit transition -->
+  <div id="olsBlackout"></div>
+
+  <!-- ====== MAIN SITE — hidden until birthday flow completes ====== -->
+  <div id="mainSite" style="display:none;">
+
+  <!-- ====== VIEW ONCE SCREEN ====== -->
+  <div class="view-once-screen" id="viewOnceScreen" style="display: none;">
+    <div class="view-once-content">
+      <p>This story was meant to be seen once.</p>
+      <p>If you're here again,<br>maybe it already meant something.</p>
+      <button class="btn-open-again" onclick="openAgain()">Open Again</button>
+    </div>
+  </div>
+
+  <!-- ====== DESTROY SCREEN (PERMANENT LOCK) ====== -->
+  <div class="destroy-screen" id="destroyScreen" style="display: none;">
+    <div class="destroy-text">
+      <p>This page once held feelings<br>that were never meant to disappear.</p>
+      <br>
+      <p>But some stories are not meant to stay forever.</p>
+      <br>
+      <p>So this page faded away —<br>just like the moments I never got to keep.</p>
+    </div>
+  </div>
 
   <!-- ====== CANVAS PARTICLES ====== -->
   <canvas id="heartCanvas"></canvas>
@@ -76,14 +349,16 @@
       </p>
       <h1 class="hero-name fade-in-up" style="animation-delay:0.6s">Anushka</h1>
       <p class="hero-tagline fade-in-up" style="animation-delay:0.9s">
-        Every melody I sing, every line of code I write — it all leads back to you
+        I never asked you to love me.<br>
+        I only wished to stay somewhere in your world.<br>
+        This is just what I felt, honestly and quietly.
       </p>
       <div class="hero-from fade-in-up" style="animation-delay:1.2s">
-        <span>— With all the love in the universe, Swapnadip 💕</span>
+        <span>— Written patiently from my heart, Swapnadip</span>
       </div>
       <div class="hero-buttons fade-in-up" style="animation-delay:1.5s">
         <a href="#propose" class="btn-primary">
-          <i class="fas fa-ring"></i> &nbsp;Will You Be Mine?
+          <i class="fas fa-envelope"></i> &nbsp;A Message For You
         </a>
         <a href="#about" class="btn-secondary">
           <i class="fas fa-heart"></i> &nbsp;Explore
@@ -99,7 +374,7 @@
   <!-- ====== ABOUT HER (with photo) ====== -->
   <section class="about-section" id="about">
     <div class="section-header reveal">
-      <p class="section-label"><i class="fas fa-star"></i> The Star of My Life</p>
+      <p class="section-label"><i class="fas fa-star"></i> Someone Special</p>
       <h2 class="section-title">About Her</h2>
       <div class="title-ornament"><i class="fas fa-heart"></i></div>
     </div>
@@ -110,28 +385,25 @@
         <div class="about-avatar">
           <img src="anushka_portrait.png" alt="Anushka" class="about-portrait"/>
         </div>
-        <div class="about-badge"><i class="fas fa-heart"></i> My Queen</div>
+        <div class="about-badge"><i class="fas fa-heart"></i> Very Special</div>
       </div>
       <div class="about-text reveal">
-        <h3>Anushka — My Universe 🌸</h3>
+        <h3>Anushka</h3>
         <p>
-          You are not just a name to me, Anushka. You are the warmth of the morning sun,
-          the calmness of a starry night, and the poetry that lives in every breath I take.
-          Your smile? It's literally the most beautiful thing I've ever seen — more beautiful
-          than the best sunset, more magical than any song I've ever sung.
+          You became a part of my daily life before I even realized it. 
+          When we started talking more after the Class 10 results, those long conversations felt like the most normal and comforting part of my day.
         </p>
         <p>
-          You are the kind of person that makes the whole world feel like a better place
-          just by being in it. Your laughter is my favorite sound. Your happiness is my
-          biggest motivation. You are my muse, my melody, and my home.
+          You are sometimes kind, sometimes distant, and sometimes hard to understand. But I never hated you. 
+          I just learned to accept you exactly as you are, loving you silently and patiently.
         </p>
         <div class="about-traits">
-          <div class="trait"><i class="fas fa-star"></i><span>Radiant</span></div>
-          <div class="trait"><i class="fas fa-heart"></i><span>Kind Soul</span></div>
-          <div class="trait"><i class="fas fa-magic"></i><span>Magical</span></div>
-          <div class="trait"><i class="fas fa-sun"></i><span>My Sunshine</span></div>
+          <div class="trait"><i class="fas fa-star"></i><span>Genuine</span></div>
+          <div class="trait"><i class="fas fa-heart"></i><span>Kind</span></div>
+          <div class="trait"><i class="fas fa-magic"></i><span>Beautiful</span></div>
+          <div class="trait"><i class="fas fa-sun"></i><span>Bright</span></div>
           <div class="trait"><i class="fas fa-gem"></i><span>Precious</span></div>
-          <div class="trait"><i class="fas fa-crown"></i><span>My Queen</span></div>
+          <div class="trait"><i class="fas fa-crown"></i><span>Thoughtful</span></div>
         </div>
       </div>
     </div>
@@ -176,7 +448,7 @@
           <span class="countdown-label">Seconds</span>
         </div>
       </div>
-      <p class="birthday-wish">🎂 Until her next birthday 🎂</p>
+      <p class="birthday-wish">Every year your birthday comes,<br>but this time I wanted to give you something<br>that came from my heart.</p>
     </div>
   </section>
 
@@ -207,56 +479,81 @@
   </section>
 
   <!-- ====== REASONS ====== -->
-  <section class="reasons-section" id="reasons">
-    <div class="section-header reveal">
-      <p class="section-label"><i class="fas fa-heart"></i> From Swapnadip's Heart</p>
-      <h2 class="section-title">Why I Love You</h2>
-      <div class="title-ornament"><i class="fas fa-heart"></i></div>
-    </div>
-    <div class="reasons-grid">
-      <div class="reason-card reveal">
-        <div class="reason-icon"><i class="fas fa-smile-beam"></i></div>
-        <h4>Your Smile</h4>
-        <p>Your smile lights up every dark corner of my world. It's my favorite thing to wake up thinking about.</p>
-      </div>
-      <div class="reason-card reveal">
-        <div class="reason-icon"><i class="fas fa-brain"></i></div>
-        <h4>Your Mind</h4>
-        <p>The way you think, the way you see the world — it's extraordinary. You inspire me every single day.</p>
-      </div>
-      <div class="reason-card reveal">
-        <div class="reason-icon"><i class="fas fa-dove"></i></div>
-        <h4>Your Kindness</h4>
-        <p>You have the gentlest, most beautiful heart I have ever known. The world is better with your kindness in it.</p>
-      </div>
-      <div class="reason-card reveal">
-        <div class="reason-icon"><i class="fas fa-music"></i></div>
-        <h4>You're My Melody</h4>
-        <p>Every song I sing finds its soul because of you. You are the music that plays in my heart, always.</p>
-      </div>
-      <div class="reason-card reveal">
-        <div class="reason-icon"><i class="fas fa-hand-holding-heart"></i></div>
-        <h4>Your Care</h4>
-        <p>The way you care about everything and everyone around you makes me fall for you deeper every day.</p>
-      </div>
-      <div class="reason-card reveal">
-        <div class="reason-icon"><i class="fas fa-eye"></i></div>
-        <h4>Your Eyes</h4>
-        <p>Those eyes hold an entire universe. Every time I look into them, I lose myself completely.</p>
-      </div>
-      <div class="reason-card reveal">
-        <div class="reason-icon"><i class="fas fa-face-laugh-beam"></i></div>
-        <h4>Your Laugh</h4>
-        <p>Your laugh is my favorite sound in this entire universe. It heals every wound in my soul.</p>
-      </div>
-      <div class="reason-card reveal">
-        <div class="reason-icon"><i class="fas fa-infinity"></i></div>
-        <h4>Everything About You</h4>
-        <p>I could write a thousand reasons and still not be done. I love you — completely, infinitely, forever.</p>
-      </div>
-    </div>
-  </section>
+<section class="reasons-section" id="reasons">
+  <div class="section-header reveal">
+    <p class="section-label"><i class="fas fa-heart"></i> Silent Truths</p>
+    <h2 class="section-title">Why I Love You</h2>
+    <div class="title-ornament"><i class="fas fa-heart"></i></div>
+  </div>
 
+  <div class="reasons-grid">
+
+    <div class="reason-card reveal">
+      <div class="reason-icon"><i class="fas fa-comment"></i></div>
+      <h4>Casual Talks</h4>
+      <p>
+        I love the way you talk casually, like nothing matters. Those simple, everyday conversations felt more real to me than anything else.
+      </p>
+    </div>
+
+    <div class="reason-card reveal">
+      <div class="reason-icon"><i class="fas fa-laugh"></i></div>
+      <h4>Your Laughter</h4>
+      <p>
+        I love the way you laugh without thinking too much. It’s one of those small, imperfect things that just stayed in my memory.
+      </p>
+    </div>
+
+    <div class="reason-card reveal">
+      <div class="reason-icon"><i class="fas fa-eye-slash"></i></div>
+      <h4>Staying in My Thoughts</h4>
+      <p>
+        Even on the days you completely ignored me, somehow you still stayed in my thoughts. It was strange, but true.
+      </p>
+    </div>
+
+    <div class="reason-card reveal">
+      <div class="reason-icon"><i class="fas fa-walking"></i></div>
+      <h4>Your Presence</h4>
+      <p>
+        Just seeing you walking around the gym or crossing the road. The most ordinary moments were the ones that mattered the most.
+      </p>
+    </div>
+
+    <div class="reason-card reveal">
+      <div class="reason-icon"><i class="fas fa-sun"></i></div>
+      <h4>Small Imperfections</h4>
+      <p>
+        I didn't fall for a fantasy. I fell for a real person with moods, silence, and distance. I loved the real you.
+      </p>
+    </div>
+
+    <div class="reason-card reveal">
+      <div class="reason-icon"><i class="fas fa-clock"></i></div>
+      <h4>Quiet Patience</h4>
+      <p>
+        The way time seemed to slow down just a bit when you were around. I never needed you to notice me for it to happen.
+      </p>
+    </div>
+
+    <div class="reason-card reveal">
+      <div class="reason-icon"><i class="fas fa-user"></i></div>
+      <h4>Being Yourself</h4>
+      <p>
+        You never tried to be anyone else. Whether you were kind or distant, you were just Anushka. And that was enough.
+      </p>
+    </div>
+
+    <div class="reason-card reveal">
+      <div class="reason-icon"><i class="fas fa-infinity"></i></div>
+      <h4>No Reason Why</h4>
+      <p>
+        I don't know why I love you. If someone asks me the reason, I still don't have a perfect answer. I just do.
+      </p>
+    </div>
+
+  </div>
+</section>
   <!-- ====== LOVE QUOTES CAROUSEL ====== -->
   <section class="quotes-section" id="quotes">
     <div class="section-header reveal">
@@ -267,28 +564,28 @@
     <div class="quotes-carousel reveal">
       <div class="quote-card active" id="quote-0">
         <i class="fas fa-quote-left quote-icon"></i>
-        <p class="quote-text">I fell in love the way you fall asleep: slowly, and then all at once — but with you, Anushka.</p>
-        <p class="quote-author">— Swapnadip, rewriting his story</p>
+        <p class="quote-text">I never wanted to have you. I just wanted to keep seeing you.</p>
+        <p class="quote-author">— A silent wish</p>
       </div>
       <div class="quote-card" id="quote-1">
         <i class="fas fa-quote-left quote-icon"></i>
-        <p class="quote-text">You don't love someone for their looks, or their clothes, or their fancy car. You love them because they sing a song that only your heart can hear.</p>
-        <p class="quote-author">— And your song, Anushka, echoes in my soul</p>
+        <p class="quote-text">Even if you never choose me, I'll still choose you.</p>
+        <p class="quote-author">— Quiet devotion</p>
       </div>
       <div class="quote-card" id="quote-2">
         <i class="fas fa-quote-left quote-icon"></i>
-        <p class="quote-text">If I had a flower for every time I thought of you, I could walk through my garden forever.</p>
-        <p class="quote-author">— Thinking of you, always</p>
+        <p class="quote-text">If you ever come back someday, I'll still be there.</p>
+        <p class="quote-author">— Waiting patiently</p>
       </div>
       <div class="quote-card" id="quote-3">
         <i class="fas fa-quote-left quote-icon"></i>
-        <p class="quote-text">তোমাকে ভালোবাসি — these three words carry my entire existence, Anushka. Every breath I take whispers your name.</p>
-        <p class="quote-author">— Swapnadip, from the depths of his heart</p>
+        <p class="quote-text">I don't know why I love you. If someone asks me the reason, I still don't have an answer. I just do.</p>
+        <p class="quote-author">— The simple truth</p>
       </div>
       <div class="quote-card" id="quote-4">
         <i class="fas fa-quote-left quote-icon"></i>
-        <p class="quote-text">I choose you. And I'll choose you over and over and over. Without pause, without doubt, in a heartbeat. I'll keep choosing you.</p>
-        <p class="quote-author">— My promise to you, forever</p>
+        <p class="quote-text">I never asked you to love me. I only wished to stay somewhere in your world.</p>
+        <p class="quote-author">— Just staying close</p>
       </div>
       <div class="quotes-dots" id="quotesDots">
         <span class="dot active" onclick="goToQuote(0)"></span>
@@ -324,33 +621,52 @@
       <div class="timeline-item left reveal">
         <div class="timeline-dot"><i class="fas fa-star"></i></div>
         <div class="timeline-content">
-          <span class="timeline-date"><i class="fas fa-calendar-heart"></i> The Beginning</span>
-          <h4>The Day My World Changed</h4>
-          <p>The first time I saw you, something shifted inside me. Like a song finding its first note — everything made sense when you appeared.</p>
+          <span class="timeline-date"><i class="fas fa-calendar-heart"></i> 2022 — Class 9</span>
+          <h4>The Day I Noticed You — And Never Really Forgot</h4>
+          <p>I first saw you standing in front of Ayan sir's batch. It was just a normal day for everyone else, but something quietly stayed in my memory. It wasn't love immediately—just a quiet feeling that simply remained with me.</p>
         </div>
       </div>
       <div class="timeline-item right reveal">
-        <div class="timeline-dot"><i class="fas fa-music"></i></div>
+        <div class="timeline-dot"><i class="fas fa-comments"></i></div>
         <div class="timeline-content">
-          <span class="timeline-date"><i class="fas fa-calendar-heart"></i> Growing Closer</span>
-          <h4>Every Moment With You</h4>
-          <p>Every conversation, every laugh, every shared moment — I was silently falling more in love with you with each passing day.</p>
+          <span class="timeline-date"><i class="fas fa-calendar-heart"></i> 2023 — After Class 10 Results</span>
+          <h4>When Conversations Became Part of My Everyday Life</h4>
+          <p>We started talking more after the Class 10 results. The conversations slowly became longer, and talking to you just became a normal part of my days. Without me even realizing it, you became a comforting part of my daily routine.</p>
         </div>
       </div>
       <div class="timeline-item left reveal">
-        <div class="timeline-dot"><i class="fas fa-heart"></i></div>
+        <div class="timeline-dot"><i class="fas fa-heart-broken"></i></div>
         <div class="timeline-content">
-          <span class="timeline-date"><i class="fas fa-calendar-heart"></i> The Realization</span>
-          <h4>I Knew It Was You</h4>
-          <p>I realized that you are not just someone I like. You are the person I want to be with, to grow with, to love endlessly.</p>
+          <span class="timeline-date"><i class="fas fa-calendar-heart"></i> Confession Period</span>
+          <h4>The Day I Finally Said What I Was Afraid To Say</h4>
+          <p>I gathered the courage to tell you how I felt. It wasn't done perfectly, but it was honest. Unfortunately, misunderstandings happened, and a quiet distance slowly began to grow between us after that.</p>
         </div>
       </div>
       <div class="timeline-item right reveal">
-        <div class="timeline-dot"><i class="fas fa-ring"></i></div>
+        <div class="timeline-dot"><i class="fas fa-utensils"></i></div>
         <div class="timeline-content">
-          <span class="timeline-date"><i class="fas fa-calendar-heart"></i> Today — April 2026</span>
-          <h4>This Moment ✨</h4>
-          <p>Today, I gather all the courage in my heart — to tell you, to show you, to ask you the most important question of my life...</p>
+          <span class="timeline-date"><i class="fas fa-calendar-heart"></i> Fuchka Day</span>
+          <h4>One Evening That Felt Quieter Than Usual</h4>
+          <p>You and the others went to eat fuchka together, and I wasn't called. I just sat quietly on the opposite side of the road. I didn't have any dramatic reaction; it was just a quiet moment of realizing how alone I felt.</p>
+        </div>
+      </div>
+      <div class="timeline-item left reveal">
+        <div class="timeline-dot"><i class="fas fa-dumbbell"></i></div>
+        <div class="timeline-content">
+          <span class="timeline-date"><i class="fas fa-calendar-heart"></i> Gym Days</span>
+          <h4>The Only Place Where I Could Still See You</h4>
+          <p>The gym became my daily routine. It wasn't because of fitness, but because it became the only place where I could still see you. Seeing you from a distance became a part of my day, and even without any conversation, those moments truly mattered to me.</p>
+        </div>
+      </div>
+      <div class="timeline-item right reveal">
+        <div class="timeline-dot"><i class="fas fa-eye-slash"></i></div>
+        <div class="timeline-content">
+          <span class="timeline-date"><i class="fas fa-calendar-heart"></i> 27 April 2026</span>
+          <h4>The Day Silence Became Too Heavy</h4>
+          <p>You told me not to look at you like that. I stayed silent. Later, I sat quietly and covered my face with a towel so no one would notice. Inside, the same questions kept repeating:</p>
+          <p style="margin-top: 10px; font-style: italic;">"Has it really become so wrong just to look at you? Did I do something so bad to deserve this distance?"</p>
+          <p style="margin-top: 10px;">I slowly realized that maybe I care more than you ever did. Maybe I truly became an unwanted person in your world.</p>
+          <p style="margin-top: 10px; font-weight: bold;">I love her — and maybe she doesn't love me. It's that simple.</p>
         </div>
       </div>
     </div>
@@ -373,25 +689,70 @@
         </div>
       </div>
       <div class="player-info">
-        <h3 class="song-title">Tumi Amar Shopno</h3>
-        <p class="song-artist"><i class="fas fa-microphone"></i> Swapnadip Ghosh — Sung just for Anushka</p>
+        <h3 class="song-title">The Words I Couldn't Say Out Loud</h3>
+        <p class="song-artist">
+<i class="fas fa-microphone"></i> Swapnadip Ghosh — Written on the days I couldn't speak
+</p>
         <div class="lyrics-box">
           <div class="lyrics-scroll" id="lyricsScroll">
-            <p>🎵 তুমি আমার স্বপ্ন, তুমি আমার গান,</p>
-            <p>তোমাকে ভালোবাসি, এটাই আমার প্রাণ।</p>
-            <p>প্রতিটি সুরে তোমার কথা ভাবি,</p>
-            <p>তোমাকে ছাড়া আমি কিছুই নাহি।</p>
-            <br/>
-            <p>You are my dream, you are my song,</p>
-            <p>I love you, that's where I belong.</p>
-            <p>In every melody, I think of you,</p>
-            <p>Without you, nothing feels true.</p>
-            <br/>
-            <p>🎵 আনুশকা — আমার হৃদয়ের রানী,</p>
-            <p>তোমার নামেই আমার জীবনের মানি।</p>
-            <p>Anushka — queen of my heart,</p>
-            <p>I've loved you right from the start. 🎵</p>
-          </div>
+
+<p class="cinematic-line">🎵 You were never just someone I saw...</p>
+
+<p class="cinematic-line">You became someone I waited to see.</p>
+
+<p class="cinematic-line">Not because you called me,</p>
+
+<p class="cinematic-line">But because seeing you</p>
+
+<p class="cinematic-line">was enough to make my day feel complete.</p>
+
+<br/>
+
+<p class="cinematic-line">I learned to stand quietly,</p>
+
+<p class="cinematic-line">to look without being noticed,</p>
+
+<p class="cinematic-line">to smile even when my chest felt heavy.</p>
+
+<p class="cinematic-line">Because loving you was never loud...</p>
+
+<p class="cinematic-line">It was silent, patient, and real.</p>
+
+<br/>
+
+<p class="cinematic-line">Maybe you never noticed</p>
+
+<p class="cinematic-line">how many times I stayed back</p>
+
+<p class="cinematic-line">just to see you one more moment.</p>
+
+<p class="cinematic-line">Maybe you never knew</p>
+
+<p class="cinematic-line">how much courage it took just to stand there.</p>
+
+<br/>
+
+<p class="cinematic-line">Even on the days I felt unwanted,</p>
+
+<p class="cinematic-line">Even on the days I walked away quietly,</p>
+
+<p class="cinematic-line">My heart still chose you...</p>
+
+<p class="cinematic-line">again, and again.</p>
+
+<br/>
+
+<p class="cinematic-line">And even if one day you forget me,</p>
+
+<p class="cinematic-line">These moments will still remain inside me.</p>
+
+<p class="cinematic-line">Because some feelings</p>
+
+<p class="cinematic-line">are not meant to be returned...</p>
+
+<p class="cinematic-line">They are meant to be remembered.</p>
+
+</div>
         </div>
         <div class="music-controls">
           <button class="music-btn" id="playBtn" onclick="toggleMusic()">
@@ -414,167 +775,135 @@
   <section class="story-section" id="anushka-story">
     <div class="story-bg-overlay"></div>
     <div class="section-header reveal">
-      <p class="section-label"><i class="fas fa-heart"></i> For Anushka ❤️</p>
-      <h2 class="section-title bengali-title">শুধু তোকে দেখেই যেতে চেয়েছি—</h2>
+      <p class="section-label"><i class="fas fa-pen-fancy"></i> A Quiet Truth</p>
+      <h2 class="section-title">শুধু তোকে দেখেই যেতে চেয়েছি—</h2>
       <div class="title-ornament"><i class="fas fa-heart"></i></div>
     </div>
     <div class="story-container reveal">
       <div class="story-scroll-box">
-        <p>আয়ন স্যারের ব্যাচের সামনে<br>
-সেই প্রথম দিনটা আজও মনে আছে,<br>
-কেন জানি না,<br>
-তোকে দেখেই মনটা থেমে গিয়েছিল একটু।</p>
+        <p>I never loved you just to call you mine,<br>I never wanted to possess you.<br>I only wanted to see you, hear your voice,<br>And quietly watch you smile.</p>
 
-        <p>সেদিন বুঝিনি<br>
-ভালোবাসা কাকে বলে,<br>
-আজ এত বছর পরে বুঝি—<br>
-সেদিনই তুই<br>
-আমার জীবনের গল্প হয়ে গিয়েছিলি।</p>
+        <p>People often ask me for reasons,<br>But I never had a perfect answer.<br>I never knew why I loved you so much,<br>I just loved you, without any explanation.</p>
 
-        <p>আমি তোকে কোনোদিন<br>
-পাওয়ার জন্য ভালোবাসিনি,<br>
-আমি শুধু চেয়েছি—<br>
-সারাজীবন তোকে দেখতে,<br>
-তোর কথা শুনতে,<br>
-তোর হাসিটা দেখতে,<br>
-তোর চোখের দিকে তাকিয়ে<br>
-চুপচাপ বেঁচে থাকতে।</p>
+        <p>Even if you never stay beside me,<br>I will still care for you quietly.<br>Even if you never understand my feelings,<br>I could never bring myself to hate you.<br>And if life ever brings you back someday,<br>I will still accept you, without a single question.</p>
 
-        <p>অনেকে জিজ্ঞেস করলে<br>
-"কেন তোকে এত ভালোবাসি?"<br>
-আমি আজও কোনো উত্তর দিতে পারিনি—<br>
-কারণ সত্যিটা হলো,<br>
-আমি নিজেই জানি না কেন,<br>
-আমি শুধু<br>
-কারণ ছাড়াই তোকে ভালোবাসি।</p>
+        <p>I learned to love without any expectation.<br>To wait for you without forcing anything.<br>My feelings simply stayed true in the silence.</p>
 
-        <p>হয়তো তুই<br>
-আমার কাছে থাকবি না,<br>
-হয়তো কোনোদিন<br>
-আমার হাতটা ধরবি না,<br>
-তবু এটুকু জানিস—<br>
-আমার মনটা<br>
-আজও তোর জন্যই একই রকম আছে।</p>
-
-        <p>আর যদি কোনোদিন<br>
-আমার জীবনের শেষ হওয়ার আগেও<br>
-হঠাৎ তুই ফিরে আসিস—<br>
-আমি তোকে জড়িয়ে ধরবো<br>
-সব কষ্ট ভুলে গিয়ে<br>
-আবার নতুন করে হাসবো।</p>
-
-        <p>তুই বুড়ি হয়ে যা,<br>
-মোটা হয়ে যা,<br>
-আমার জীবনে হাজার ঝড় আসুক,<br>
-সময় যতই বদলে যাক—<br>
-আমি তবুও<br>
-তোকে একইভাবে ভালোবাসবো।</p>
-
-        <p>তুই যখনই আমাকে প্রয়োজন মনে করবি,<br>
-আমি ঠিক তোর পাশেই থাকবো—<br>
-হয়তো নিজের জায়গা না পেয়েও,<br>
-তবু তোকে আগের মতোই ভালোবেসে যাব।</p>
-
-        <p>তুই আমাকে বিয়ে করিস বা না করিস,<br>
-আমাকে ভালোবাসিস বা না বাসিস,<br>
-আমার জীবনে একটা স্বপ্ন<br>
-তবুও থেকে যাবে—<br>
-আমি একদিন একটা মেয়েকে বড় করবো,<br>
-তার নাম রাখবো Anushka।</p>
-
-        <p>এই কবিতাটা শুধু তোর জন্যই, Anushka।<br>
-তোকে ভালোবেসেছিলাম,<br>
-আজও ভালোবাসি,<br>
-আর হয়তো সারা জীবন<br>
-চুপচাপ ভালোবেসেই যাব।</p>
+        <p style="font-size: 1.15rem; margin-top: 2rem; text-align: center; color: var(--accent);">তোকে পাওয়াই আমার ভালোবাসা ছিল না,<br>তোকে ভালোবাসাটাই ছিল আমার পাওয়া।</p>
       </div>
     </div>
   </section>
 
-  <!-- ====== CONFESSION SECTION ====== -->
-  <section class="confession-section" id="confession">
+  <!-- ====== THINGS I NEVER SAID ====== -->
+  <section class="confession-section" id="things-i-never-said">
     <div class="confession-bg"></div>
     <div class="confession-container reveal">
-      <div class="confession-icon"><i class="fas fa-heart-crack"></i></div>
-      <h2 class="confession-title">My Truth</h2>
+      <div class="confession-icon"><i class="fas fa-comment-slash"></i></div>
+      <h2 class="confession-title">Things I Never Said</h2>
       <div class="confession-content">
         <p>Anushka,</p>
         <p>
-          I know you don't love me. I know that maybe you never will. And that's okay.
-          Because love isn't about being loved back — it's about the feeling itself.
-          And the feeling I have for you is the most beautiful thing I've ever experienced.
+          It was always so difficult for me to express my feelings face to face. Whenever I tried, the words just stayed locked inside my chest.
         </p>
         <p>
-          But I want you to know something — <strong>till the rest of my life, I will always love you.</strong>
-          Not because I expect anything in return. But because you are worth every second of love
-          that my heart can give. You deserve the world, Anushka.
+          I often stayed completely silent, even on the days when I really wanted to speak to you.
         </p>
         <p>
-          Every song I sing will carry your name. Every beat of my heart will whisper yours.
-          Even if we walk different paths, you'll always be the brightest star in my sky.
+          The fear of losing whatever small connection we had made me quiet. Over time, loving you silently just became normal for me.
         </p>
         <p class="confession-promise">
-          <i class="fas fa-infinity"></i>
-          I will love you — today, tomorrow, and till my last breath.
-          <i class="fas fa-infinity"></i>
+          <i class="fas fa-leaf"></i>
+          I kept it all inside, quietly.
+          <i class="fas fa-leaf"></i>
         </p>
       </div>
       <div class="confession-sign">
         <p>— Swapnadip Ghosh</p>
-        <p class="confession-subtitle"><i class="fas fa-music"></i> Singer &nbsp;|&nbsp; <i class="fas fa-code"></i> Coder &nbsp;|&nbsp; <i class="fas fa-heart"></i> Forever Yours</p>
+        <p class="confession-subtitle"><i class="fas fa-pen-fancy"></i> Silent Thoughts</p>
       </div>
     </div>
   </section>
 
-  <!-- ====== PROPOSAL SECTION ====== -->
+  <!-- ====== IF YOU NEVER READ THIS ====== -->
+  <section class="confession-section" id="if-you-never-read-this" style="background: rgba(15, 10, 20, 0.95);">
+    <div class="confession-container reveal">
+      <div class="confession-icon"><i class="fas fa-envelope"></i></div>
+      <h2 class="confession-title">If You Never Read This</h2>
+      <div class="confession-content">
+        <p>
+          Even if you never understand my feelings, I want you to know that the love was still real. 
+          Even if you never read this, I don't regret loving you.
+        </p>
+        <p>
+          This website was not made to force you or make you feel guilty. 
+          It was made simply to release the emotions I couldn't hold inside anymore. 
+        </p>
+        <p>
+          Loving you changed me, even if nothing came from it. And I have accepted that.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== BEFORE I LEAVE ====== -->
   <section class="propose-section" id="propose">
     <div class="propose-bg-overlay"></div>
     <div class="propose-particles" id="proposeParticles"></div>
     <div class="propose-container reveal">
       <div class="ring-animation">
-        <div class="ring-outer"><i class="fas fa-ring ring-icon"></i></div>
+        <div class="ring-outer"><i class="fas fa-dove ring-icon"></i></div>
         <div class="ring-glow"></div>
       </div>
-      <p class="propose-from"><i class="fas fa-heart"></i> From Swapnadip Ghosh</p>
-      <h2 class="propose-title">Anushka,</h2>
+      <p class="propose-from"><i class="fas fa-leaf"></i> With silent strength</p>
+      <h2 class="propose-title">Before I Leave</h2>
       <div class="propose-message">
         <p>
-          I am just a singer who codes by night and sings by day — but every song, every line of code,
-          every dream I have — it all has your name written on it.
+          This website is a final memory for you before I leave for university. 
+          I just wanted to leave behind something meaningful.
         </p>
         <p>
-          You are the most beautiful, the most kind, the most extraordinary person I have ever known.
-          And I don't want to spend a single day of my life without you in it.
+          I am not doing this to force you into anything. 
+          I just wanted a place to preserve these memories before I go.
         </p>
         <p class="propose-big-text">
-          Will you be my girlfriend?<br/>
-          <span>Will you be mine — forever? 💕</span>
+          <span>Even if life takes us in different directions,<br>a part of my story will always carry your name.</span>
         </p>
       </div>
       <div class="propose-buttons" id="proposeButtons">
         <button class="btn-yes" id="yesBtn" onclick="sayYes()">
-          <i class="fas fa-heart"></i> Yes, Forever! 💕
-        </button>
-        <button class="btn-no" id="noBtn" onmouseover="runAway(this)" ontouchstart="runAway(this)">
-          <i class="fas fa-times"></i> No
+          <i class="fas fa-heart"></i> I Understand
         </button>
       </div>
       <div class="celebrate-message" id="celebrateMessage">
         <div class="firework-container" id="fireworks"></div>
         <div class="celebrate-text">
-          <i class="fas fa-heart"></i>
-          <h3>She Said YES! 💕</h3>
-          <p>My heart just exploded with happiness! I love you, Anushka, with every single beat of my heart. This is the best day of my entire life! 🥺💕</p>
+          <i class="fas fa-leaf"></i>
+          <h3>Thank You</h3>
+          <p>Thank you for taking the time to read my true feelings. That is all I ever wanted.</p>
           <div class="celebrate-icons">
-            <i class="fas fa-heart"></i>
-            <i class="fas fa-music"></i>
+            <i class="fas fa-dove"></i>
             <i class="fas fa-star"></i>
             <i class="fas fa-heart"></i>
-            <i class="fas fa-ring"></i>
-            <i class="fas fa-heart"></i>
           </div>
-          <p class="forever-text">— Swapnadip loves Anushka — Forever & Always 💕</p>
+          <p class="forever-text">— With silent respect, Swapnadip</p>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== ONE LAST CHOICE ====== -->
+  <section class="final-choice-section" id="final-choice">
+    <div class="final-choice-container reveal">
+      <h2 class="final-choice-title">One Last Choice</h2>
+      <div class="final-choice-content" id="finalChoiceContent">
+        <p>This website carries memories that mattered to me.<br>But memories only stay if they are allowed to.</p>
+        <div class="final-buttons" id="finalButtons">
+          <button id="keepBtn" class="btn-keep" onclick="keepStory()">Keep This Story</button>
+          <button id="fadeBtn" class="btn-fade" onclick="fadeAway()">Let It Fade Away</button>
+        </div>
+      </div>
+      <div class="keep-message" id="keepMessage" style="display: none;">
+        <p>Then this story stays —<br>quietly,<br>without expectations.</p>
       </div>
     </div>
   </section>
@@ -582,20 +911,450 @@
   <!-- ====== FOOTER ====== -->
   <footer class="footer">
     <div class="footer-hearts">
-      <i class="fas fa-heart"></i>
-      <i class="fas fa-heart"></i>
-      <i class="fas fa-heart"></i>
+      <i class="fas fa-leaf"></i>
+      <i class="fas fa-dove"></i>
+      <i class="fas fa-leaf"></i>
     </div>
     <p class="footer-text">
-      Made with <i class="fas fa-heart footer-heart-icon"></i> &amp; Code by
+      Made with quiet devotion by
       <strong>Swapnadip Ghosh</strong> for <strong>Anushka</strong>
     </p>
     <p class="footer-sub">
-      <i class="fas fa-music"></i> Singer &nbsp;|&nbsp; <i class="fas fa-code"></i> Coder &nbsp;|&nbsp; <i class="fas fa-heart"></i> Your Lover
+      If love is true, no effort ever goes to waste.
     </p>
-    <p class="footer-copy">💕 Always &amp; Forever — 2026</p>
+    <p class="footer-copy">Silent Memories — 2026</p>
   </footer>
 
+  <!-- Final Fade Screen -->
+  <div class="fade-out-screen" id="fadeOutScreen">
+    <div class="fade-out-text" id="fadeOutText">
+      <p id="fadeText1">If this story doesn't belong in your life,<br>I'll let it fade quietly.</p>
+      <p id="fadeText2">Not because it didn't matter,<br>but because loving you<br>was never about forcing you to stay.</p>
+      <p id="fadeText3">Some stories don't last forever,<br>but they still remain real.</p>
+    </div>
+  </div>
+
+  </div><!-- /mainSite -->
+
   <script src="script.js"></script>
+
+  <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
+  <script>
+    (function(){
+      emailjs.init("Vgp1Tvu88MeOV6IdI");
+    })();
+  </script>
+
+  <!-- ====== BIRTHDAY FLOW SCRIPT ====== -->
+  <script>
+  (function () {
+    /* ---------- state ---------- */
+    var currentScreen = 1;
+    var totalSteps    = 7;   // screens 1-7 (final is separate)
+    var musicStarted  = false;
+
+    /* ---------- particle canvas ---------- */
+    var canvas = document.getElementById('bdCanvas');
+    var ctx    = canvas.getContext('2d');
+    var bdParticles = [];
+
+    function resizeBdCanvas() {
+      canvas.width  = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeBdCanvas();
+    window.addEventListener('resize', resizeBdCanvas, { passive: true });
+
+    for (var i = 0; i < 70; i++) {
+      bdParticles.push(makeBdParticle());
+    }
+
+    function makeBdParticle() {
+      var types  = ['heart', 'star', 'dot'];
+      var colors = ['255,77,133', '162,57,202', '255,179,198', '255,255,255'];
+      return {
+        x:       Math.random() * canvas.width,
+        y:       Math.random() * canvas.height,
+        size:    Math.random() * 2.4 + 0.6,
+        speed:   Math.random() * 0.55 + 0.15,
+        opacity: Math.random() * 0.45 + 0.05,
+        type:    types[Math.floor(Math.random() * types.length)],
+        color:   colors[Math.floor(Math.random() * colors.length)],
+        phase:   Math.random() * Math.PI * 2,
+        twinkle: Math.random() * 0.018 + 0.008,
+      };
+    }
+
+    function animateBdParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      bdParticles.forEach(function (p) {
+        p.phase += p.twinkle;
+        var alpha = p.opacity * (0.5 + 0.5 * Math.sin(p.phase));
+        ctx.fillStyle = 'rgba(' + p.color + ',' + alpha + ')';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        p.y -= p.speed;
+        p.x += Math.sin(p.y * 0.009) * 0.25;
+        if (p.y < -10) {
+          p.y = canvas.height + 10;
+          p.x = Math.random() * canvas.width;
+        }
+      });
+      requestAnimationFrame(animateBdParticles);
+    }
+    animateBdParticles();
+
+    /* ---------- dot updater ---------- */
+    function updateDots(n) {
+      var dots = document.querySelectorAll('.bd-dot');
+      dots.forEach(function (d, i) {
+        d.classList.toggle('active', i === n - 1);
+      });
+    }
+
+    /* ---------- screen transition ---------- */
+    function showScreen(fromId, toId) {
+      var from = document.getElementById(fromId);
+      var to   = document.getElementById(toId);
+      if (!from || !to) return;
+
+      from.classList.add('exiting');
+      from.classList.remove('active');
+
+      setTimeout(function () {
+        from.classList.remove('exiting');
+        to.classList.add('active');
+      }, 880);
+    }
+
+    /* ---------- music ---------- */
+    function tryStartMusic() {
+      if (musicStarted) return;
+      var audio = document.getElementById('bgAudio');
+      if (!audio) return;
+      var playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.then(function () {
+          musicStarted = true;
+          // sync main site music-player state
+          var playIcon = document.getElementById('playIcon');
+          var vinyl    = document.getElementById('vinyl');
+          var eq       = document.getElementById('equalizer');
+          if (playIcon) playIcon.className = 'fas fa-pause';
+          if (vinyl)    vinyl.classList.add('playing');
+          if (eq)       eq.classList.add('active');
+          // sync isPlaying flag in script.js scope via a custom event
+          window.dispatchEvent(new Event('bdMusicStarted'));
+          // hide prompt if visible
+          var prompt = document.getElementById('bdMusicPrompt');
+          if (prompt) prompt.style.display = 'none';
+        }).catch(function () {
+          // autoplay blocked — show tap prompt
+          var prompt = document.getElementById('bdMusicPrompt');
+          if (prompt) prompt.style.display = 'block';
+        });
+      }
+    }
+
+    /* tap-to-play (global so onclick can call it) */
+    window.bdTapPlay = function () {
+      musicStarted = false; // reset so tryStartMusic will re-attempt
+      tryStartMusic();
+    };
+
+    /* ---------- public flow functions ---------- */
+    window.bdStart = function () {
+      tryStartMusic();
+      showScreen('bdScreen1', 'bdScreen2');
+      currentScreen = 2;
+      updateDots(2);
+    };
+
+    window.bdNext = function (fromNum) {
+      var nextNum = fromNum + 1;
+      var fromId  = 'bdScreen' + fromNum;
+      var toId    = nextNum > totalSteps ? 'bdScreenFinal' : 'bdScreen' + nextNum;
+
+      showScreen(fromId, toId);
+
+      if (nextNum <= totalSteps) {
+        currentScreen = nextNum;
+        updateDots(nextNum);
+      } else {
+        // Entering final screen — hide dots
+        var dotsEl = document.getElementById('bdDots');
+        if (dotsEl) dotsEl.style.display = 'none';
+
+        // Trigger line-by-line animation on final screen
+        setTimeout(function () {
+          var finalEl = document.getElementById('bdScreenFinal');
+          if (finalEl) finalEl.classList.add('ols-active');
+        }, 900); // after the screen fade-in completes
+
+        // Lower music volume slightly for the quiet final moment
+        var audio = document.getElementById('bgAudio');
+        if (audio) {
+          var fadeVol = setInterval(function () {
+            if (audio.volume > 0.38) {
+              audio.volume = Math.max(0.38, audio.volume - 0.025);
+            } else {
+              clearInterval(fadeVol);
+            }
+          }, 80);
+        }
+      }
+    };
+
+    /* ---------- revealMainSite — cinematic One Last Smile exit ---------- */
+    window.revealMainSite = function () {
+      var mainSite  = document.getElementById('mainSite');
+      var flow      = document.getElementById('birthdayFlow');
+      var blackout  = document.getElementById('olsBlackout');
+      var enterBtn  = document.getElementById('enterBtn');
+
+      if (!mainSite) return;
+
+      // Prevent double-trigger
+      if (window._olsExiting) return;
+      window._olsExiting = true;
+
+      // ── Step 1: Button soft glow (via CSS class; already handled by .bd-enter-btn animation) ──
+      if (enterBtn) {
+        enterBtn.style.transition = 'box-shadow 0.4s ease, opacity 0.6s ease';
+        enterBtn.style.boxShadow  = '0 0 40px rgba(255,78,205,0.9), 0 0 80px rgba(168,85,247,0.6)';
+        enterBtn.style.opacity    = '0.6';
+      }
+
+      // ── Step 2: Fade to black (blackout overlay) ──
+      setTimeout(function () {
+        if (blackout) {
+          blackout.style.transition = 'opacity 1.8s cubic-bezier(0.4,0,0.2,1)';
+          blackout.classList.add('active');
+        }
+
+        // ── Step 3: Fade music out smoothly ──
+        var audio = document.getElementById('bgAudio');
+        if (audio) {
+          var fadeOut = setInterval(function () {
+            if (audio.volume > 0.03) {
+              audio.volume = Math.max(0, audio.volume - 0.018);
+            } else {
+              audio.volume = 0;
+              audio.pause();
+              clearInterval(fadeOut);
+            }
+          }, 60);
+        }
+      }, 300);
+
+      // ── Step 4: Pink glow pulse in centre (1.9s after click) ──
+      setTimeout(function () {
+        if (blackout) blackout.classList.add('glow-pulse');
+      }, 1900);
+
+      // ── Step 5: Silence moment — then reveal main site (3.6s after click) ──
+      setTimeout(function () {
+        // Bypass view-once on repeat visits (uses the existing key openAgain() uses)
+        try { sessionStorage.setItem('allowAccess', 'true'); } catch (e) {}
+
+        // Hide view-once screen if it was activated
+        var vos = document.getElementById('viewOnceScreen');
+        if (vos) vos.style.display = 'none';
+
+        // Restore body scroll
+        document.body.style.overflow = '';
+
+        // Show #mainSite beneath the blackout
+        mainSite.style.opacity    = '0';
+        mainSite.style.transition = 'none';
+        mainSite.style.display    = 'block';
+        mainSite.offsetHeight;          // forces reflow — DO NOT REMOVE
+        mainSite.style.transition = 'opacity 1.4s ease';
+        mainSite.style.opacity    = '1';
+
+        // Scroll to top
+        window.scrollTo(0, 0);
+
+        // Hide birthday flow
+        if (flow) flow.style.display = 'none';
+
+        // Fade out the blackout to reveal the main site
+        setTimeout(function () {
+          if (blackout) {
+            blackout.style.transition = 'opacity 1.6s ease';
+            blackout.classList.remove('active');
+            blackout.classList.remove('glow-pulse');
+            setTimeout(function () {
+              blackout.style.pointerEvents = 'none';
+              window._olsExiting = false;
+            }, 1700);
+          }
+        }, 600);
+
+      }, 3600);
+    };
+
+    // bdEnter is an alias so onclick="bdEnter()" on the button still works
+    window.bdEnter = window.revealMainSite;
+
+    /* sync isPlaying in script.js when birthday flow starts music */
+    window.addEventListener('bdMusicStarted', function () {
+      window._bdMusicActive = true;
+    });
+
+  })();
+  </script>
+
+  <!-- ====== CURSOR SCRIPT — frame-rate independent (60/90/120/144 Hz) ====== -->
+  <script>
+  (function () {
+    var ring = document.getElementById('customCursor');
+    var dot  = document.getElementById('cursorDot');
+    if (!ring || !dot) return;
+
+    /* ── Touch bail-out ── */
+    if (('ontouchstart' in window) || navigator.maxTouchPoints > 0) {
+      ring.style.display = dot.style.display = 'none';
+      var s = document.createElement('style');
+      s.textContent = 'html,body,*{cursor:auto!important}';
+      document.head.appendChild(s);
+      return;
+    }
+
+    /* ── Mutable state (all primitives — no object allocation in loop) ── */
+    var mx = window.innerWidth  >> 1;   // real mouse X  (bit-shift = fast /2)
+    var my = window.innerHeight >> 1;   // real mouse Y
+    var rx = mx, ry = my;              // ring position
+    var dx = mx, dy = my;              // dot  position
+    var ringScale  = 1.0;
+    var isHovering = false;
+    var cursorVisible = false;
+    var beatPhase  = 0.0;
+    var lastTs     = 0.0;
+
+    /* ── Pre-computed constants ── */
+    // Exponential-decay bases (per 16.67 ms reference frame).
+    // At any fps: factor = 1 - base^(dt/16.67)
+    // Ring trails  → base 0.880  (≈12% per 16.67ms at 60fps)
+    // Dot instant  → base 0.050  (≈95% per 16.67ms at 60fps)
+    // Scale lerp   → base 0.880  (matches ring)
+    var RING_BASE  = 0.880;
+    var DOT_BASE   = 0.050;
+    var SCALE_BASE = 0.880;
+
+    // Heartbeat: 2.4 s period, ±8% scale
+    var BEAT_OMEGA = 6.2832 / 2.4;   // 2π / period  (rad per second)
+    var BEAT_AMP   = 0.08;
+
+    /* ── Mouse tracking ── */
+    document.addEventListener('mousemove', function (e) {
+      mx = e.clientX;
+      my = e.clientY;
+      if (!cursorVisible) {
+        cursorVisible = true;
+        ring.style.opacity = '1';
+        dot.style.opacity  = '1';
+      }
+    }, { passive: true });
+
+    document.addEventListener('mouseleave', function () {
+      cursorVisible = false;
+      ring.style.opacity = '0';
+      dot.style.opacity  = '0';
+    });
+    document.addEventListener('mouseenter', function () {
+      cursorVisible = true;
+      ring.style.opacity = '1';
+      dot.style.opacity  = '1';
+    });
+
+    /* ── Hover detection (event delegation — zero per-element overhead) ── */
+    var clickSel = 'a,button,[onclick],[role="button"],.bd-btn,.nav-link,' +
+                   '.dot,.trait,.quote-nav-btn,.music-btn,.btn-keep,.btn-fade';
+    document.addEventListener('mouseover', function (e) {
+      if (e.target && e.target.closest && e.target.closest(clickSel)) {
+        isHovering = true;
+        ring.classList.add('ring-hovering');
+        dot.classList.add('dot-hovering');
+      }
+    }, { passive: true });
+    document.addEventListener('mouseout', function (e) {
+      if (e.target && e.target.closest && e.target.closest(clickSel)) {
+        isHovering = false;
+        ring.classList.remove('ring-hovering');
+        dot.classList.remove('dot-hovering');
+      }
+    }, { passive: true });
+
+    /* ── Magnetic — single delegated mousemove, not N element listeners ── */
+    var magEl = null;
+    document.addEventListener('mousemove', function (e) {
+      var el = e.target && e.target.closest && e.target.closest('.bd-btn');
+      if (el) {
+        if (magEl !== el) {
+          if (magEl) { magEl.style.transition = 'transform 0.4s ease'; magEl.style.transform = ''; }
+          magEl = el;
+        }
+        var r  = el.getBoundingClientRect();
+        var fx = (e.clientX - r.left - r.width  * 0.5) * 0.10;
+        var fy = (e.clientY - r.top  - r.height * 0.5) * 0.10;
+        el.style.transition = 'transform 0.15s ease';
+        el.style.transform  = 'translate(' + fx + 'px,' + fy + 'px)';
+      } else if (magEl) {
+        magEl.style.transition = 'transform 0.4s ease';
+        magEl.style.transform  = 'translate(0,0)';
+        var _el = magEl;
+        magEl = null;
+        setTimeout(function () { _el.style.transform = ''; _el.style.transition = ''; }, 420);
+      }
+    }, { passive: true });
+
+    /* ── rAF loop — frame-rate independent via exponential decay ── */
+    function animate(ts) {
+      /* Delta time in ms, clamped to 50ms to absorb tab-switch spikes */
+      var dt  = lastTs ? Math.min(ts - lastTs, 50) : 16.67;
+      lastTs  = ts;
+
+      /* Frame-rate independent lerp factors using exponential decay:
+         factor = 1 - base^(dt / 16.67)
+         At 60fps (dt=16.67): factor = 1 - base^1.0
+         At 120fps (dt=8.33):  factor = 1 - base^0.5  (smaller per frame, same real-time result) */
+      var norm   = dt * 0.06;            // dt / 16.67  (multiply is faster than divide)
+      var ringF  = 1 - Math.pow(RING_BASE,  norm);
+      var dotF   = 1 - Math.pow(DOT_BASE,   norm);
+      var scaleF = 1 - Math.pow(SCALE_BASE, norm);
+
+      /* Position lerp */
+      dx += (mx - dx) * dotF;
+      dy += (my - dy) * dotF;
+      rx += (mx - rx) * ringF;
+      ry += (my - ry) * ringF;
+
+      /* Heartbeat — time-based (sounds the same at every refresh rate) */
+      beatPhase += BEAT_OMEGA * (dt * 0.001);   // dt/1000 = seconds
+      var beat = 1 + Math.sin(beatPhase) * BEAT_AMP;
+
+      /* Scale lerp */
+      var targetScale = (isHovering ? 1.65 : 1.0) * beat;
+      ringScale += (targetScale - ringScale) * scaleF;
+
+      /* Write transforms — two strings, built with minimal allocation.
+         |0 truncates float to int for the position part (sub-pixel not
+         needed for a 26px circle; saves toString work in string concat). */
+      ring.style.transform =
+        'translate3d(' + (rx | 0) + 'px,' + (ry | 0) + 'px,0)translate(-50%,-50%)scale(' + ringScale + ')';
+
+      dot.style.transform =
+        'translate3d(' + (dx | 0) + 'px,' + (dy | 0) + 'px,0)translate(-50%,-50%)' +
+        (isHovering ? 'scale(1.35)' : '');
+
+      requestAnimationFrame(animate);
+    }
+
+    requestAnimationFrame(animate);
+  })();
+  </script>
+
 </body>
 </html>
