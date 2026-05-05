@@ -661,6 +661,126 @@ section { padding: 100px 5%; position: relative; }
 }
 .timeline-content p { color: var(--text-muted); }
 
+/* ====== LOVE QUOTES CAROUSEL ====== */
+.quotes-section { background: var(--bg-dark); padding: 100px 5%; }
+
+.quotes-carousel {
+  max-width: 700px;
+  margin: 0 auto;
+  position: relative;
+  min-height: 290px;
+}
+
+/* All cards stacked; only .active is visible */
+.quote-card {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 25px;
+  padding: 50px 40px;
+  text-align: center;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  opacity: 0;
+  transform: translateX(60px) scale(0.95);
+  transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1),
+              transform 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
+  pointer-events: none;
+}
+.quote-card.active {
+  opacity: 1;
+  transform: translateX(0) scale(1);
+  pointer-events: auto;
+}
+
+.quote-icon {
+  font-size: 2rem;
+  color: var(--secondary-color);
+  margin-bottom: 20px;
+  opacity: 0.5;
+  display: block;
+}
+.quote-text {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  color: #eee;
+  font-style: italic;
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+.quote-author {
+  color: var(--primary-color);
+  font-weight: bold;
+  font-size: 0.95rem;
+}
+
+/* Dots — pushed below the tallest card */
+.quotes-dots {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 310px;     /* clears the absolute-stacked cards */
+  position: relative;
+  z-index: 2;
+}
+.quotes-dots .dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: rgba(255, 77, 133, 0.3);
+  border: none;
+  transition: var(--transition);
+  cursor: pointer;
+}
+.quotes-dots .dot.active {
+  background: var(--primary-color);
+  box-shadow: 0 0 10px var(--primary-color);
+  transform: scale(1.2);
+}
+
+/* Prev / Next arrow buttons */
+.quotes-nav {
+  position: absolute;
+  top: 45%;
+  width: calc(100% + 80px);
+  left: -40px;
+  display: flex;
+  justify-content: space-between;
+  transform: translateY(-50%);
+  pointer-events: none;
+  z-index: 3;
+}
+.quote-nav-btn {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(6px);
+  color: var(--text-light);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: var(--transition);
+  pointer-events: auto;
+  cursor: pointer;
+}
+.quote-nav-btn:hover {
+  background: rgba(255, 77, 133, 0.2);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 12px rgba(255, 77, 133, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .quotes-carousel { min-height: 360px; }
+  .quotes-dots     { margin-top: 380px; }
+  .quotes-nav      { width: calc(100% + 20px); left: -10px; }
+  .quote-card      { padding: 40px 25px; }
+  .quote-text      { font-size: 1.1rem; }
+}
+
 /* ====== MUSIC SECTION ====== */
 .music-section {
   position: relative;
