@@ -383,7 +383,7 @@
       <li><a href="#timeline" class="nav-link"><i class="fas fa-infinity"></i> Our Story</a></li>
       <li><a href="#music" class="nav-link"><i class="fas fa-music"></i> Song</a></li>
       <li><a href="#anushka-story" class="nav-link"><i class="fas fa-pen-fancy"></i> Poem</a></li>
-      <li><a href="#confession" class="nav-link"><i class="fas fa-hand-holding-heart"></i> My Truth</a></li>
+      <li><a href="#things-i-never-said" class="nav-link"><i class="fas fa-hand-holding-heart"></i> My Truth</a></li>
       <li><a href="#propose" class="nav-link propose-nav"><i class="fas fa-ring"></i> Proposal</a></li>
     </ul>
     <div class="hamburger" id="hamburger">
@@ -847,6 +847,7 @@
 
   <!-- ====== THINGS I NEVER SAID ====== -->
   <section class="confession-section" id="things-i-never-said">
+    <a id="confession"></a>
     <div class="confession-bg"></div>
     <div class="confession-container reveal">
       <div class="confession-icon"><i class="fas fa-comment-slash"></i></div>
@@ -1302,9 +1303,12 @@
     }
 
     // ── bdEnter: “One Last Smile” → show Gift Intro + start music ──
+    var _giShowing = false;  // double-trigger guard
     window.bdEnter = function () {
+      if (_giShowing) return;          // prevent double-tap on mobile
+      _giShowing = true;
       var gi = document.getElementById('giftIntro');
-      if (!gi) return;
+      if (!gi) { _giShowing = false; return; }
 
       // Show overlay + trigger CSS transitions
       gi.style.display = 'flex';
@@ -1402,6 +1406,7 @@
           gi.style.display = 'none';
           gi.style.pointerEvents = '';
           stopGiftIntroParticles();
+          _giShowing = false;  // reset guard so bdEnter can be called again if needed
         }, 620);
       }
 

@@ -243,11 +243,16 @@
   100% { opacity: 1; transform: scale(1.00);  }
 }
 
-/* Subtle breathing glow after the name appears */
+/* Subtle breathing glow after the name appears.
+   Override only the animation list — keep fill-mode via forwards on giNameIn. */
 .gi-name-glow {
-  animation:
-    giNameIn 1.6s 5.9s cubic-bezier(0.22, 1, 0.36, 1) forwards,
-    giNamePulse 3.2s 7.8s ease-in-out infinite;
+  /* giNameIn runs once (forwards fills opacity+scale), then giNamePulse loops */
+  animation-name:            giNameIn,    giNamePulse;
+  animation-duration:        1.6s,        3.2s;
+  animation-delay:           5.9s,        7.8s;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1), ease-in-out;
+  animation-fill-mode:       forwards,    none;
+  animation-iteration-count: 1,           infinite;
 }
 
 @keyframes giNamePulse {

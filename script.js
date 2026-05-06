@@ -143,17 +143,24 @@ class Particle {
 
 for (let i = 0; i < 80; i++) particles.push(new Particle());
 
+let _heartAnimId = null;
 function animateParticles() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   particles.forEach(p => p.update());
-  requestAnimationFrame(animateParticles);
+  _heartAnimId = requestAnimationFrame(animateParticles);
 }
 animateParticles();
 
 window.addEventListener('resize', () => {
-  canvas.width = window.innerWidth;
+  // Resize without interrupting the loop — canvas clears automatically next frame
+  canvas.width  = window.innerWidth;
   canvas.height = window.innerHeight;
-});
+  // Re-randomise particles that are now out of bounds
+  particles.forEach(p => {
+    if (p.x > canvas.width)  p.x = Math.random() * canvas.width;
+    if (p.y > canvas.height) p.y = Math.random() * canvas.height;
+  });
+}, { passive: true });
 
 // ====== BIRTHDAY COUNTDOWN ======
 const birthday = new Date('2008-01-03');
@@ -378,27 +385,37 @@ function sayYes() {
   if (!isPlaying) toggleMusic();
 }
 
-function createFireworks(container) {
-  for (let i = 0; i < 30; i++) {
-    const heart = document.createElement('i');
-    heart.className = 'fas fa-heart';
-    heart.style.cssText = `position:absolute;color:#ff4d85;font-size:${Math.random()*20+10}px;left:50%;top:50%;transform:translate(-50%,-50%);z-index:100;transition:all 1s ease-out;`;
-    const angle = Math.random() * Math.PI * 2;
-    const vel = Math.random() * 100 + 50;
-    const tx = Math.cos(angle) * vel, ty = Math.sin(angle) * vel;
-    container.appendChild(heart);
-    setTimeout(() => { heart.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0)`; heart.style.opacity = '0'; }, 50);
-    setTimeout(() => heart.remove(), 1050);
+  // ── confession nav link ID fix ──
+  // (id="confession" vs id="things-i-never-said" resolved below)
+
+  var _fireworksInterval = null;  // ← so we can clear it later
+
+  function createFireworks(container) {
+    // Burst on click
+    for (let i = 0; i < 30; i++) {
+      const heart = document.createElement('i');
+      heart.className = 'fas fa-heart';
+      heart.style.cssText = `position:absolute;color:#ff4d85;font-size:${Math.random()*20+10}px;left:50%;top:50%;transform:translate(-50%,-50%);z-index:100;transition:all 1s ease-out;`;
+      const angle = Math.random() * Math.PI * 2;
+      const vel = Math.random() * 100 + 50;
+      const tx = Math.cos(angle) * vel, ty = Math.sin(angle) * vel;
+      container.appendChild(heart);
+      setTimeout(() => { heart.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0)`; heart.style.opacity = '0'; }, 50);
+      setTimeout(() => heart.remove(), 1050);
+    }
+    // Continuous rain — stored so it can be cleared if needed
+    if (_fireworksInterval) clearInterval(_fireworksInterval); // safety reset
+    _fireworksInterval = setInterval(() => {
+      const h = document.createElement('i');
+      h.className = 'fas fa-heart';
+      h.style.cssText = `position:absolute;color:${Math.random()>0.5?'#ff4d85':'#a239ca'};left:${Math.random()*100}%;top:-20px;font-size:${Math.random()*15+10}px;opacity:0.7;transition:top 3s linear,opacity 3s linear;`;
+      const fw = document.getElementById('fireworks');
+      if (!fw) { clearInterval(_fireworksInterval); return; } // null-guard
+      fw.appendChild(h);
+      setTimeout(() => { h.style.top = '100%'; h.style.opacity = '0'; }, 50);
+      setTimeout(() => h.remove(), 3050);
+    }, 300);
   }
-  setInterval(() => {
-    const h = document.createElement('i');
-    h.className = 'fas fa-heart';
-    h.style.cssText = `position:absolute;color:${Math.random()>0.5?'#ff4d85':'#a239ca'};left:${Math.random()*100}%;top:-20px;font-size:${Math.random()*15+10}px;opacity:0.7;transition:top 3s linear,opacity 3s linear;`;
-    document.getElementById('fireworks').appendChild(h);
-    setTimeout(() => { h.style.top = '100%'; h.style.opacity = '0'; }, 50);
-    setTimeout(() => h.remove(), 3050);
-  }, 300);
-}
 
 // ====== FINAL CHOICE LOGIC ======
 function keepStory() {
@@ -452,10 +469,11 @@ function fadeAway() {
 
 // ====== SYNC WITH BIRTHDAY FLOW MUSIC START ======
 window.addEventListener('bdMusicStarted', function () {
-  // Birthday overlay already called audio.play() and updated UI icons.
+  // Birthday overlay / gift intro already called audio.play() and updated UI.
   // Mark isPlaying=true so toggleMusic() won't double-play.
   isPlaying = true;
-  // Start lyrics scroll animation since music is playing
+  // Restart lyrics scroll in case it isn't running yet
+  cancelAnimationFrame(lyricsAnimationId);
   if (lyricsBox) {
     exactScrollTop = lyricsBox.scrollTop;
     scrollLyrics();
