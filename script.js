@@ -68,21 +68,21 @@ let isScrolling = false;
 window.addEventListener('scroll', () => {
   if (!isScrolling) {
     window.requestAnimationFrame(() => {
-      navbar.classList.toggle('scrolled', window.scrollY > 50);
+      if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 50);
       isScrolling = false;
     });
     isScrolling = true;
   }
 }, { passive: true });
 
-hamburger.addEventListener('click', () => {
+if (hamburger) hamburger.addEventListener('click', () => {
   hamburger.classList.toggle('active');
-  navLinks.classList.toggle('active');
+  if (navLinks) navLinks.classList.toggle('active');
 });
 
-navLinks.querySelectorAll('a').forEach(link => {
+if (navLinks) navLinks.querySelectorAll('a').forEach(link => {
   link.addEventListener('click', () => {
-    hamburger.classList.remove('active');
+    if (hamburger) hamburger.classList.remove('active');
     navLinks.classList.remove('active');
   });
 });
@@ -325,19 +325,24 @@ function handleUserScroll() {
 function toggleMusic() {
   if (isPlaying) {
     bgAudio.pause();
-    playIcon.className = 'fas fa-play';
-    vinyl.classList.remove('playing');
-    equalizer.classList.remove('active');
+    if (playIcon) playIcon.className = 'fas fa-play';
+    if (vinyl)    vinyl.classList.remove('playing');
+    if (equalizer) equalizer.classList.remove('active');
     cancelAnimationFrame(lyricsAnimationId);
+    isPlaying = false;
   } else {
-    bgAudio.play().catch(e => console.log("Audio play blocked", e));
-    playIcon.className = 'fas fa-pause';
-    vinyl.classList.add('playing');
-    equalizer.classList.add('active');
-    if (lyricsBox) exactScrollTop = lyricsBox.scrollTop;
-    scrollLyrics();
+    var playP = bgAudio.play();
+    if (playP !== undefined) {
+      playP.then(() => {
+        isPlaying = true;
+        if (playIcon) playIcon.className = 'fas fa-pause';
+        if (vinyl)    vinyl.classList.add('playing');
+        if (equalizer) equalizer.classList.add('active');
+        if (lyricsBox) exactScrollTop = lyricsBox.scrollTop;
+        scrollLyrics();
+      }).catch(e => console.log('Audio play blocked:', e));
+    }
   }
-  isPlaying = !isPlaying;
 }
 
 function scrollLyrics() {
@@ -385,37 +390,34 @@ function sayYes() {
   if (!isPlaying) toggleMusic();
 }
 
-  // ── confession nav link ID fix ──
-  // (id="confession" vs id="things-i-never-said" resolved below)
+var _fireworksInterval = null;  // stored so it can be cleared
 
-  var _fireworksInterval = null;  // ← so we can clear it later
-
-  function createFireworks(container) {
-    // Burst on click
-    for (let i = 0; i < 30; i++) {
-      const heart = document.createElement('i');
-      heart.className = 'fas fa-heart';
-      heart.style.cssText = `position:absolute;color:#ff4d85;font-size:${Math.random()*20+10}px;left:50%;top:50%;transform:translate(-50%,-50%);z-index:100;transition:all 1s ease-out;`;
-      const angle = Math.random() * Math.PI * 2;
-      const vel = Math.random() * 100 + 50;
-      const tx = Math.cos(angle) * vel, ty = Math.sin(angle) * vel;
-      container.appendChild(heart);
-      setTimeout(() => { heart.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0)`; heart.style.opacity = '0'; }, 50);
-      setTimeout(() => heart.remove(), 1050);
-    }
-    // Continuous rain — stored so it can be cleared if needed
-    if (_fireworksInterval) clearInterval(_fireworksInterval); // safety reset
-    _fireworksInterval = setInterval(() => {
-      const h = document.createElement('i');
-      h.className = 'fas fa-heart';
-      h.style.cssText = `position:absolute;color:${Math.random()>0.5?'#ff4d85':'#a239ca'};left:${Math.random()*100}%;top:-20px;font-size:${Math.random()*15+10}px;opacity:0.7;transition:top 3s linear,opacity 3s linear;`;
-      const fw = document.getElementById('fireworks');
-      if (!fw) { clearInterval(_fireworksInterval); return; } // null-guard
-      fw.appendChild(h);
-      setTimeout(() => { h.style.top = '100%'; h.style.opacity = '0'; }, 50);
-      setTimeout(() => h.remove(), 3050);
-    }, 300);
+function createFireworks(container) {
+  // Initial burst
+  for (let i = 0; i < 30; i++) {
+    const heart = document.createElement('i');
+    heart.className = 'fas fa-heart';
+    heart.style.cssText = `position:absolute;color:#ff4d85;font-size:${Math.random()*20+10}px;left:50%;top:50%;transform:translate(-50%,-50%);z-index:100;transition:all 1s ease-out;`;
+    const angle = Math.random() * Math.PI * 2;
+    const vel   = Math.random() * 100 + 50;
+    const tx = Math.cos(angle) * vel, ty = Math.sin(angle) * vel;
+    container.appendChild(heart);
+    setTimeout(() => { heart.style.transform = `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(0)`; heart.style.opacity = '0'; }, 50);
+    setTimeout(() => heart.remove(), 1050);
   }
+  // Continuous rain — stored so it can be cleared
+  if (_fireworksInterval) clearInterval(_fireworksInterval);
+  _fireworksInterval = setInterval(() => {
+    const h = document.createElement('i');
+    h.className = 'fas fa-heart';
+    h.style.cssText = `position:absolute;color:${Math.random()>0.5?'#ff4d85':'#a239ca'};left:${Math.random()*100}%;top:-20px;font-size:${Math.random()*15+10}px;opacity:0.7;transition:top 3s linear,opacity 3s linear;`;
+    const fw = document.getElementById('fireworks');
+    if (!fw) { clearInterval(_fireworksInterval); return; }
+    fw.appendChild(h);
+    setTimeout(() => { h.style.top = '100%'; h.style.opacity = '0'; }, 50);
+    setTimeout(() => h.remove(), 3050);
+  }, 300);
+}
 
 // ====== FINAL CHOICE LOGIC ======
 function keepStory() {
@@ -469,16 +471,53 @@ function fadeAway() {
 
 // ====== SYNC WITH BIRTHDAY FLOW MUSIC START ======
 window.addEventListener('bdMusicStarted', function () {
-  // Birthday overlay / gift intro already called audio.play() and updated UI.
+  // Gift intro / birthday overlay started audio and synced UI icons.
   // Mark isPlaying=true so toggleMusic() won't double-play.
   isPlaying = true;
-  // Restart lyrics scroll in case it isn't running yet
+  // Restart lyrics scroll (cancel any stale loop first)
   cancelAnimationFrame(lyricsAnimationId);
   if (lyricsBox) {
     exactScrollTop = lyricsBox.scrollTop;
     scrollLyrics();
   }
+  // Re-attach cursor hover to newly-visible interactive elements
+  if (!isTouchDevice && cursor) {
+    document.querySelectorAll('a, button, .nav-logo, .trait, .dot, .quote-nav-btn').forEach(el => {
+      el.removeEventListener('mouseenter', _cursorHoverOn);
+      el.removeEventListener('mouseleave', _cursorHoverOff);
+      el.addEventListener('mouseenter', _cursorHoverOn);
+      el.addEventListener('mouseleave', _cursorHoverOff);
+    });
+  }
 });
+
+// Named cursor hover handlers (reusable, no duplicate listeners)
+function _cursorHoverOn()  { if (cursor) cursor.classList.add('hovering'); }
+function _cursorHoverOff() { if (cursor) cursor.classList.remove('hovering'); }
+
+// ====== "YOU STAYED TILL THE END" HIDDEN DETAIL ======
+(function () {
+  var _stayTimer = null;
+  var _stayShown = false;
+
+  var finalSection = document.getElementById('final-choice');
+  if (!finalSection) return;
+
+  var stayObs = new IntersectionObserver(function (entries) {
+    entries.forEach(function (entry) {
+      if (entry.isIntersecting && !_stayShown) {
+        _stayTimer = setTimeout(function () {
+          var el = document.getElementById('stayMessage');
+          if (el) { el.classList.add('stay-visible'); _stayShown = true; }
+        }, 3500);
+      } else {
+        clearTimeout(_stayTimer);
+      }
+    });
+  }, { threshold: 0.4 });
+
+  stayObs.observe(finalSection);
+})();
 
 // ====== EMAIL NOTIFICATION SYSTEM ======
 function sendDecisionEmail(type) {

@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#0f0514"/>
   <title>Anushka 💕 — My Forever</title>
   <meta name="description" content="A love letter to Anushka — from Swapnadip Ghosh, with all his heart."/>
   <!-- Favicon -->
@@ -434,7 +435,7 @@
         <div class="about-image-ring"></div>
         <div class="about-image-ring ring2"></div>
         <div class="about-avatar">
-          <img src="anushka_portrait.png" alt="Anushka" class="about-portrait"/>
+          <img src="anushka_portrait.png" alt="Anushka" class="about-portrait" loading="lazy"/>
         </div>
         <div class="about-badge"><i class="fas fa-heart"></i> Very Special</div>
       </div>
@@ -957,6 +958,8 @@
       <div class="keep-message" id="keepMessage" style="display: none;">
         <p>Then this story stays —<br>quietly,<br>without expectations.</p>
       </div>
+      <!-- Hidden emotional detail: appears after 3.5s on this section -->
+      <p id="stayMessage">You stayed till the end.</p>
     </div>
   </section>
 
@@ -1218,8 +1221,12 @@
         mainSite.style.transition = 'opacity 1.4s ease';
         mainSite.style.opacity    = '1';
 
-        // Scroll to top
+        // Scroll to top instantly (no smooth scroll fighting the transition)
+        document.documentElement.classList.add('instant-scroll');
         window.scrollTo(0, 0);
+        setTimeout(function () {
+          document.documentElement.classList.remove('instant-scroll');
+        }, 100);
 
         // Hide birthday flow
         if (flow) flow.style.display = 'none';

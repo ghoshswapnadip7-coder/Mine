@@ -2269,3 +2269,92 @@ a, button, [onclick], .trait, .dot, .quote-nav-btn, .music-btn,
   .quotes-carousel { min-height: 450px; }
   .quotes-dots { margin-top: 470px; }
 }
+
+/* ─────────────────────────────────────────────────────────
+    POLISHING — added in stability pass
+───────────────────────────────────────────────────────── */
+
+/* ── "You stayed till the end." — hidden emotional detail ── */
+#stayMessage {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 50000;
+  font-family: 'Lato', sans-serif;
+  font-size: clamp(0.65rem, 2vw, 0.78rem);
+  color: rgba(255, 182, 210, 0.38);
+  letter-spacing: 0.20em;
+  font-style: italic;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 2.4s ease;
+  white-space: nowrap;
+}
+
+#stayMessage.stay-visible {
+  opacity: 1;
+}
+
+/* ── Universal button micro-interactions ── */
+/* All clickable buttons get a consistent hover lift + glow */
+button:not(.gi-btn):not(.warning-btn):not(.bd-btn):not(.quote-nav-btn):not(.music-btn):not(#giMusicPrompt):not(#bdMusicPrompt) {
+  transition: transform 0.28s cubic-bezier(0.22,1,0.36,1),
+              box-shadow 0.28s ease,
+              background 0.28s ease,
+              opacity 0.28s ease;
+}
+
+/* Buttons with class .btn-primary / .btn-secondary */
+.btn-primary:hover,
+.btn-secondary:hover {
+  transform: translateY(-3px) scale(1.04);
+  filter: brightness(1.1);
+}
+
+/* Keep/Fade/Yes buttons */
+.btn-keep:hover,
+.btn-fade:hover,
+.btn-yes:hover {
+  transform: translateY(-2px) scale(1.04);
+  filter: brightness(1.12);
+}
+
+/* Letter replay button */
+.letter-replay-btn:hover {
+  transform: translateY(-2px) scale(1.04);
+  filter: brightness(1.1);
+}
+
+/* ── will-change hints for GPU compositing ── */
+.bd-screen,
+.reveal,
+.fade-in-up,
+.ols-line,
+.gi-content,
+.gi-heading,
+.gi-line,
+.gi-name,
+.gi-soft,
+.gi-btn,
+.warning-content,
+.lock-content {
+  will-change: opacity, transform;
+}
+
+/* Remove will-change once animation is done (prevents over-promotion) */
+.bd-screen.active,
+.reveal.active {
+  will-change: auto;
+}
+
+/* ── Smooth scroll only when user navigates; instant for programmatic scroll ── */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Disable smooth scroll during cinematic transitions (applied temporarily by JS) */
+html.instant-scroll {
+  scroll-behavior: auto;
+}
+
