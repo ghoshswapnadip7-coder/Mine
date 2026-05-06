@@ -108,6 +108,70 @@
 </head>
 <body>
 
+  <!-- ====================================================
+       WARNING SCREEN — shown before the OneLastSmile gift.
+       Fullscreen overlay over the birthday flow.
+       "I Understand" button triggers warningContinue().
+       ==================================================== -->
+  <div id="warningScreen" style="display:none;">
+    <div class="warning-content">
+      <p class="warning-pre">Before you go further&hellip;</p>
+      <div class="warning-body">
+        <p>This isn&rsquo;t just a page.</p>
+        <p>It&rsquo;s something that was written once&hellip;<br>and meant to be felt once.</p>
+        <p>So if you choose to continue,<br>read it slowly.</p>
+      </div>
+      <p class="warning-soft">Some things don&rsquo;t come back twice.</p>
+      <button class="warning-btn" onclick="warningContinue()" style="touch-action:manipulation;">I Understand &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       GIFT INTRO PAGE — cinematic, personal, line-by-line.
+       Clicking "Open It" triggers giftIntroNext().
+       ==================================================== -->
+  <div id="giftIntro" style="display:none;">
+    <!-- Slow-zooming background -->
+    <div class="gi-bg"></div>
+    <!-- Soft floating particles -->
+    <canvas id="giftIntroCanvas"></canvas>
+    <!-- All text content -->
+    <div class="gi-content">
+      <!-- Line 1 heading -->
+      <p class="gi-heading">This is for you.</p>
+      <!-- Lines 2–6 individual -->
+      <div class="gi-body">
+        <p class="gi-line gi-l1">I didn&rsquo;t know how to say everything&hellip;</p>
+        <p class="gi-line gi-l2">so I made something instead.</p>
+        <p class="gi-line gi-l3">It&rsquo;s simple.</p>
+        <p class="gi-line gi-l4">But it&rsquo;s honest.</p>
+        <p class="gi-line gi-l5">And it&rsquo;s from me&hellip; to you.</p>
+      </div>
+      <!-- Her name -->
+      <p class="gi-name gi-name-glow">Anushka</p>
+      <!-- Ghost soft line -->
+      <p class="gi-soft">Think of it as&hellip; a small gift.</p>
+      <!-- CTA -->
+      <button class="gi-btn" onclick="giftIntroNext()" style="touch-action:manipulation;">Open It &rarr;</button>
+    </div>
+    <!-- Music fallback prompt (shown only if autoplay blocked) -->
+    <button id="giMusicPrompt" onclick="giTapPlay()" style="display:none; touch-action:manipulation;">
+      <i class="fas fa-music"></i>&nbsp; Tap to start
+    </button>
+  </div>
+
+  <!-- ====================================================
+       LOCK SCREEN — shown when gift is already viewed.
+       Appears via cinematic transition after warning.
+       ==================================================== -->
+  <div id="lockScreen" style="display:none;">
+    <div class="lock-content">
+      <p class="lock-line lock-line-1">You&rsquo;ve already seen it once.</p>
+      <p class="lock-line lock-line-2">Some things are meant to stay like that.</p>
+      <p class="lock-line lock-line-3">And maybe&hellip;<br>that&rsquo;s what makes them real.</p>
+    </div>
+  </div>
+
   <!-- Dual-layer cursor: outer trailing ring + inner instant dot -->
   <div id="customCursor"></div>   <!-- outer ring -->
   <div id="cursorDot"></div>      <!-- inner dot  -->
@@ -287,26 +351,6 @@
 
   <!-- ====== MAIN SITE — hidden until birthday flow completes ====== -->
   <div id="mainSite" style="display:none;">
-
-  <!-- ====== VIEW ONCE SCREEN ====== -->
-  <div class="view-once-screen" id="viewOnceScreen" style="display: none;">
-    <div class="view-once-content">
-      <p>This story was meant to be seen once.</p>
-      <p>If you're here again,<br>maybe it already meant something.</p>
-      <button class="btn-open-again" onclick="openAgain()">Open Again</button>
-    </div>
-  </div>
-
-  <!-- ====== DESTROY SCREEN (PERMANENT LOCK) ====== -->
-  <div class="destroy-screen" id="destroyScreen" style="display: none;">
-    <div class="destroy-text">
-      <p>This page once held feelings<br>that were never meant to disappear.</p>
-      <br>
-      <p>But some stories are not meant to stay forever.</p>
-      <br>
-      <p>So this page faded away —<br>just like the moments I never got to keep.</p>
-    </div>
-  </div>
 
   <!-- ====== CANVAS PARTICLES ====== -->
   <canvas id="heartCanvas"></canvas>
@@ -1162,13 +1206,6 @@
 
       // ── Step 5: Silence moment — then reveal main site (3.6s after click) ──
       setTimeout(function () {
-        // Bypass view-once on repeat visits (uses the existing key openAgain() uses)
-        try { sessionStorage.setItem('allowAccess', 'true'); } catch (e) {}
-
-        // Hide view-once screen if it was activated
-        var vos = document.getElementById('viewOnceScreen');
-        if (vos) vos.style.display = 'none';
-
         // Restore body scroll
         document.body.style.overflow = '';
 
@@ -1202,8 +1239,249 @@
       }, 3600);
     };
 
-    // bdEnter is an alias so onclick="bdEnter()" on the button still works
-    window.bdEnter = window.revealMainSite;
+    // ─────────────────────────────────────────────────────────
+    //  CONTROLLED VIEWING FLOW
+    //  Birthday → Gift Intro → Warning → OneLastSmile (once) → Lock
+    // ─────────────────────────────────────────────────────────
+
+    // ── Gift Intro particle canvas (40 soft floating dots) ──
+    var _giAnimId  = null;
+    var _giResize  = null;
+
+    function startGiftIntroParticles() {
+      var c = document.getElementById('giftIntroCanvas');
+      if (!c) return;
+      var ctx = c.getContext('2d');
+
+      function resize() {
+        c.width  = window.innerWidth;
+        c.height = window.innerHeight;
+      }
+      resize();
+      _giResize = resize;
+      window.addEventListener('resize', _giResize, { passive: true });
+
+      var pts = [];
+      var colors = ['255,77,133', '162,57,202', '255,179,198', '210,150,220'];
+      for (var i = 0; i < 40; i++) {
+        pts.push({
+          x: Math.random() * c.width,
+          y: Math.random() * c.height,
+          r: Math.random() * 2.0 + 0.5,
+          speed: Math.random() * 0.38 + 0.08,
+          phase: Math.random() * Math.PI * 2,
+          tw:    Math.random() * 0.014 + 0.006,
+          color: colors[Math.floor(Math.random() * colors.length)]
+        });
+      }
+
+      function loop() {
+        ctx.clearRect(0, 0, c.width, c.height);
+        pts.forEach(function (p) {
+          p.phase += p.tw;
+          var a = 0.32 * (0.5 + 0.5 * Math.sin(p.phase));
+          ctx.fillStyle = 'rgba(' + p.color + ',' + a + ')';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+          p.y -= p.speed;
+          p.x += Math.sin(p.y * 0.007) * 0.2;
+          if (p.y < -6) {
+            p.y = c.height + 6;
+            p.x = Math.random() * c.width;
+          }
+        });
+        _giAnimId = requestAnimationFrame(loop);
+      }
+      loop();
+    }
+
+    function stopGiftIntroParticles() {
+      if (_giAnimId) { cancelAnimationFrame(_giAnimId); _giAnimId = null; }
+      if (_giResize) { window.removeEventListener('resize', _giResize); _giResize = null; }
+    }
+
+    // ── bdEnter: “One Last Smile” → show Gift Intro + start music ──
+    window.bdEnter = function () {
+      var gi = document.getElementById('giftIntro');
+      if (!gi) return;
+
+      // Show overlay + trigger CSS transitions
+      gi.style.display = 'flex';
+      gi.offsetHeight;                        // force reflow
+      gi.classList.add('gift-intro-visible');
+
+      // Start particles
+      startGiftIntroParticles();
+
+      // ── Music: fade in to 25% volume over 2 s ──
+      var audio = document.getElementById('bgAudio');
+      if (audio) {
+        var targetVol = 0.25;
+        // If audio isn't playing yet, start it silently
+        if (audio.paused) {
+          audio.volume = 0;
+          var playPromise = audio.play();
+          if (playPromise !== undefined) {
+            playPromise.then(function () {
+              // Successfully started — fade up over 2 s
+              var step = 0;
+              var steps = 40;       // 40 × 50ms = 2000ms
+              var giVolTimer = setInterval(function () {
+                step++;
+                audio.volume = Math.min(targetVol, (step / steps) * targetVol);
+                if (step >= steps) clearInterval(giVolTimer);
+              }, 50);
+              // Sync isPlaying flag and UI icons
+              var playIcon = document.getElementById('playIcon');
+              var vinyl    = document.getElementById('vinyl');
+              var eq       = document.getElementById('equalizer');
+              if (playIcon) playIcon.className = 'fas fa-pause';
+              if (vinyl)    vinyl.classList.add('playing');
+              if (eq)       eq.classList.add('active');
+              window.dispatchEvent(new Event('bdMusicStarted'));
+              var prompt = document.getElementById('giMusicPrompt');
+              if (prompt) prompt.style.display = 'none';
+            }).catch(function () {
+              // Autoplay blocked — show tap prompt
+              var prompt = document.getElementById('giMusicPrompt');
+              if (prompt) prompt.style.display = 'block';
+            });
+          }
+        } else {
+          // Already playing from earlier screen — gently adjust to 25%
+          var curVol = audio.volume;
+          if (curVol !== targetVol) {
+            var diff   = targetVol - curVol;
+            var steps2 = 40;
+            var step2  = 0;
+            var giVolTimer2 = setInterval(function () {
+              step2++;
+              audio.volume = Math.max(0, Math.min(1, curVol + diff * (step2 / steps2)));
+              if (step2 >= steps2) clearInterval(giVolTimer2);
+            }, 50);
+          }
+        }
+      }
+    };
+
+    // ── giTapPlay: tap-to-start fallback for mobile autoplay block ──
+    window.giTapPlay = function () {
+      var audio  = document.getElementById('bgAudio');
+      var prompt = document.getElementById('giMusicPrompt');
+      if (!audio) return;
+      audio.volume = 0;
+      audio.play().then(function () {
+        if (prompt) prompt.style.display = 'none';
+        var step = 0, steps = 40;
+        var t = setInterval(function () {
+          step++;
+          audio.volume = Math.min(0.25, (step / steps) * 0.25);
+          if (step >= steps) clearInterval(t);
+        }, 50);
+        var playIcon = document.getElementById('playIcon');
+        var vinyl    = document.getElementById('vinyl');
+        var eq       = document.getElementById('equalizer');
+        if (playIcon) playIcon.className = 'fas fa-pause';
+        if (vinyl)    vinyl.classList.add('playing');
+        if (eq)       eq.classList.add('active');
+        window.dispatchEvent(new Event('bdMusicStarted'));
+      }).catch(function () {});
+    };
+
+    // ── giftIntroNext: “Open It” button → hide intro, show warning ──
+    window.giftIntroNext = function () {
+      var gi = document.getElementById('giftIntro');
+      var ws = document.getElementById('warningScreen');
+
+      // Fade out gift intro
+      if (gi) {
+        gi.classList.remove('gift-intro-visible');
+        gi.style.pointerEvents = 'none';
+        setTimeout(function () {
+          gi.style.display = 'none';
+          gi.style.pointerEvents = '';
+          stopGiftIntroParticles();
+        }, 620);
+      }
+
+      // Show warning screen (slight delay so fade-out starts first)
+      setTimeout(function () {
+        if (ws) {
+          ws.style.display = 'flex';
+          ws.offsetHeight;
+          ws.classList.add('warning-visible');
+        }
+      }, 380);
+    };
+
+    // ── warningContinue: called when "I Understand" is clicked ──
+    window.warningContinue = function () {
+      var ws = document.getElementById('warningScreen');
+
+      // Fade out the warning screen
+      if (ws) {
+        ws.classList.remove('warning-visible');
+        ws.style.pointerEvents = 'none';
+        setTimeout(function () {
+          ws.style.display = 'none';
+          ws.style.pointerEvents = '';
+        }, 600);
+      }
+
+      // Check if already viewed
+      if (localStorage.getItem('onelastsmile_viewed') === 'true') {
+        // ── ALREADY VIEWED — cinematic lock screen transition ──
+        var blackout  = document.getElementById('olsBlackout');
+        var flow      = document.getElementById('birthdayFlow');
+        var lockScreen = document.getElementById('lockScreen');
+
+        setTimeout(function () {
+          // Fade to black
+          if (blackout) {
+            blackout.style.transition = 'opacity 1.8s cubic-bezier(0.4,0,0.2,1)';
+            blackout.classList.add('active');
+          }
+          // Fade music if playing
+          var audio = document.getElementById('bgAudio');
+          if (audio && !audio.paused) {
+            var fo = setInterval(function () {
+              if (audio.volume > 0.03) {
+                audio.volume = Math.max(0, audio.volume - 0.018);
+              } else {
+                audio.volume = 0; audio.pause();
+                clearInterval(fo);
+              }
+            }, 60);
+          }
+        }, 200);
+
+        // After blackout — reveal lock screen
+        setTimeout(function () {
+          if (flow)      flow.style.display = 'none';
+          document.body.style.overflow = 'hidden';
+
+          if (lockScreen) {
+            lockScreen.style.display = 'flex';
+            lockScreen.offsetHeight;           // force reflow
+            lockScreen.classList.add('lock-visible');
+          }
+          // Fade out blackout
+          if (blackout) {
+            blackout.style.transition = 'opacity 1.6s ease';
+            blackout.classList.remove('active');
+            setTimeout(function () {
+              blackout.style.pointerEvents = 'none';
+            }, 1700);
+          }
+        }, 2400);
+
+      } else {
+        // ── FIRST TIME — mark as viewed and open the gift ──
+        try { localStorage.setItem('onelastsmile_viewed', 'true'); } catch (e) {}
+        window.revealMainSite();
+      }
+    };
 
     /* sync isPlaying in script.js when birthday flow starts music */
     window.addEventListener('bdMusicStarted', function () {

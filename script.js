@@ -1,24 +1,13 @@
-// ====== AUTO CLEAR OLD LOCK DATA ======
-localStorage.removeItem('siteDestroyed');
-
-// ====== DESTROY AND VIEW ONCE LOGIC ======
-const destroyScreen = document.getElementById('destroyScreen');
-const viewOnceScreen = document.getElementById('viewOnceScreen');
-
-if (false && localStorage.getItem('siteDestroyed') === 'true') {
-  if (destroyScreen) destroyScreen.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-} else if (localStorage.getItem('hasVisited') === 'true' && !sessionStorage.getItem('allowAccess')) {
-  if (viewOnceScreen) viewOnceScreen.style.display = 'flex';
-  document.body.style.overflow = 'hidden';
-} else {
-  localStorage.setItem('hasVisited', 'true');
-}
-
-function openAgain() {
-  sessionStorage.setItem('allowAccess', 'true');
-  location.reload();
-}
+// ====== ONE-TIME ACCESS — CONTROLLED VIEWING FLOW ======
+// The birthday section is ALWAYS shown on every visit.
+// Access to the OneLastSmile gift is controlled via:
+//   1. Warning screen (shown when user clicks "One Last Smile")
+//   2. warningContinue() in index.html checks localStorage
+//      → First time:  opens the gift, sets "onelastsmile_viewed"
+//      → Subsequent:  cinematic lock screen transition
+//
+// Key: "onelastsmile_viewed" (set in warningContinue on first entry)
+// NO blocking, NO throw, NO page-load lock. Birthday always works.
 
 // ====== LOADER ======
 window.addEventListener('load', () => {
