@@ -1104,3 +1104,47 @@ document.addEventListener("click", () => {
     }
   }
 }, { once: true });
+
+// ====== MESSAGE SYSTEM (FORMSUBMIT AJAX) ======
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("olsMessageForm");
+  const statusEl = document.getElementById("olsFormStatus");
+  const btn = document.getElementById("olsSubmitBtn");
+  
+  if (form) {
+    form.addEventListener("submit", function(e) {
+      e.preventDefault();
+      const formData = new FormData(form);
+      
+      // Use FormSubmit AJAX endpoint
+      const url = "https://formsubmit.co/ajax/ghoshswapnadip7@gmail.com";
+      
+      btn.innerHTML = "Sending... <i class='fas fa-spinner fa-spin'></i>";
+      btn.style.opacity = "0.7";
+      btn.style.pointerEvents = "none";
+      
+      fetch(url, {
+        method: "POST",
+        body: formData
+      })
+      .then(response => response.json())
+      .then(data => {
+        form.style.display = "none";
+        statusEl.style.display = "block";
+        if (data.success === "false" || data.success === false) {
+           statusEl.innerHTML = "Sent! <br><span style='font-size:0.8em; opacity:0.7;'>(Note: The website owner needs to activate FormSubmit in their inbox first)</span>";
+        } else {
+           statusEl.innerHTML = "Your message was sent beautifully. Thank you. 💌";
+        }
+      })
+      .catch(error => {
+        statusEl.style.display = "block";
+        statusEl.innerText = "There was an issue sending your message. Please try again.";
+        statusEl.style.color = "#ff4d85";
+        btn.innerHTML = "Send 💌";
+        btn.style.opacity = "1";
+        btn.style.pointerEvents = "auto";
+      });
+    });
+  }
+});

@@ -946,13 +946,13 @@
 
       <!-- ====== MESSAGE SYSTEM ====== -->
       <div class="message-container reveal">
-        <form action="https://formsubmit.co/ghoshswapnadip7@gmail.com" method="POST" class="ols-form">
-          <input type="hidden" name="_captcha" value="false">
+        <form id="olsMessageForm" class="ols-form">
           <input type="hidden" name="_subject" value="💖 Message from OneLastSmile">
           <input type="text" name="name" placeholder="Your name..." required class="ols-input">
           <textarea name="message" placeholder="Write something from your heart..." required class="ols-textarea"></textarea>
-          <button type="submit" class="ols-submit-btn">Send 💌</button>
+          <button type="submit" id="olsSubmitBtn" class="ols-submit-btn">Send 💌</button>
         </form>
+        <p id="olsFormStatus" style="display:none; text-align:center; margin-top:15px; color:#ffb3c6; font-family:'Playfair Display',serif; font-style:italic; letter-spacing:1px;"></p>
       </div>
 
       <div class="propose-buttons" id="proposeButtons">
