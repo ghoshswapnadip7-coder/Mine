@@ -20,44 +20,23 @@ window.addEventListener('load', () => {
   }, 2000);
 });
 
-// ====== CUSTOM CURSOR ======
-const cursor = document.getElementById('cursor');
-const cursorTrail = document.getElementById('cursorTrail');
-
-let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
-let cursorX = mouseX, cursorY = mouseY;
-let trailX = mouseX, trailY = mouseY;
-
+// ====== GLOBAL INTERACTION & RIPPLE EFFECT ======
+window._olsClickCount = 0;
 const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-if (!isTouchDevice) {
-  document.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  }, { passive: true });
+document.addEventListener('click', function(e) {
+  window._olsClickCount++;
 
-  function animateCursor() {
-    cursorX += (mouseX - cursorX) * 0.5;
-    cursorY += (mouseY - cursorY) * 0.5;
-    trailX += (mouseX - trailX) * 0.15;
-    trailY += (mouseY - trailY) * 0.15;
-    
-    if (cursor) cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
-    if (cursorTrail) cursorTrail.style.transform = `translate3d(${trailX}px, ${trailY}px, 0) translate(-50%, -50%)`;
-    
-    requestAnimationFrame(animateCursor);
+  // Subtle ripple effect (disabled on mobile)
+  if (!isTouchDevice) {
+    const ripple = document.createElement('div');
+    ripple.className = 'click-ripple';
+    ripple.style.left = e.clientX + 'px';
+    ripple.style.top = e.clientY + 'px';
+    document.body.appendChild(ripple);
+    setTimeout(() => { if (ripple.parentNode) ripple.remove(); }, 800);
   }
-  requestAnimationFrame(animateCursor);
-
-  const interactiveElements = document.querySelectorAll('a, button, .nav-logo, .trait, .dot, .quote-nav-btn');
-  interactiveElements.forEach(el => {
-    el.addEventListener('mouseenter', () => cursor.classList.add('hovering'));
-    el.addEventListener('mouseleave', () => cursor.classList.remove('hovering'));
-  });
-} else {
-  if (cursor) cursor.style.display = 'none';
-  if (cursorTrail) cursorTrail.style.display = 'none';
-}
+}, { passive: true });
 
 // ====== NAVBAR & HAMBURGER ======
 const navbar = document.getElementById('navbar');
@@ -442,6 +421,13 @@ function triggerSecretEnding() {
   if (dynamicText) {
     // If stayed longer than 60s
     dynamicText.innerHTML = timeSpent > 60000 ? "You really stayed…" : "Even a moment was enough.";
+
+    // Smart interaction detection: adjust glow intensity
+    if (window._olsClickCount > 8) {
+      document.documentElement.style.setProperty('--secret-glow', 'rgba(255,105,160,0.35)');
+    } else {
+      document.documentElement.style.setProperty('--secret-glow', 'rgba(255,105,160,0.15)');
+    }
   }
 
   // Blackout via existing fadeOutScreen if not already active

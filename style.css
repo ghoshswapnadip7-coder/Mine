@@ -2386,10 +2386,44 @@ html.instant-scroll {
   text-align: center;
   line-height: 2.2;
   opacity: 0;
-  transition: opacity 3s ease;
-  text-shadow: 0 0 12px rgba(255, 105, 160, 0.2);
+  transform: translateY(15px);
+  transition: opacity 1.2s ease, transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+  text-shadow: 0 0 15px var(--secret-glow, rgba(255, 105, 160, 0.15));
 }
 #secretEndingText.visible {
   opacity: 1;
+  transform: translateY(0);
 }
 
+/* ─────────────────────────────────────────────────────────
+    ADVANCED INTERACTIONS
+───────────────────────────────────────────────────────── */
+
+/* ── Click Ripple Effect ── */
+.click-ripple {
+  position: fixed;
+  width: 20px;
+  height: 20px;
+  background: transparent;
+  border: 1px solid rgba(255, 105, 160, 0.4);
+  border-radius: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(1);
+  animation: rippleAnim 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  z-index: 999998;
+}
+
+@keyframes rippleAnim {
+  0%   { transform: translate(-50%, -50%) scale(1); opacity: 0.6; border-width: 2px; }
+  100% { transform: translate(-50%, -50%) scale(5); opacity: 0;   border-width: 0px; }
+}
+
+/* ── Breathing Effect on Final Page ── */
+@keyframes slowBreath {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.01); }
+}
+
+#final-choice {
+  animation: slowBreath 7s infinite ease-in-out;
+}

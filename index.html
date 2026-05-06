@@ -1014,6 +1014,21 @@
     </div>
   </div>
 
+  <style>
+    /* ── Vignette and grain on Secret Screen ── */
+    #secretEndingScreen {
+      background: radial-gradient(circle at center, #110515 0%, #000 85%);
+    }
+    #secretEndingScreen::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      opacity: 0.05;
+      pointer-events: none;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+    }
+  </style>
+
   </div><!-- /mainSite -->
 
   <script src="script.js"></script>
@@ -1565,9 +1580,19 @@
     var DOT_BASE   = 0.050;
     var SCALE_BASE = 0.880;
 
-    // Heartbeat: 2.4 s period, ±8% scale
-    var BEAT_OMEGA = 6.2832 / 2.4;   // 2π / period  (rad per second)
+    // Heartbeat: 1.25 s period, ±8% scale
+    var BEAT_OMEGA = 6.2832 / 1.25;   // 2π / period  (rad per second)
     var BEAT_AMP   = 0.08;
+
+    /* ── Trail Dots ── */
+    var trailEls = [];
+    var NUM_TRAILS = 3;
+    for (var i = 0; i < NUM_TRAILS; i++) {
+      var t = document.createElement('div');
+      t.style.cssText = 'position:fixed; top:0; left:0; width:5px; height:5px; background:rgba(255,45,117,' + (0.5 - i*0.15) + '); border-radius:50%; pointer-events:none; z-index:999997; will-change:transform;';
+      document.body.appendChild(t);
+      trailEls.push({ el: t, x: mx, y: my });
+    }
 
     /* ── Mouse tracking ── */
     document.addEventListener('mousemove', function (e) {
@@ -1670,6 +1695,17 @@
       dot.style.transform =
         'translate3d(' + (dx | 0) + 'px,' + (dy | 0) + 'px,0)translate(-50%,-50%)' +
         (isHovering ? 'scale(1.35)' : '');
+
+      /* Update trails */
+      var prevX = rx, prevY = ry;
+      for (var i = 0; i < NUM_TRAILS; i++) {
+        var tr = trailEls[i];
+        tr.x += (prevX - tr.x) * 0.45;
+        tr.y += (prevY - tr.y) * 0.45;
+        tr.el.style.transform = 'translate3d(' + (tr.x | 0) + 'px,' + (tr.y | 0) + 'px,0)translate(-50%,-50%)scale(' + (1 - i*0.2) + ')';
+        prevX = tr.x;
+        prevY = tr.y;
+      }
 
       requestAnimationFrame(animate);
     }
