@@ -2470,3 +2470,743 @@ html.instant-scroll {
   opacity: 1;
   transform: translateY(0);
 }
+
+/* ═══════════════════════════════════════════════════════════
+   CINEMATIC ENHANCEMENT LAYER — Premium Immersive Upgrades
+   Subtle, emotional, performance-safe.
+═══════════════════════════════════════════════════════════ */
+
+/* ──────────────────────────────────────────────
+   1. SUBTLE PARALLAX — hero background drifts
+   Layers move at different rates via transform.
+   No JS needed for the base, hero uses CSS only.
+────────────────────────────────────────────── */
+.hero {
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+/* Parallax bg wrapper — JS adds translateY offset */
+.hero-parallax-bg {
+  position: absolute;
+  inset: -8%;
+  background: url('romantic_bg.png') no-repeat center center / cover;
+  will-change: transform;
+  z-index: 0;
+  pointer-events: none;
+}
+
+/* Remove the old inline background from .hero when parallax wrapper exists */
+.hero.has-parallax {
+  background: none !important;
+}
+
+/* Foreground moves slightly less than bg (handled in JS) */
+.hero-content.parallax-fg {
+  will-change: transform;
+  transition: transform 0.1s linear;
+}
+
+/* ──────────────────────────────────────────────
+   2. GLASS / SOFT BLUR — text section depth
+   Very low opacity glass panels behind key text.
+────────────────────────────────────────────── */
+.glass-panel {
+  background: rgba(15, 5, 20, 0.14);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 77, 133, 0.08);
+  border-radius: 18px;
+  padding: 36px 40px;
+  position: relative;
+}
+
+/* Apply to specific sections that need depth */
+.about-text.glass-panel,
+.story-scroll-box.glass-panel,
+.confession-content.glass-panel,
+.propose-message.glass-panel {
+  padding: 28px 32px;
+}
+
+/* ──────────────────────────────────────────────
+   3. CINEMATIC LIGHT SWEEP
+   One slow, translucent diagonal highlight.
+   Repeats every ~12s via animation-delay trick.
+────────────────────────────────────────────── */
+.light-sweep-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.light-sweep-layer::after {
+  content: '';
+  position: absolute;
+  top: -30%;
+  left: -60%;
+  width: 40%;
+  height: 160%;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 200, 230, 0.045) 48%,
+    rgba(255, 200, 230, 0.072) 50%,
+    rgba(255, 200, 230, 0.045) 52%,
+    transparent 70%
+  );
+  transform: skewX(-12deg);
+  animation: lightSweep 13s 4s ease-in-out infinite;
+  will-change: left;
+}
+
+@keyframes lightSweep {
+  0%   { left: -60%; opacity: 0; }
+  3%   { opacity: 1; }
+  40%  { left: 130%; opacity: 0.8; }
+  41%  { opacity: 0; }
+  100% { left: 130%; opacity: 0; }
+}
+
+/* ──────────────────────────────────────────────
+   4. TEXT EMPHASIS SYSTEM
+   Key phrases glow softly on a slow pulse.
+   Use class .glow-word or .glow-phrase on spans.
+────────────────────────────────────────────── */
+.glow-word {
+  color: #ffcce0;
+  font-weight: 600;
+  text-shadow:
+    0 0 8px rgba(255, 105, 160, 0.55),
+    0 0 20px rgba(255, 105, 160, 0.22);
+  animation: wordGlowPulse 4s ease-in-out infinite;
+}
+
+.glow-phrase {
+  display: inline;
+  color: rgba(255, 182, 210, 0.96);
+  text-shadow:
+    0 0 10px rgba(255, 105, 160, 0.50),
+    0 0 24px rgba(255, 105, 160, 0.22);
+  animation: wordGlowPulse 5s ease-in-out infinite;
+}
+
+@keyframes wordGlowPulse {
+  0%, 100% {
+    text-shadow:
+      0 0 8px  rgba(255, 105, 160, 0.40),
+      0 0 20px rgba(255, 105, 160, 0.16);
+  }
+  50% {
+    text-shadow:
+      0 0 14px rgba(255, 105, 160, 0.70),
+      0 0 34px rgba(255, 105, 160, 0.32),
+      0 0 55px rgba(200,  60, 120, 0.18);
+  }
+}
+
+/* Brighter version for hero name */
+.hero-name {
+  animation: heroNameGlow 6s ease-in-out infinite;
+}
+
+@keyframes heroNameGlow {
+  0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 77, 133, 0.30)); }
+  50%       { filter: drop-shadow(0 0 24px rgba(255, 77, 133, 0.55)); }
+}
+
+/* ──────────────────────────────────────────────
+   5. SECTION TRANSITIONS
+   Reveal: fade + 22px rise, 0.7s smooth ease.
+   Replaces instant snap with organic motion.
+────────────────────────────────────────────── */
+.reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity  0.70s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.70s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Stagger children inside a revealed container */
+.reveal.active > *:nth-child(1) { transition-delay: 0.00s; }
+.reveal.active > *:nth-child(2) { transition-delay: 0.08s; }
+.reveal.active > *:nth-child(3) { transition-delay: 0.16s; }
+.reveal.active > *:nth-child(4) { transition-delay: 0.24s; }
+.reveal.active > *:nth-child(5) { transition-delay: 0.32s; }
+
+/* ──────────────────────────────────────────────
+   6. PARTICLE REFINEMENT
+   Particles: random fade-in/out via JS.
+   CSS: softer look, slower feel overall.
+────────────────────────────────────────────── */
+
+/* Particle canvas opacity pulse — handled per-particle in JS.
+   CSS: ensure canvas composites correctly */
+#heartCanvas {
+  opacity: 0.85;
+  transition: opacity 3s ease;
+}
+
+/* ──────────────────────────────────────────────
+   7. FINAL MOMENT IMPACT — lingering glow
+   After secret ending text fades, a soft
+   pink glow remains on the screen for ~2s.
+────────────────────────────────────────────── */
+.ols-linger-glow {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999995;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(255, 90, 150, 0.12) 0%,
+    transparent 72%
+  );
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+.ols-linger-glow.active {
+  opacity: 1;
+}
+
+.ols-linger-glow.fade-out {
+  opacity: 0;
+}
+
+/* ──────────────────────────────────────────────
+   8. AUDIO IMMERSION — visual pulse on playing
+   Subtle ring around music section when active.
+────────────────────────────────────────────── */
+.music-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 20% 50%,
+    rgba(255, 77, 133, 0.06) 0%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+.music-section.music-playing::before {
+  opacity: 1;
+  animation: musicAuraPulse 4s ease-in-out infinite;
+}
+
+@keyframes musicAuraPulse {
+  0%, 100% {
+    background: radial-gradient(ellipse at 20% 50%, rgba(255,77,133,0.06) 0%, transparent 65%);
+  }
+  50% {
+    background: radial-gradient(ellipse at 20% 50%, rgba(255,77,133,0.11) 0%, transparent 65%);
+  }
+}
+
+/* ──────────────────────────────────────────────
+   9. VISUAL CONSISTENCY — glow / shadow polish
+   Ensure color palette is locked to pink/purple.
+────────────────────────────────────────────── */
+
+/* Cinematic lyrics line emphasis */
+.cinematic-line {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 2.0;
+  color: rgba(255, 210, 228, 0.88);
+  transition: color 0.4s ease, text-shadow 0.4s ease;
+}
+
+/* Active lyric highlight (added by JS on scroll position) */
+.cinematic-line.lyric-active {
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow:
+    0 0 8px  rgba(255, 105, 160, 0.50),
+    0 0 18px rgba(255, 105, 160, 0.20);
+}
+
+/* Section-title consistent glow */
+.section-title {
+  text-shadow:
+    0 0 20px rgba(255, 255, 255, 0.14),
+    0 0 40px rgba(255, 77, 133, 0.08);
+}
+
+/* ──────────────────────────────────────────────
+   10. MOBILE CLEANUP — density & spacing
+────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Reduce visual density */
+  .reasons-grid { gap: 18px; }
+  .reason-card  { padding: 28px 18px; }
+
+  .timeline-item  { padding: 8px 22px; margin-bottom: 28px; }
+  .timeline-content { padding: 20px 18px; }
+
+  /* Cleaner section spacing */
+  section { padding: 70px 4%; }
+
+  /* Hero: smaller name on mobile */
+  .hero-name { font-size: 5rem; }
+
+  /* Reduce hero tagline size */
+  .hero-tagline { font-size: 1.15rem; }
+
+  /* Improve letter readability */
+  .letter-paper { padding: 30px 18px; }
+
+  /* Music player stacks on mobile */
+  .music-player {
+    flex-direction: column;
+    gap: 24px;
+    padding: 28px 18px;
+  }
+
+  /* Lyrics box smaller on mobile */
+  .lyrics-box { height: 200px; }
+
+  /* Reduce light sweep intensity on mobile */
+  .light-sweep-layer::after { opacity: 0.4; }
+
+  /* Propose section padding */
+  .propose-container { padding: 36px 20px; }
+  .propose-title     { font-size: 3.5rem; }
+}
+
+@media (max-width: 480px) {
+  .hero-name     { font-size: 3.8rem; }
+  .hero-tagline  { font-size: 1rem; }
+  .section-title { font-size: 2.2rem; }
+  .propose-title { font-size: 2.8rem; }
+}
+
+/* ──────────────────────────────────────────────
+   11. PERFORMANCE — GPU-composited layers only
+   Ensure animated elements stay on compositor.
+────────────────────────────────────────────── */
+.hero-parallax-bg,
+.light-sweep-layer::after,
+.ols-linger-glow,
+.about-portrait,
+#heartCanvas {
+  will-change: transform, opacity;
+}
+
+/* Disable parallax and heavy effects on reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .hero-parallax-bg,
+  .light-sweep-layer::after,
+  .hero-name {
+    animation: none !important;
+    transform: none !important;
+  }
+  .reveal {
+    transition: opacity 0.4s ease !important;
+    transform: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BEHAVIORAL INTERACTION LAYER — Natural, emotional responsiveness
+═══════════════════════════════════════════════════════════ */
+
+/* --- 1. Scroll Behavior --- */
+body.scroll-fast .reveal {
+  transition-duration: 0.35s !important;
+}
+body.scroll-slow .reveal {
+  transition-duration: 1.2s !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* --- 2. Pause Detection & 6. Breathing UI --- */
+@keyframes uiBreathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.006); }
+}
+body.is-idle {
+  animation: uiBreathe 8s ease-in-out infinite;
+}
+body.is-idle #mainSite {
+  filter: brightness(0.92) contrast(0.98);
+  transition: filter 3s ease;
+}
+.idle-prompt {
+  position: fixed;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  color: rgba(255, 182, 210, 0.75);
+  text-shadow: 0 0 15px rgba(255, 105, 160, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 999999;
+  letter-spacing: 0.08em;
+  transition: opacity 2s ease;
+}
+.idle-prompt.visible {
+  opacity: 1;
+}
+
+/* --- 3. Engagement Response --- */
+body.high-engagement {
+  --primary-color: #ff6091; /* Slightly warmer */
+  --secondary-color: #b03ecc;
+}
+
+/* --- 4. Text Reaction --- */
+.hero-tagline, .about-text p, .reason-card p, .timeline-content p, .propose-message p, .cinematic-line, .quote-text {
+  transition: filter 0.8s ease, text-shadow 0.8s ease;
+}
+  opacity: 0;
+}
+
+/* ──────────────────────────────────────────────
+   8. AUDIO IMMERSION — visual pulse on playing
+   Subtle ring around music section when active.
+────────────────────────────────────────────── */
+.music-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse at 20% 50%,
+    rgba(255, 77, 133, 0.06) 0%,
+    transparent 65%
+  );
+  pointer-events: none;
+  z-index: 0;
+  opacity: 0;
+  transition: opacity 1.5s ease;
+}
+
+.music-section.music-playing::before {
+  opacity: 1;
+  animation: musicAuraPulse 4s ease-in-out infinite;
+}
+
+@keyframes musicAuraPulse {
+  0%, 100% {
+    background: radial-gradient(ellipse at 20% 50%, rgba(255,77,133,0.06) 0%, transparent 65%);
+  }
+  50% {
+    background: radial-gradient(ellipse at 20% 50%, rgba(255,77,133,0.11) 0%, transparent 65%);
+  }
+}
+
+/* ──────────────────────────────────────────────
+   9. VISUAL CONSISTENCY — glow / shadow polish
+   Ensure color palette is locked to pink/purple.
+────────────────────────────────────────────── */
+
+/* Cinematic lyrics line emphasis */
+.cinematic-line {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: 1.05rem;
+  line-height: 2.0;
+  color: rgba(255, 210, 228, 0.88);
+  transition: color 0.4s ease, text-shadow 0.4s ease;
+}
+
+/* Active lyric highlight (added by JS on scroll position) */
+.cinematic-line.lyric-active {
+  color: rgba(255, 255, 255, 0.96);
+  text-shadow:
+    0 0 8px  rgba(255, 105, 160, 0.50),
+    0 0 18px rgba(255, 105, 160, 0.20);
+}
+
+/* Section-title consistent glow */
+.section-title {
+  text-shadow:
+    0 0 20px rgba(255, 255, 255, 0.14),
+    0 0 40px rgba(255, 77, 133, 0.08);
+}
+
+/* ──────────────────────────────────────────────
+   10. MOBILE CLEANUP — density & spacing
+────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  /* Reduce visual density */
+  .reasons-grid { gap: 18px; }
+  .reason-card  { padding: 28px 18px; }
+
+  .timeline-item  { padding: 8px 22px; margin-bottom: 28px; }
+  .timeline-content { padding: 20px 18px; }
+
+  /* Cleaner section spacing */
+  section { padding: 70px 4%; }
+
+  /* Hero: smaller name on mobile */
+  .hero-name { font-size: 5rem; }
+
+  /* Reduce hero tagline size */
+  .hero-tagline { font-size: 1.15rem; }
+
+  /* Improve letter readability */
+  .letter-paper { padding: 30px 18px; }
+
+  /* Music player stacks on mobile */
+  .music-player {
+    flex-direction: column;
+    gap: 24px;
+    padding: 28px 18px;
+  }
+
+  /* Lyrics box smaller on mobile */
+  .lyrics-box { height: 200px; }
+
+  /* Reduce light sweep intensity on mobile */
+  .light-sweep-layer::after { opacity: 0.4; }
+
+  /* Propose section padding */
+  .propose-container { padding: 36px 20px; }
+  .propose-title     { font-size: 3.5rem; }
+}
+
+@media (max-width: 480px) {
+  .hero-name     { font-size: 3.8rem; }
+  .hero-tagline  { font-size: 1rem; }
+  .section-title { font-size: 2.2rem; }
+  .propose-title { font-size: 2.8rem; }
+}
+
+/* ──────────────────────────────────────────────
+   11. PERFORMANCE — GPU-composited layers only
+   Ensure animated elements stay on compositor.
+────────────────────────────────────────────── */
+.hero-parallax-bg,
+.light-sweep-layer::after,
+.ols-linger-glow,
+.about-portrait,
+#heartCanvas {
+  will-change: transform, opacity;
+}
+
+/* Disable parallax and heavy effects on reduced-motion preference */
+@media (prefers-reduced-motion: reduce) {
+  .hero-parallax-bg,
+  .light-sweep-layer::after,
+  .hero-name {
+    animation: none !important;
+    transform: none !important;
+  }
+  .reveal {
+    transition: opacity 0.4s ease !important;
+    transform: none !important;
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   BEHAVIORAL INTERACTION LAYER — Natural, emotional responsiveness
+═══════════════════════════════════════════════════════════ */
+
+/* --- 1. Scroll Behavior --- */
+body.scroll-fast .reveal {
+  transition-duration: 0.35s !important;
+}
+body.scroll-slow .reveal {
+  transition-duration: 1.2s !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+/* --- 2. Pause Detection & 6. Breathing UI --- */
+@keyframes uiBreathe {
+  0%, 100% { transform: scale(1); }
+  50%      { transform: scale(1.006); }
+}
+body.is-idle {
+  animation: uiBreathe 8s ease-in-out infinite;
+}
+body.is-idle #mainSite {
+  filter: brightness(0.92) contrast(0.98);
+  transition: filter 3s ease;
+}
+.idle-prompt {
+  position: fixed;
+  bottom: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: 1.15rem;
+  color: rgba(255, 182, 210, 0.75);
+  text-shadow: 0 0 15px rgba(255, 105, 160, 0.3);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 999999;
+  letter-spacing: 0.08em;
+  transition: opacity 2s ease;
+}
+.idle-prompt.visible {
+  opacity: 1;
+}
+
+/* --- 3. Engagement Response --- */
+body.high-engagement {
+  --primary-color: #ff6091; /* Slightly warmer */
+  --secondary-color: #b03ecc;
+}
+
+/* --- 4. Text Reaction --- */
+.hero-tagline, .about-text p, .reason-card p, .timeline-content p, .propose-message p, .cinematic-line, .quote-text {
+  transition: filter 0.8s ease, text-shadow 0.8s ease;
+}
+.hero-tagline:hover, .about-text p:hover, .reason-card p:hover, .timeline-content p:hover, .propose-message p:hover, .cinematic-line:hover, .quote-text:hover {
+  filter: brightness(1.25);
+  text-shadow: 0 0 12px rgba(255, 182, 210, 0.25);
+}
+
+/* --- 5. Cursor Proximity Effect --- */
+.prox-near:not(:hover) {
+  transform: scale(1.025);
+  box-shadow: 0 15px 35px rgba(0,0,0,0.3), 0 0 20px rgba(255, 77, 133, 0.12);
+}
+
+/* ═══════════════════════════════════════════════════════════
+   DYNAMIC ENDING SCREEN
+═══════════════════════════════════════════════════════════ */
+.dynamic-ending-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999999; /* Above everything */
+  background: black;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.5s ease;
+}
+.dynamic-ending-screen.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.de-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, rgba(255, 105, 160, 0.08) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 3s ease;
+}
+.de-bg.theme-keep { opacity: 1; }
+.de-bg.theme-fade { opacity: 0; }
+
+.de-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, transparent 30%, rgba(0, 0, 0, 0.95) 100%);
+  opacity: 0;
+  transition: opacity 3s ease;
+}
+.de-vignette.theme-fade { opacity: 1; }
+.de-vignette.theme-keep { opacity: 0.5; }
+
+.de-content {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 25px;
+  text-align: center;
+  padding: 0 20px;
+}
+
+.de-line {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1.2rem, 3.5vw, 1.6rem);
+  color: rgba(255, 210, 228, 0.85);
+  line-height: 1.8;
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 1.5s ease, transform 1.5s cubic-bezier(0.22, 1, 0.36, 1);
+  margin: 0;
+}
+.de-line.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.de-final {
+  margin-top: 20px;
+  font-size: clamp(1.4rem, 4vw, 1.8rem);
+}
+.de-final.theme-keep-final {
+  color: rgba(255, 255, 255, 0.95);
+  text-shadow: 0 0 15px rgba(255, 105, 160, 0.4);
+}
+.de-final.theme-fade-final {
+  color: rgba(200, 200, 200, 0.8);
+  text-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+
+.de-signature {
+  margin-top: 40px;
+  font-family: 'Lato', sans-serif;
+  font-style: normal;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.de-extra {
+  position: absolute;
+  bottom: -60px;
+  font-family: 'Lato', sans-serif;
+  font-style: normal;
+  font-size: 0.8rem;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.de-final-silence {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -40%);
+  font-family: 'Lato', sans-serif;
+  font-style: italic;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+  color: rgba(255, 255, 255, 0.35);
+  width: 100%;
+  text-align: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 3s ease, transform 3s ease;
+}
+.de-final-silence.visible {
+  opacity: 1;
+  transform: translate(-50%, -50%);
+}
+
+/* Button pulse state */
+.btn-choice.pulse {
+  animation: endingPulse 1.5s ease-out forwards;
+}
+@keyframes endingPulse {
+  0% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 255, 255, 0.5); }
+  50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 255, 255, 0.8); }
+  100% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 255, 255, 0); }
+}

@@ -997,37 +997,25 @@
     <p class="footer-copy">Silent Memories — 2026</p>
   </footer>
 
-  <!-- Final Fade Screen -->
-  <div class="fade-out-screen" id="fadeOutScreen">
-    <div class="fade-out-text" id="fadeOutText">
-      <p id="fadeText1">If this story doesn't belong in your life,<br>I'll let it fade quietly.</p>
-      <p id="fadeText2">Not because it didn't matter,<br>but because loving you<br>was never about forcing you to stay.</p>
-      <p id="fadeText3">Some stories don't last forever,<br>but they still remain real.</p>
+  <!-- ====== DYNAMIC ENDING SCREEN ====== -->
+  <div class="dynamic-ending-screen" id="dynamicEndingScreen">
+    <!-- Visual layers -->
+    <div class="de-bg" id="deBg"></div>
+    <div class="de-vignette" id="deVignette"></div>
+
+    <!-- Text layers -->
+    <div class="de-content" id="deContent">
+      <p class="de-line" id="deLine1"></p>
+      <p class="de-line" id="deLine2"></p>
+      <p class="de-line" id="deLine3"></p>
+      <p class="de-line de-final" id="deLine4"></p>
+      
+      <p class="de-line de-signature" id="deSig" style="display:none;">— OneLastSmile</p>
+      <p class="de-line de-extra" id="deExtra"></p>
+
+      <p class="de-line de-final-silence" id="deFinalSilence">Some things are better left as they are.</p>
     </div>
   </div>
-
-  <!-- ====== SECRET ENDING SCREEN ====== -->
-  <div id="secretEndingScreen">
-    <div id="secretEndingText">
-      <p>Some stories don't need an ending…</p>
-      <p id="secretDynamicText">just a moment.</p>
-    </div>
-  </div>
-
-  <style>
-    /* ── Vignette and grain on Secret Screen ── */
-    #secretEndingScreen {
-      background: radial-gradient(circle at center, #110515 0%, #000 85%);
-    }
-    #secretEndingScreen::before {
-      content: "";
-      position: absolute;
-      inset: 0;
-      opacity: 0.05;
-      pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    }
-  </style>
 
   </div><!-- /mainSite -->
 
