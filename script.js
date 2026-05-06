@@ -420,6 +420,54 @@ function createFireworks(container) {
 }
 
 // ====== FINAL CHOICE LOGIC ======
+function triggerSecretEnding() {
+  try { localStorage.setItem("clicked_final", "true"); } catch(e){}
+  const timeSpent = window._olsStartTime ? Date.now() - window._olsStartTime : 0;
+  
+  // Fade out music smoothly over ~2s
+  const audio = document.getElementById('bgAudio');
+  if (audio && !audio.paused) {
+    let fadeOut = setInterval(() => {
+      if (audio.volume > 0.02) audio.volume = Math.max(0, audio.volume - 0.015);
+      else { audio.volume = 0; audio.pause(); clearInterval(fadeOut); isPlaying = false; }
+    }, 50);
+  } else if (isPlaying) {
+    toggleMusic();
+  }
+
+  const secretScreen = document.getElementById('secretEndingScreen');
+  const secretTextWrap = document.getElementById('secretEndingText');
+  const dynamicText = document.getElementById('secretDynamicText');
+
+  if (dynamicText) {
+    // If stayed longer than 60s
+    dynamicText.innerHTML = timeSpent > 60000 ? "You really stayed…" : "Even a moment was enough.";
+  }
+
+  // Blackout via existing fadeOutScreen if not already active
+  const fadeScreen = document.getElementById('fadeOutScreen');
+  if (fadeScreen && !fadeScreen.classList.contains('active')) {
+    fadeScreen.classList.add('active');
+  }
+
+  if (secretScreen) {
+    // 1.5s of silence/black before showing the secret text
+    setTimeout(() => {
+      secretScreen.style.display = 'flex';
+      secretScreen.offsetHeight;
+      secretScreen.classList.add('active');
+
+      setTimeout(() => {
+        if (secretTextWrap) secretTextWrap.classList.add('visible');
+      }, 1500);
+
+      setTimeout(() => {
+        if (secretTextWrap) secretTextWrap.classList.remove('visible');
+      }, 7000); 
+    }, 1500);
+  }
+}
+
 function keepStory() {
   const finalButtons = document.getElementById('finalButtons');
   const finalContentP = document.querySelector('#finalChoiceContent p');
@@ -428,12 +476,12 @@ function keepStory() {
   if (finalButtons) finalButtons.style.display = 'none';
   if (finalContentP) finalContentP.style.display = 'none';
   if (keepMessage) keepMessage.style.display = 'block';
+
+  // Wait 3s to let them read the keepMessage, then trigger secret ending
+  setTimeout(triggerSecretEnding, 3000);
 }
 
 function fadeAway() {
-  // Set permanent lock (Temporarily disabled for testing)
-  // localStorage.setItem('siteDestroyed', 'true');
-
   // Show the fade screen
   const fadeScreen = document.getElementById('fadeOutScreen');
   if (fadeScreen) fadeScreen.classList.add('active');
@@ -443,14 +491,6 @@ function fadeAway() {
   if (canvas) {
     canvas.style.transition = 'opacity 3s ease';
     canvas.style.opacity = '0';
-  }
-  
-  // Stop music
-  if (isPlaying) {
-    toggleMusic(); // Stops and resets vinyl/equalizer
-  } else {
-    const bgAudio = document.getElementById('bgAudio');
-    if (bgAudio) bgAudio.pause();
   }
   
   // Disable scrolling
@@ -465,7 +505,15 @@ function fadeAway() {
     if (p1) setTimeout(() => p1.classList.add('visible'), 500);
     if (p2) setTimeout(() => p2.classList.add('visible'), 3500);
     if (p3) setTimeout(() => p3.classList.add('visible'), 7000);
-  }, 4000); // Wait until screen is mostly faded to black
+    
+    // Fade out text and trigger secret ending
+    setTimeout(() => {
+      if (p1) p1.classList.remove('visible');
+      if (p2) p2.classList.remove('visible');
+      if (p3) p3.classList.remove('visible');
+      setTimeout(triggerSecretEnding, 2000);
+    }, 11000);
+  }, 2000); // Wait until screen is mostly faded to black
 }
 // Auto Scroll Lyrics logic integrated into music player
 

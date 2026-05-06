@@ -51,23 +51,40 @@
       background: transparent;
       border: 2px solid rgba(255, 45, 117, 0.85);
       box-shadow:
-        0 0  8px rgba(255,  45, 117, 0.55),
-        0 0 18px rgba(255,  45, 117, 0.25),
-        0 0 28px rgba(168,  85, 247, 0.20),
-        inset 0 0 6px rgba(255, 45, 117, 0.08);
+        0 0 10px rgba(255,  45, 117, 0.50),
+        0 0 22px rgba(255,  45, 117, 0.25),
+        inset 0 0 6px rgba(255, 45, 117, 0.1);
       will-change: transform;
       opacity: 0;
       /* Only glow + opacity via CSS transition; size/position in JS */
       transition: border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
+      animation: ringPulse 2.4s infinite ease-in-out;
     }
 
-    /* Ring hover — brighter glow, wider border */
+    @keyframes ringPulse {
+      0%, 100% {
+        box-shadow:
+          0 0 10px rgba(255,  45, 117, 0.50),
+          0 0 22px rgba(255,  45, 117, 0.25),
+          inset 0 0 6px rgba(255, 45, 117, 0.1);
+      }
+      50% {
+        box-shadow:
+          0 0 14px rgba(255,  45, 117, 0.70),
+          0 0 30px rgba(255,  45, 117, 0.40),
+          0 0 45px rgba(168,  85, 247, 0.30),
+          inset 0 0 8px rgba(255, 45, 117, 0.15);
+      }
+    }
+
+    /* Ring hover — brighter glow, wider border, pauses heartbeat */
     #customCursor.ring-hovering {
       border-color: rgba(255, 45, 117, 1);
       box-shadow:
-        0 0 14px rgba(255,  45, 117, 0.85),
-        0 0 30px rgba(255,  45, 117, 0.45),
-        0 0 50px rgba(168,  85, 247, 0.40);
+        0 0 16px rgba(255,  45, 117, 0.90),
+        0 0 35px rgba(255,  45, 117, 0.50),
+        0 0 60px rgba(168,  85, 247, 0.45) !important;
+      animation-play-state: paused;
     }
 
     /* ── Inner dot (near-instant, solid pink) ── */
@@ -989,6 +1006,14 @@
     </div>
   </div>
 
+  <!-- ====== SECRET ENDING SCREEN ====== -->
+  <div id="secretEndingScreen">
+    <div id="secretEndingText">
+      <p>Some stories don't need an ending…</p>
+      <p id="secretDynamicText">just a moment.</p>
+    </div>
+  </div>
+
   </div><!-- /mainSite -->
 
   <script src="script.js"></script>
@@ -1188,16 +1213,15 @@
           blackout.classList.add('active');
         }
 
-        // ── Step 3: Fade music out smoothly ──
+        // ── Step 3: Fade music UP slightly for the main section ──
         var audio = document.getElementById('bgAudio');
-        if (audio) {
-          var fadeOut = setInterval(function () {
-            if (audio.volume > 0.03) {
-              audio.volume = Math.max(0, audio.volume - 0.018);
+        if (audio && !audio.paused) {
+          var targetVol = 0.45;
+          var fadeUp = setInterval(function () {
+            if (audio.volume < targetVol) {
+              audio.volume = Math.min(targetVol, audio.volume + 0.015);
             } else {
-              audio.volume = 0;
-              audio.pause();
-              clearInterval(fadeOut);
+              clearInterval(fadeUp);
             }
           }, 60);
         }
@@ -1220,6 +1244,7 @@
         mainSite.offsetHeight;          // forces reflow — DO NOT REMOVE
         mainSite.style.transition = 'opacity 1.4s ease';
         mainSite.style.opacity    = '1';
+        window._olsStartTime      = Date.now(); // track time spent on main site
 
         // Scroll to top instantly (no smooth scroll fighting the transition)
         document.documentElement.classList.add('instant-scroll');

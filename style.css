@@ -217,11 +217,11 @@
 }
 
 /* Line-by-line staggered delays — calm, deliberate pacing */
-.gi-l1 { animation-delay: 1.8s;  }   /* I didn't know how to say everything… */
-.gi-l2 { animation-delay: 2.7s;  }   /* so I made something instead.          */
-.gi-l3 { animation-delay: 3.5s;  }   /* It's simple.                          */
-.gi-l4 { animation-delay: 4.1s;  }   /* But it's honest.                      */
-.gi-l5 { animation-delay: 4.9s;  }   /* And it's from me… to you.             */
+.gi-l1 { animation-delay: 2.0s;  }   /* I didn't know how to say everything… */
+.gi-l2 { animation-delay: 3.0s;  }   /* so I made something instead.          */
+.gi-l3 { animation-delay: 4.1s;  }   /* It's simple.                          */
+.gi-l4 { animation-delay: 5.3s;  }   /* But it's honest.                      */
+.gi-l5 { animation-delay: 6.7s;  }   /* And it's from me… to you.             */
 
 /* ── Name: "Anushka" — soft glow, scale-pulse entrance ── */
 .gi-name {
@@ -233,7 +233,7 @@
     0 0 28px rgba(255, 105, 160, 0.40),
     0 0 55px rgba(200,  60, 120, 0.22);
   opacity: 0;
-  animation: giNameIn 1.6s 5.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  animation: giNameIn 1.6s 8.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
   letter-spacing: 0.04em;
 }
 
@@ -249,7 +249,7 @@
   /* giNameIn runs once (forwards fills opacity+scale), then giNamePulse loops */
   animation-name:            giNameIn,    giNamePulse;
   animation-duration:        1.6s,        3.2s;
-  animation-delay:           5.9s,        7.8s;
+  animation-delay:           8.5s,        10.4s;
   animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1), ease-in-out;
   animation-fill-mode:       forwards,    none;
   animation-iteration-count: 1,           infinite;
@@ -2356,5 +2356,40 @@ html {
 /* Disable smooth scroll during cinematic transitions (applied temporarily by JS) */
 html.instant-scroll {
   scroll-behavior: auto;
+}
+
+/* ─────────────────────────────────────────────────────────
+    SECRET ENDING SCREEN
+───────────────────────────────────────────────────────── */
+#secretEndingScreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9999999;
+  background: black;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  opacity: 0;
+  transition: opacity 2s ease;
+  pointer-events: none;
+}
+#secretEndingScreen.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+#secretEndingText {
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-size: clamp(1rem, 3.5vw, 1.45rem);
+  color: rgba(255, 182, 210, 0.65);
+  text-align: center;
+  line-height: 2.2;
+  opacity: 0;
+  transition: opacity 3s ease;
+  text-shadow: 0 0 12px rgba(255, 105, 160, 0.2);
+}
+#secretEndingText.visible {
+  opacity: 1;
 }
 
