@@ -3219,3 +3219,73 @@ body.high-engagement {
   50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 255, 255, 0.8); }
   100% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 255, 255, 0); }
 }
+
+/* ====== MESSAGE SYSTEM ====== */
+.message-container {
+  margin: 40px auto 20px;
+  max-width: 500px;
+  background: rgba(25, 10, 30, 0.4);
+  border: 1px solid rgba(255, 77, 133, 0.2);
+  border-radius: 20px;
+  padding: 30px;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3), inset 0 0 15px rgba(255, 77, 133, 0.05);
+  position: relative;
+  z-index: 10;
+}
+
+.ols-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.ols-input, .ols-textarea {
+  width: 100%;
+  background: rgba(10, 5, 15, 0.6);
+  border: 1px solid rgba(255, 77, 133, 0.3);
+  border-radius: 12px;
+  padding: 15px 20px;
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.ols-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.ols-input::placeholder, .ols-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+}
+
+.ols-input:focus, .ols-textarea:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 15px rgba(255, 77, 133, 0.3);
+  background: rgba(15, 5, 20, 0.8);
+}
+
+.ols-submit-btn {
+  background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
+  color: #fff;
+  border: none;
+  border-radius: 30px;
+  padding: 15px 30px;
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 5px 15px rgba(255, 77, 133, 0.3);
+  align-self: center;
+  margin-top: 10px;
+}
+
+.ols-submit-btn:hover {
+  transform: scale(1.05);
+  box-shadow: 0 10px 25px rgba(255, 77, 133, 0.5);
+}
