@@ -327,11 +327,17 @@ function toggleMusic() {
 function scrollLyrics() {
   if (!isPlaying || !lyricsBox) return;
 
-  function animate() {
+  let lastTs = 0;
+  function animate(ts) {
     if (!isPlaying) return;
     
+    if (!lastTs) lastTs = ts;
+    const dt = Math.min(ts - lastTs, 50); // cap delta to 50ms
+    lastTs = ts;
+    
     if (!isUserScrolling) {
-      exactScrollTop += 0.3; // Cinematic scroll speed
+      // 0.3px per 16.67ms frame -> 0.018 * dt
+      exactScrollTop += 0.018 * dt;
       
       // Loop back if reached the bottom
       if (exactScrollTop + lyricsBox.clientHeight >= lyricsBox.scrollHeight - 2) {
