@@ -676,7 +676,13 @@ body {
   -webkit-text-fill-color: transparent;
   line-height: 1;
   margin-bottom: 20px;
-  text-shadow: 0 10px 30px rgba(255, 77, 133, 0.3);
+  /* Fix 1: Ensure name is always visible and stacked correctly */
+  opacity: 1 !important;
+  visibility: visible !important;
+  position: relative;
+  z-index: 10;
+  /* Fix 3: Reduce glow bloom */
+  text-shadow: 0 5px 15px rgba(255, 77, 133, 0.15);
 }
 .hero-tagline {
   font-family: var(--font-serif);
@@ -774,7 +780,10 @@ section { padding: 100px 5%; position: relative; }
   font-family: var(--font-heading);
   font-size: 3.5rem;
   color: #fff;
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  /* Fix 3: Reduce glow bloom */
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+  position: relative;
+  z-index: 5;
 }
 .title-ornament {
   margin-top: 15px;
@@ -1346,7 +1355,7 @@ section { padding: 100px 5%; position: relative; }
   z-index: -1;
 }
 .propose-from { color: var(--primary-color); font-weight: bold; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; }
-.propose-title { font-family: var(--font-cursive); font-size: 5rem; color: #fff; line-height: 1; margin-bottom: 30px; text-shadow: 0 5px 15px rgba(255, 77, 133, 0.5); }
+.propose-title { font-family: var(--font-cursive); font-size: 5rem; color: #fff; line-height: 1; margin-bottom: 30px; text-shadow: 0 3px 10px rgba(255, 77, 133, 0.3); position: relative; z-index: 5; }
 .propose-message p { font-size: 1.2rem; margin-bottom: 20px; color: #eee; }
 .propose-big-text { font-family: var(--font-serif); font-size: 2rem !important; color: #fff !important; margin: 40px 0 !important; line-height: 1.4 !important; }
 .propose-big-text span { color: var(--primary-color); font-weight: bold; font-style: italic; display: block; font-size: 2.5rem; margin-top: 10px; }
@@ -1437,7 +1446,7 @@ section { padding: 100px 5%; position: relative; }
 .quote-icon { font-size: 2rem; color: var(--secondary-color); margin-bottom: 20px; opacity: 0.5; }
 .quote-text { font-family: var(--font-serif); font-size: 1.3rem; color: #eee; font-style: italic; line-height: 1.8; margin-bottom: 20px; }
 .quote-author { color: var(--primary-color); font-weight: bold; font-size: 0.95rem; }
-.quotes-dots { display: flex; justify-content: center; gap: 10px; margin-top: 300px; }
+.quotes-dots { display: flex; justify-content: center; gap: 10px; position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 10; margin-top: 0; }
 .quotes-dots .dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(255,77,133,0.3); transition: var(--transition); cursor: pointer; border: none; }
 .quotes-dots .dot.active { background: var(--primary-color); box-shadow: 0 0 10px var(--primary-color); transform: scale(1.2); }
 .quotes-nav { position: absolute; top: 50%; width: 100%; display: flex; justify-content: space-between; transform: translateY(-50%); padding: 0 -20px; pointer-events: none; }

@@ -47,7 +47,7 @@
 
     } else {
       overlay.innerHTML = `
-        <p style="opacity: 0; animation: fadeIn 2s ease forwards 1s;">You already made your choice.</p>
+        <p style="opacity: 0; animation: fadeIn 2s ease forwards 1s;">This moment isn’t meant to repeat.</p>
         <p style="opacity: 0; animation: fadeIn 2s ease forwards 4s; margin-top: 30px;">And maybe…<br>that’s enough.</p>
         <style>@keyframes fadeIn { to { opacity: 1; } }</style>
       `;
@@ -63,8 +63,20 @@
         document.body.style.overflow = "hidden";
       });
     }
+  } else {
+    // Hardened multi-layer tracking
+    sessionStorage.setItem("session_seen", "true");
   }
 })();
+
+// ====== BACK BUTTON PROTECTION ======
+history.pushState(null, null, location.href);
+window.onpopstate = () => history.go(1);
+
+// ====== FLICKER-FREE FIRST PAINT RESOLUTION ======
+document.addEventListener('DOMContentLoaded', () => {
+  document.body.classList.add('loaded');
+});
 
 // ====== LIGHTWEIGHT PRIVACY-SAFE ANALYTICS ======
 (function() {
@@ -233,7 +245,7 @@ class Particle {
   }
 }
 
-for (let i = 0; i < 80; i++) particles.push(new Particle());
+for (let i = 0; i < 60; i++) particles.push(new Particle());
 
 let _heartAnimId = null;
 function animateParticles() {
@@ -1070,3 +1082,25 @@ function _cursorHoverOff() { if (cursor) cursor.classList.remove('hovering'); }
   }, { passive: true });
 
 })();
+
+// ====== GLOBAL MUSIC RELIABILITY FIX ======
+let _globalMusicStarted = false;
+document.addEventListener("click", () => {
+  if (!_globalMusicStarted) {
+    var audio = document.getElementById('bgAudio');
+    if (audio && audio.paused) {
+      audio.volume = 0;
+      audio.play().then(() => {
+        let step = 0;
+        let fade = setInterval(() => {
+          step++;
+          audio.volume = Math.min(0.35, (step / 40) * 0.35);
+          if (step >= 40) clearInterval(fade);
+        }, 50);
+        _globalMusicStarted = true;
+      }).catch(() => {});
+    } else {
+      _globalMusicStarted = true;
+    }
+  }
+}, { once: true });
