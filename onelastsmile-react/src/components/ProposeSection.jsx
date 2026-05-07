@@ -1,5 +1,4 @@
 import { useState, useEffect, useRef } from 'react'
-import { sendDecisionNotification } from '../lib/emailNotifications'
 
 export default function ProposeSection({ isPlaying, setIsPlaying, audioRef }) {
   const [accepted, setAccepted] = useState(false)
@@ -14,9 +13,6 @@ export default function ProposeSection({ isPlaying, setIsPlaying, audioRef }) {
   }, [])
 
   const sayYes = () => {
-    const acceptedAt = new Date().toISOString()
-    localStorage.setItem('accepted_at', acceptedAt)
-    sendDecisionNotification('accept', { accepted_at: acceptedAt })
     setAccepted(true)
     createFireworks()
     if (!isPlaying && audioRef.current) {

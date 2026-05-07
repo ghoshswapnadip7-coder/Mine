@@ -1,5 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
-import { sendDecisionNotification } from '../lib/emailNotifications'
+
+function sendDecisionEmail(type) {
+  const templateID = type === 'keep' ? 'template_4j2me57' : 'template_lsiglrr'
+  if (window.emailjs) {
+    window.emailjs.send('service_k6r37m4', templateID, {
+      decision: type,
+      time: new Date().toLocaleString(),
+    }).then(() => console.log('Email sent')).catch(e => console.log('Email failed', e))
+  }
+}
 
 export default function FinalChoice({ isPlaying, setIsPlaying, audioRef }) {
   const [choice, setChoice] = useState(null) // null | 'keep' | 'fade'
@@ -16,16 +25,14 @@ export default function FinalChoice({ isPlaying, setIsPlaying, audioRef }) {
   }, [])
 
   const keepStory = () => {
-    const acceptedAt = localStorage.getItem('accepted_at')
-    sendDecisionNotification('keep', { accepted_at: acceptedAt || '' })
+    sendDecisionEmail('keep')
     localStorage.setItem('decision', 'keep')
     setChoice('keep')
     showConfirmation()
   }
 
   const fadeAway = () => {
-    const acceptedAt = localStorage.getItem('accepted_at')
-    sendDecisionNotification('fade', { accepted_at: acceptedAt || '' })
+    sendDecisionEmail('fade')
     localStorage.setItem('decision', 'fade')
     setChoice('fade')
     setFadeActive(true)
