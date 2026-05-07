@@ -69,44 +69,13 @@
   }
 })();
 
-// ====== BACK BUTTON BEHAVIOR (SOFTENED) ======
-// Keep history stable for cinematic transitions without trapping navigation.
-history.pushState({ ols: "entry" }, "", location.href);
-window.addEventListener("popstate", () => {
-  // No forced forward navigation; let users leave naturally.
-});
+// ====== BACK BUTTON PROTECTION ======
+history.pushState(null, null, location.href);
+window.onpopstate = () => history.go(1);
 
 // ====== FLICKER-FREE FIRST PAINT RESOLUTION ======
 document.addEventListener('DOMContentLoaded', () => {
   document.body.classList.add('loaded');
-});
-
-// ====== MISSING ASSET FALLBACKS ======
-document.addEventListener("DOMContentLoaded", () => {
-  // Portrait fallback: preserve layout with a subtle initial placeholder.
-  const portrait = document.querySelector(".about-portrait");
-  if (portrait) {
-    portrait.addEventListener("error", () => {
-      const avatar = portrait.closest(".about-avatar");
-      if (!avatar) return;
-      portrait.style.display = "none";
-      avatar.setAttribute("aria-label", "Portrait missing");
-      avatar.style.display = "flex";
-      avatar.style.alignItems = "center";
-      avatar.style.justifyContent = "center";
-      avatar.style.background = "linear-gradient(135deg, rgba(255,77,133,0.25), rgba(162,57,202,0.22))";
-      avatar.style.border = "1px solid rgba(255,179,198,0.35)";
-      if (!avatar.querySelector(".portrait-fallback")) {
-        const fallback = document.createElement("span");
-        fallback.className = "portrait-fallback";
-        fallback.textContent = "A";
-        fallback.style.fontFamily = "'Cinzel Decorative', serif";
-        fallback.style.fontSize = "clamp(2.2rem, 5vw, 3.2rem)";
-        fallback.style.color = "rgba(255, 225, 235, 0.92)";
-        avatar.appendChild(fallback);
-      }
-    }, { once: true });
-  }
 });
 
 // ====== LIGHTWEIGHT PRIVACY-SAFE ANALYTICS ======
@@ -436,48 +405,6 @@ const playIcon = document.getElementById('playIcon');
 const vinyl = document.getElementById('vinyl');
 const equalizer = document.getElementById('equalizer');
 const lyricsBox = document.querySelector('.lyrics-box');
-const bdMusicPrompt = document.getElementById('bdMusicPrompt');
-const giMusicPrompt = document.getElementById('giMusicPrompt');
-let _audioUnavailable = false;
-
-function showMusicStatus(message) {
-  const musicPlayer = document.querySelector('.music-player');
-  if (!musicPlayer || musicPlayer.querySelector('.audio-fallback-status')) return;
-  const status = document.createElement('p');
-  status.className = 'audio-fallback-status';
-  status.textContent = message;
-  status.style.marginTop = '10px';
-  status.style.textAlign = 'center';
-  status.style.color = '#ffb3c6';
-  status.style.fontFamily = "'Playfair Display', serif";
-  status.style.fontStyle = 'italic';
-  status.style.letterSpacing = '0.03em';
-  musicPlayer.appendChild(status);
-}
-
-function disableAudioUi(message) {
-  _audioUnavailable = true;
-  isPlaying = false;
-  cancelAnimationFrame(lyricsAnimationId);
-  if (playIcon) playIcon.className = 'fas fa-music';
-  if (vinyl) vinyl.classList.remove('playing');
-  if (equalizer) equalizer.classList.remove('active');
-  const playBtn = document.getElementById('playBtn');
-  if (playBtn) {
-    playBtn.disabled = true;
-    playBtn.style.opacity = '0.55';
-    playBtn.style.pointerEvents = 'none';
-  }
-  if (bdMusicPrompt) bdMusicPrompt.style.display = 'none';
-  if (giMusicPrompt) giMusicPrompt.style.display = 'none';
-  showMusicStatus(message);
-}
-
-if (bgAudio) {
-  bgAudio.addEventListener('error', () => {
-    disableAudioUi("Music file missing. Add `song.mp3` next to this page.");
-  });
-}
 
 let lyricsAnimationId;
 let exactScrollTop = 0;
@@ -500,7 +427,6 @@ function handleUserScroll() {
 }
 
 function toggleMusic() {
-  if (_audioUnavailable || !bgAudio) return;
   if (isPlaying) {
     bgAudio.pause();
     if (playIcon) playIcon.className = 'fas fa-play';
@@ -1197,41 +1123,27 @@ document.addEventListener("DOMContentLoaded", () => {
       btn.style.opacity = "0.7";
       btn.style.pointerEvents = "none";
       
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 15000);
-
       fetch(url, {
         method: "POST",
-        body: formData,
-        signal: controller.signal
+        body: formData
       })
       .then(response => response.json())
       .then(data => {
+        form.style.display = "none";
         statusEl.style.display = "block";
         if (data.success === "false" || data.success === false) {
-           statusEl.innerHTML = "Couldn't confirm delivery yet. Please try again in a moment.";
-           statusEl.style.color = "#ffb3c6";
-           btn.innerHTML = "Send 💌";
-           btn.style.opacity = "1";
-           btn.style.pointerEvents = "auto";
+           statusEl.innerHTML = "Sent! <br><span style='font-size:0.8em; opacity:0.7;'>(Note: The website owner needs to activate FormSubmit in their inbox first)</span>";
         } else {
-           form.style.display = "none";
            statusEl.innerHTML = "Your message was sent beautifully. Thank you. 💌";
-           statusEl.style.color = "#ffb3c6";
         }
       })
       .catch(error => {
         statusEl.style.display = "block";
-        statusEl.innerText = error && error.name === "AbortError"
-          ? "Sending timed out. Please check connection and try again."
-          : "There was an issue sending your message. Please try again.";
+        statusEl.innerText = "There was an issue sending your message. Please try again.";
         statusEl.style.color = "#ff4d85";
         btn.innerHTML = "Send 💌";
         btn.style.opacity = "1";
         btn.style.pointerEvents = "auto";
-      })
-      .finally(() => {
-        clearTimeout(timeoutId);
       });
     });
   }
