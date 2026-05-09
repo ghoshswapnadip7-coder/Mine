@@ -3143,13 +3143,13 @@ body.high-engagement {
   color: rgba(255, 210, 228, 0.85);
   line-height: 1.8;
   opacity: 0;
-  transform: translateY(15px);
+  transform: translate3d(0, 15px, 0);
   transition: opacity 1.5s ease, transform 1.5s cubic-bezier(0.22, 1, 0.36, 1);
   margin: 0;
 }
 .de-line.visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translate3d(0, 0, 0);
 }
 
 .de-final {
@@ -3283,4 +3283,177 @@ body.high-engagement {
 .ols-submit-btn:hover {
   transform: scale(1.05);
   box-shadow: 0 10px 25px rgba(255, 77, 133, 0.5);
+}
+
+/* Soft story lines (minimal; does not compete with main copy) */
+.ols-whisper-line {
+  font-family: var(--font-body);
+  font-size: 0.92em;
+  font-style: italic;
+  letter-spacing: 0.04em;
+  color: rgba(255, 182, 210, 0.52);
+  margin: 0.35rem 0 0;
+  line-height: 1.55;
+}
+.hero-tagline .ols-whisper-line {
+  display: block;
+  margin-top: 1rem;
+  font-size: 0.88em;
+}
+.letter-whisper {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.footer-whisper {
+  margin: 1rem auto 0;
+  max-width: 26rem;
+}
+
+/* Save keepsake — quiet, not loud */
+.btn-save-memory {
+  display: block;
+  margin: 1.25rem auto 0;
+  padding: 0.55rem 1.25rem;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(255, 182, 210, 0.55);
+  background: rgba(25, 10, 35, 0.5);
+  border: 1px solid rgba(255, 77, 133, 0.22);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: color 0.35s ease, border-color 0.35s ease, box-shadow 0.35s ease, transform 0.35s ease;
+  box-shadow: 0 0 0 rgba(255, 77, 133, 0);
+}
+.btn-save-memory:hover {
+  color: rgba(255, 210, 228, 0.85);
+  border-color: rgba(162, 57, 202, 0.45);
+  box-shadow: 0 0 22px rgba(255, 77, 133, 0.12);
+  transform: translateY(-1px);
+}
+
+/* Before You Go — after final choice sequence */
+.before-you-go-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10000050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 22px;
+  box-sizing: border-box;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 2.4s ease;
+}
+.before-you-go-screen.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+.byg-ambient {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 55% at 50% 45%, rgba(162, 57, 202, 0.14) 0%, transparent 55%),
+    radial-gradient(ellipse 70% 50% at 50% 60%, rgba(255, 77, 133, 0.08) 0%, transparent 50%);
+  opacity: 0.85;
+  pointer-events: none;
+}
+.byg-inner {
+  position: relative;
+  z-index: 1;
+  max-width: 26rem;
+  text-align: center;
+}
+.byg-text {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(1.05rem, 3.2vw, 1.35rem);
+  color: rgba(255, 210, 228, 0.78);
+  line-height: 1.85;
+  margin: 0 0 1rem;
+  opacity: 0;
+  transform: translate3d(0, 12px, 0);
+  transition: opacity 1.8s ease 0.4s, transform 1.8s cubic-bezier(0.22, 1, 0.36, 1) 0.4s;
+}
+.before-you-go-screen.active .byg-text {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+.byg-soft {
+  font-family: var(--font-body);
+  font-style: normal;
+  font-size: clamp(0.88rem, 2.6vw, 0.98rem);
+  letter-spacing: 0.04em;
+  color: rgba(200, 175, 190, 0.55);
+  line-height: 1.75;
+}
+.byg-brand {
+  margin-top: 2.5rem;
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.22);
+  opacity: 0;
+  transition: opacity 2s ease 1.2s;
+}
+.before-you-go-screen.active .byg-brand {
+  opacity: 1;
+}
+
+body.ols-before-you-go .navbar,
+body.ols-before-you-go .scroll-indicator {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1s ease;
+}
+
+.de-signature.visible {
+  display: block !important;
+}
+
+/* Mobile / touch — lighter glass, calmer motion, scroll polish */
+@media (max-width: 768px), (pointer: coarse) {
+  html, body {
+    overscroll-behavior-y: contain;
+  }
+  .gi-bg {
+    animation-duration: 14s;
+  }
+  .birthday-card,
+  .final-choice-container,
+  .navbar,
+  .confession-container,
+  .story-container,
+  .quote-card {
+    backdrop-filter: blur(9px) !important;
+    -webkit-backdrop-filter: blur(9px) !important;
+  }
+  .music-section .vinyl-wrap,
+  .about-text {
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+  }
+  .btn-primary:hover,
+  .btn-secondary:hover,
+  .btn-keep:hover,
+  .btn-fade:hover {
+    transform: translateY(-1px) scale(1.02);
+    filter: brightness(1.05);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gi-bg {
+    animation: none !important;
+  }
+  .before-you-go-screen .byg-text,
+  .before-you-go-screen .byg-brand {
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
 }

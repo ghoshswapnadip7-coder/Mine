@@ -76,16 +76,20 @@ window.onpopstate = () => history.go(1);
 // ====== FLICKER-FREE FIRST PAINT RESOLUTION ======
 document.addEventListener('DOMContentLoaded', () => {
   document.body.classList.add('loaded');
+  try {
+    if (window.matchMedia && (window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(pointer: coarse)').matches)) {
+      document.documentElement.classList.add('ols-mobile');
+    }
+  } catch (e) { /* ignore */ }
 });
 
-// ====== LIGHTWEIGHT PRIVACY-SAFE ANALYTICS ======
+// ====== LOCAL-ONLY VISIT & ENGAGEMENT (ols_* — no network) ======
 (function() {
   try {
     const now = Date.now();
     let visitCount = parseInt(localStorage.getItem('ols_visit_count') || '0', 10);
     const lastVisit = parseInt(localStorage.getItem('ols_last_visit_time') || '0', 10);
-    
-    // 3. Return Detection
+
     if (lastVisit > 0) {
       const hoursSince = (now - lastVisit) / (1000 * 60 * 60);
       if (hoursSince >= 24) {
@@ -95,31 +99,88 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         window._olsReturnStatus = 'active_session';
       }
-      
-      // If returning, increment visit
-      if (hoursSince >= 6) {
-        visitCount++;
-      }
+      if (hoursSince >= 6) visitCount++;
     } else {
       visitCount = 1;
-      localStorage.setItem('ols_first_visit_time', now.toString());
+      localStorage.setItem('ols_first_visit_time', String(now));
+      localStorage.setItem('ols_first_visit_at', String(now));
       window._olsReturnStatus = 'first_visit';
     }
 
-    localStorage.setItem('ols_visit_count', visitCount.toString());
-    localStorage.setItem('ols_last_visit_time', now.toString());
+    localStorage.setItem('ols_visit_count', String(visitCount));
+    localStorage.setItem('ols_last_visit_time', String(now));
     window._olsVisitCount = visitCount;
 
-    // 2. Time Spent Tracking
+    if (!localStorage.getItem('ols_sections_visited')) {
+      localStorage.setItem('ols_sections_visited', '[]');
+    }
+
     const sessionStart = now;
+    let visibleSince = typeof document !== 'undefined' && document.visibilityState === 'visible' ? now : null;
+
+    function flushActiveMs(extraMs) {
+      const add = Math.max(0, extraMs | 0);
+      const prev = parseInt(localStorage.getItem('ols_active_ms') || '0', 10);
+      localStorage.setItem('ols_active_ms', String(prev + add));
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      const t = Date.now();
+      if (document.visibilityState === 'hidden') {
+        if (visibleSince != null) flushActiveMs(t - visibleSince);
+        visibleSince = null;
+      } else {
+        visibleSince = t;
+      }
+    });
+
+    setInterval(() => {
+      if (document.visibilityState !== 'visible' || visibleSince == null) return;
+      const t = Date.now();
+      const delta = t - visibleSince;
+      if (delta < 8000) return;
+      flushActiveMs(delta);
+      visibleSince = t;
+    }, 10000);
+
     window.addEventListener('beforeunload', () => {
       const sessionDuration = Date.now() - sessionStart;
-      const totalTime = parseInt(localStorage.getItem('ols_total_time_spent') || '0', 10);
-      localStorage.setItem('ols_total_time_spent', (totalTime + sessionDuration).toString());
-      localStorage.setItem('ols_last_session_time', sessionDuration.toString());
+      localStorage.setItem('ols_last_session_time', String(sessionDuration));
+      if (document.visibilityState === 'visible' && visibleSince != null) {
+        flushActiveMs(Date.now() - visibleSince);
+      }
     });
-  } catch(e) {
-    // Fail silently
+  } catch (e) { /* ignore */ }
+})();
+
+// ====== SECTION VISITS (IntersectionObserver, localStorage only) ======
+(function () {
+  function recordSection(id) {
+    try {
+      const raw = localStorage.getItem('ols_sections_visited') || '[]';
+      const arr = JSON.parse(raw);
+      if (!Array.isArray(arr) || arr.indexOf(id) >= 0) return;
+      arr.push(id);
+      localStorage.setItem('ols_sections_visited', JSON.stringify(arr));
+    } catch (e) { /* ignore */ }
+  }
+
+  function init() {
+    var ids = ['home', 'about', 'birthday', 'letter', 'reasons', 'quotes', 'timeline', 'music', 'anushka-story', 'things-i-never-said', 'if-you-never-read-this', 'propose', 'final-choice'];
+    var obs = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (en.isIntersecting && en.target.id) recordSection(en.target.id);
+      });
+    }, { threshold: 0.22, rootMargin: '0px 0px -12% 0px' });
+    ids.forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) obs.observe(el);
+    });
+  }
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
   }
 })();
 
@@ -148,6 +209,12 @@ window.addEventListener('load', () => {
 // ====== GLOBAL INTERACTION & RIPPLE EFFECT ======
 window._olsClickCount = 0;
 const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+try {
+  if (typeof document !== 'undefined' && window.matchMedia &&
+      (window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(pointer: coarse)').matches)) {
+    document.documentElement.classList.add('ols-mobile');
+  }
+} catch (e) { /* ignore */ }
 
 document.addEventListener('click', function(e) {
   window._olsClickCount++;
@@ -168,15 +235,13 @@ const navbar = document.getElementById('navbar');
 const hamburger = document.getElementById('hamburger');
 const navLinks = document.getElementById('navLinks');
 
-let isScrolling = false;
+let _navScrollRaf = null;
 window.addEventListener('scroll', () => {
-  if (!isScrolling) {
-    window.requestAnimationFrame(() => {
-      if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 50);
-      isScrolling = false;
-    });
-    isScrolling = true;
-  }
+  if (_navScrollRaf != null) return;
+  _navScrollRaf = requestAnimationFrame(() => {
+    _navScrollRaf = null;
+    if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 50);
+  });
 }, { passive: true });
 
 if (hamburger) hamburger.addEventListener('click', () => {
@@ -190,6 +255,19 @@ if (navLinks) navLinks.querySelectorAll('a').forEach(link => {
     navLinks.classList.remove('active');
   });
 });
+
+if (navLinks && hamburger && isTouchDevice) {
+  let _navCloseRaf = null;
+  window.addEventListener('scroll', () => {
+    if (!navLinks.classList.contains('active')) return;
+    if (_navCloseRaf != null) return;
+    _navCloseRaf = requestAnimationFrame(() => {
+      _navCloseRaf = null;
+      hamburger.classList.remove('active');
+      navLinks.classList.remove('active');
+    });
+  }, { passive: true });
+}
 
 // ====== REVEAL ANIMATIONS ======
 const revealElements = document.querySelectorAll('.reveal');
@@ -205,16 +283,27 @@ revealElements.forEach(el => revealObserver.observe(el));
 
 // ====== CANVAS HEARTS (Upgraded with stars) ======
 const canvas = document.getElementById('heartCanvas');
-const ctx = canvas.getContext('2d');
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+const ctx = canvas ? canvas.getContext('2d') : null;
+const _olsReduceMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+const _olsMobileCanvas = typeof window !== 'undefined' && window.matchMedia &&
+  (window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(pointer: coarse)').matches);
+const HEART_PARTICLE_TARGET = _olsReduceMotion ? 18 : (_olsMobileCanvas ? 32 : 60);
+
+if (canvas && ctx) {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+}
 
 const particles = [];
+let _heartAnimId = null;
+let _heartCanvasStopped = false;
 
 class Particle {
   constructor() {
-    this.x = Math.random() * canvas.width;
-    this.y = Math.random() * canvas.height;
+    const w = canvas ? canvas.width : innerWidth;
+    const h = canvas ? canvas.height : innerHeight;
+    this.x = Math.random() * w;
+    this.y = Math.random() * h;
     this.size = Math.random() * 2.5 + 0.5;
     this.speed = Math.random() * 0.8 + 0.2;
     this.opacity = Math.random() * 0.5 + 0.1;
@@ -235,6 +324,7 @@ class Particle {
     ctx.fill();
   }
   update() {
+    if (!canvas) return;
     this.y -= this.speed;
     this.x += Math.sin(this.y * 0.008) * 0.3;
     if (this.y < -10) {
@@ -245,23 +335,50 @@ class Particle {
   }
 }
 
-for (let i = 0; i < 60; i++) particles.push(new Particle());
+if (canvas && ctx) {
+  for (let i = 0; i < HEART_PARTICLE_TARGET; i++) particles.push(new Particle());
+}
 
-let _heartAnimId = null;
 function animateParticles() {
+  if (!canvas || !ctx || _heartCanvasStopped) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   particles.forEach(p => p.update());
   _heartAnimId = requestAnimationFrame(animateParticles);
 }
-animateParticles();
+if (canvas && ctx) animateParticles();
+
+function olsCalmHeartCanvasForEnding() {
+  if (window._olsHeartCalmDone) return;
+  window._olsHeartCalmDone = true;
+  particles.forEach(p => {
+    p.speed *= 0.18;
+    p.opacity *= 0.45;
+    p.twinkleSpeed *= 0.35;
+  });
+  const hc = document.getElementById('heartCanvas');
+  if (hc) {
+    var op = 1;
+    try { op = parseFloat(getComputedStyle(hc).opacity); } catch (e) { /* ignore */ }
+    if (op > 0.18) {
+      hc.style.transition = 'opacity 2.8s ease';
+      hc.style.opacity = '0.35';
+    }
+  }
+  setTimeout(() => {
+    _heartCanvasStopped = true;
+    if (_heartAnimId) cancelAnimationFrame(_heartAnimId);
+    _heartAnimId = null;
+    if (canvas && ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
+    if (hc) hc.style.opacity = '0';
+  }, 2800);
+}
 
 window.addEventListener('resize', () => {
-  // Resize without interrupting the loop — canvas clears automatically next frame
-  canvas.width  = window.innerWidth;
+  if (!canvas || !ctx) return;
+  canvas.width = window.innerWidth;
   canvas.height = window.innerHeight;
-  // Re-randomise particles that are now out of bounds
   particles.forEach(p => {
-    if (p.x > canvas.width)  p.x = Math.random() * canvas.width;
+    if (p.x > canvas.width) p.x = Math.random() * canvas.width;
     if (p.y > canvas.height) p.y = Math.random() * canvas.height;
   });
 }, { passive: true });
@@ -444,7 +561,7 @@ function toggleMusic() {
         if (equalizer) equalizer.classList.add('active');
         if (lyricsBox) exactScrollTop = lyricsBox.scrollTop;
         scrollLyrics();
-      }).catch(e => console.log('Audio play blocked:', e));
+      }).catch(function () { /* autoplay blocked */ });
     }
   }
 }
@@ -567,6 +684,52 @@ function createFireworks(container) {
   }, { passive: true });
 })();
 
+// ====== BEFORE YOU GO (after dynamic ending — one shot) ======
+window._olsBeforeYouGoShown = false;
+function olsShowBeforeYouGo() {
+  if (window._olsBeforeYouGoShown) return;
+  window._olsBeforeYouGoShown = true;
+  try { localStorage.setItem('ols_before_you_go_shown', 'true'); } catch (e) { /* ignore */ }
+
+  olsCalmHeartCanvasForEnding();
+
+  var deContent = document.getElementById('deContent');
+  if (deContent) {
+    deContent.style.transition = 'opacity 2.2s ease';
+    deContent.style.opacity = '0';
+  }
+
+  var el = document.getElementById('beforeYouGoScreen');
+  if (!el) return;
+  document.body.classList.add('ols-before-you-go');
+  el.setAttribute('aria-hidden', 'false');
+  requestAnimationFrame(function () {
+    el.classList.add('active');
+  });
+}
+
+// ====== SAVE MEMORY — small offline HTML keepsake (no deps) ======
+window.olsDownloadMemoryKeepsake = function () {
+  try {
+    var decision = '';
+    try { decision = localStorage.getItem('final_decision') || ''; } catch (e) { /* ignore */ }
+    var stamp = new Date().toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
+    var html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>OneLastSmile — a quiet keepsake</title><style>body{margin:0;min-height:100vh;background:#0a0510;color:#e8c8d8;font:300 1.05rem/1.75 Lato,system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:32px;box-sizing:border-box}.wrap{max-width:34rem;border:1px solid rgba(255,77,133,.22);border-radius:20px;padding:2rem 2.2rem;background:linear-gradient(165deg,rgba(30,10,40,.95),rgba(12,6,18,.98));box-shadow:0 0 40px rgba(162,57,202,.12)}h1{font:400 1.6rem "Playfair Display",Georgia,serif;font-style:italic;margin:0 0 1.2rem;color:#ffb6c8;letter-spacing:.02em}p{margin:.85rem 0;opacity:.92}.sig{margin-top:2rem;font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,182,210,.45)}.soft{color:rgba(255,200,220,.55);font-size:.95rem;font-style:italic}</style><link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet"/></head><body><div class="wrap"><h1>A small keepsake</h1><p>This page was saved from <strong>OneLastSmile</strong> — not to convince you of anything, only to hold a few honest lines.</p><p>I didn’t know how to say everything… so I made something instead. It’s simple, but it’s honest.</p><p class="soft">Some things are meant to be felt once. That doesn’t make them less real.</p><p class="soft">If love is true, no effort ever goes to waste — even when nothing comes back the way we hoped.</p>' +
+      (decision ? '<p class="soft">Your choice here was private; this file doesn’t know the details. It only carries the quiet of the moment.</p>' : '') +
+      '<p class="sig">— OneLastSmile · ' + stamp.replace(/</g, '') + '</p></div></body></html>';
+
+    var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'onelastsmile-memory.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(function () { URL.revokeObjectURL(url); }, 400);
+  } catch (e) { /* ignore */ }
+};
+
 // ====== DYNAMIC ENDING LOGIC (CONNECTED TO EMAILJS) ======
 function handleEndingDecision(decision) {
   if (localStorage.getItem("final_decision_locked") === "true") return;
@@ -575,6 +738,7 @@ function handleEndingDecision(decision) {
     localStorage.setItem("final_decision_locked", "true");
     localStorage.setItem("epilogue_ready", "true");
     localStorage.setItem("epilogue_time", Date.now().toString());
+    localStorage.setItem("ols_final_ending_reached", "true");
   } catch(e){}
   
   window._olsExiting = true; // Signal behavioral layer to stop interfering
@@ -611,7 +775,7 @@ function handleEndingDecision(decision) {
         visit_count: window._olsVisitCount || 1,
         return_status: window._olsReturnStatus || "first_visit",
         time: new Date().toLocaleString()
-    }).catch(err => console.log("EmailJS logged silently")); 
+    }).catch(function () { /* silent */ });
   }
 
   // 2. Pause for 0.5s (Emotional Weight)
@@ -677,10 +841,10 @@ function handleEndingDecision(decision) {
       else extraText = "You chose to let it go.";
       extra.innerHTML = extraText;
       
-      const canvas = document.getElementById('heartCanvas');
-      if (canvas) {
-        canvas.style.transition = 'opacity 3s ease';
-        canvas.style.opacity = '0';
+      var heartFade = document.getElementById('heartCanvas');
+      if (heartFade) {
+        heartFade.style.transition = 'opacity 3s ease';
+        heartFade.style.opacity = '0';
       }
     }
 
@@ -713,6 +877,9 @@ function handleEndingDecision(decision) {
       
       setTimeout(() => {
         if (finalSilenceText) finalSilenceText.classList.add('visible');
+        setTimeout(function () {
+          olsShowBeforeYouGo();
+        }, 5600);
       }, 2500); 
     }, timeOffset + 10500); 
 
@@ -804,8 +971,8 @@ function _cursorHoverOff() { if (cursor) cursor.classList.remove('hovering'); }
       _pRaf = null;
       var sy = window.scrollY;
       if (sy > hero.offsetTop + hero.offsetHeight) return;
-      parallaxBg.style.transform  = 'translateY(' + (sy * 0.25) + 'px)';
-      if (heroContent) heroContent.style.transform = 'translateY(' + (-sy * 0.06) + 'px)';
+      parallaxBg.style.transform  = 'translate3d(0,' + (sy * 0.25) + 'px,0)';
+      if (heroContent) heroContent.style.transform = 'translate3d(0,' + (-sy * 0.06) + 'px,0)';
     }
     window.addEventListener('scroll', function () {
       if (!_pRaf) _pRaf = requestAnimationFrame(applyParallax);
@@ -824,14 +991,15 @@ function _cursorHoverOff() { if (cursor) cursor.classList.remove('hovering'); }
   //  3. PARTICLE REFINEMENT — fewer, slower, softer
   // ─────────────────────────────────────────────────────────────
   setTimeout(function () {
-    if (typeof particles !== 'undefined' && Array.isArray(particles)) {
-      // Remove ~20 particles (down from 80 → ~60)
+    if (typeof particles !== 'undefined' && Array.isArray(particles) && particles.length > 42) {
       particles.splice(0, 20);
-      // Slow + soften survivors
+    }
+    if (typeof particles !== 'undefined' && Array.isArray(particles)) {
+      var soft = document.documentElement.classList.contains('ols-mobile') ? 0.62 : 0.55;
       particles.forEach(function (p) {
-        p.speed        = p.speed        * 0.55;
-        p.opacity      = Math.max(0.04, p.opacity * 0.72);
-        p.twinkleSpeed = p.twinkleSpeed * 0.60;
+        p.speed        = p.speed        * soft;
+        p.opacity      = Math.max(0.04, p.opacity * (document.documentElement.classList.contains('ols-mobile') ? 0.68 : 0.72));
+        p.twinkleSpeed = p.twinkleSpeed * (document.documentElement.classList.contains('ols-mobile') ? 0.5 : 0.60);
         p.twinklePhase = Math.random() * Math.PI * 2;
       });
     }
