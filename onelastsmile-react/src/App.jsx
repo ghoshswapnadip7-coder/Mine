@@ -18,7 +18,7 @@ export default function App() {
     <>
       <DualCursor />
       {phase === 'birthday' ? (
-        <BirthdayFlow onEnter={() => setPhase('main')} isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
+        <BirthdayFlow onEnter={() => setPhase('main')} setIsPlaying={setIsPlaying} />
       ) : (
         <MainSite isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
       )}

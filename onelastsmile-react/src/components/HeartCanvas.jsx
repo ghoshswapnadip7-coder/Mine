@@ -6,10 +6,16 @@ export default function HeartCanvas() {
   useEffect(() => {
     const canvas = canvasRef.current
     const ctx = canvas.getContext('2d')
-    canvas.width = window.innerWidth
-    canvas.height = window.innerHeight
 
-    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight }
+    const resize = () => {
+      const nextWidth = window.innerWidth
+      const nextHeight = window.innerHeight
+      if (canvas.width !== nextWidth || canvas.height !== nextHeight) {
+        canvas.width = nextWidth
+        canvas.height = nextHeight
+      }
+    }
+    resize()
     window.addEventListener('resize', resize, { passive: true })
 
     class Particle {
@@ -40,16 +46,37 @@ export default function HeartCanvas() {
     }
 
     const particles = Array.from({ length: 80 }, () => new Particle())
-    let rafId
+    let rafId = 0
+    let running = true
 
     function animate() {
+      if (!running) return
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      particles.forEach(p => p.update())
+      for (let i = 0; i < particles.length; i += 1) particles[i].update()
       rafId = requestAnimationFrame(animate)
     }
-    animate()
+    const stop = () => {
+      running = false
+      if (rafId) cancelAnimationFrame(rafId)
+      rafId = 0
+    }
+    const start = () => {
+      if (running) return
+      running = true
+      rafId = requestAnimationFrame(animate)
+    }
+    const onVisibilityChange = () => {
+      if (document.hidden) stop()
+      else start()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    rafId = requestAnimationFrame(animate)
 
-    return () => { cancelAnimationFrame(rafId); window.removeEventListener('resize', resize) }
+    return () => {
+      stop()
+      window.removeEventListener('resize', resize)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
   }, [])
 
   return <canvas id="heartCanvas" ref={canvasRef}></canvas>

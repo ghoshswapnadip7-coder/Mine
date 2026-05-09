@@ -19,6 +19,7 @@ export default function DualCursor() {
     let rx = mx, ry = my, dx = mx, dy = my
     let ringScale = 1.0, isHovering = false
     let cursorVisible = false, beatPhase = 0.0, lastTs = 0.0
+    let rafId = 0, running = false
 
     const RING_BASE = 0.880, DOT_BASE = 0.050, SCALE_BASE = 0.880
     const BEAT_OMEGA = 6.2832 / 2.4, BEAT_AMP = 0.08
@@ -29,9 +30,26 @@ export default function DualCursor() {
         cursorVisible = true
         ring.style.opacity = '1'; dot.style.opacity = '1'
       }
+      magTarget = e.target?.closest?.('.bd-btn') || null
+      magX = e.clientX
+      magY = e.clientY
+      requestMagnet()
+      startLoop()
     }
-    const onLeave = () => { cursorVisible = false; ring.style.opacity = '0'; dot.style.opacity = '0' }
-    const onEnter = () => { cursorVisible = true; ring.style.opacity = '1'; dot.style.opacity = '1' }
+    const onLeave = () => {
+      cursorVisible = false
+      ring.style.opacity = '0'
+      dot.style.opacity = '0'
+      magTarget = null
+      requestMagnet()
+      stopLoop()
+    }
+    const onEnter = () => {
+      cursorVisible = true
+      ring.style.opacity = '1'
+      dot.style.opacity = '1'
+      startLoop()
+    }
 
     const clickSel = 'a,button,[onclick],[role="button"],.bd-btn,.nav-link,.dot,.trait,.quote-nav-btn,.music-btn,.btn-keep,.btn-fade'
     const onOver = e => {
@@ -46,36 +64,40 @@ export default function DualCursor() {
     }
 
     // Magnetic effect
-    let magEl = null
-    const onMagMove = e => {
-      const el = e.target?.closest?.('.bd-btn')
+    let magEl = null, magTarget = null, magX = mx, magY = my, magRaf = 0, magResetTimer = 0
+    const applyMagnet = () => {
+      magRaf = 0
+      const el = magTarget
       if (el) {
         if (magEl !== el) {
           if (magEl) { magEl.style.transition = 'transform 0.4s ease'; magEl.style.transform = '' }
           magEl = el
         }
         const r = el.getBoundingClientRect()
-        const fx = (e.clientX - r.left - r.width * 0.5) * 0.10
-        const fy = (e.clientY - r.top - r.height * 0.5) * 0.10
+        const fx = (magX - r.left - r.width * 0.5) * 0.10
+        const fy = (magY - r.top - r.height * 0.5) * 0.10
         el.style.transition = 'transform 0.15s ease'
         el.style.transform = `translate(${fx}px,${fy}px)`
       } else if (magEl) {
         magEl.style.transition = 'transform 0.4s ease'
         magEl.style.transform = 'translate(0,0)'
         const _el = magEl; magEl = null
-        setTimeout(() => { _el.style.transform = ''; _el.style.transition = '' }, 420)
+        clearTimeout(magResetTimer)
+        magResetTimer = setTimeout(() => { _el.style.transform = ''; _el.style.transition = '' }, 420)
       }
+    }
+    const requestMagnet = () => {
+      if (!magRaf) magRaf = requestAnimationFrame(applyMagnet)
     }
 
     document.addEventListener('mousemove', onMove, { passive: true })
-    document.addEventListener('mousemove', onMagMove, { passive: true })
     document.addEventListener('mouseleave', onLeave)
     document.addEventListener('mouseenter', onEnter)
     document.addEventListener('mouseover', onOver, { passive: true })
     document.addEventListener('mouseout', onOut, { passive: true })
 
-    let rafId
     function animate(ts) {
+      if (!running) return
       const dt = lastTs ? Math.min(ts - lastTs, 50) : 16.67
       lastTs = ts
       const norm = dt * 0.06
@@ -95,16 +117,34 @@ export default function DualCursor() {
 
       rafId = requestAnimationFrame(animate)
     }
-    rafId = requestAnimationFrame(animate)
+    function startLoop() {
+      if (running || document.hidden) return
+      running = true
+      lastTs = 0
+      rafId = requestAnimationFrame(animate)
+    }
+    function stopLoop() {
+      running = false
+      if (rafId) cancelAnimationFrame(rafId)
+      rafId = 0
+    }
+    const onVisibilityChange = () => {
+      if (document.hidden) stopLoop()
+      else if (cursorVisible) startLoop()
+    }
+
+    document.addEventListener('visibilitychange', onVisibilityChange)
 
     return () => {
-      cancelAnimationFrame(rafId)
+      stopLoop()
+      if (magRaf) cancelAnimationFrame(magRaf)
+      clearTimeout(magResetTimer)
       document.removeEventListener('mousemove', onMove)
-      document.removeEventListener('mousemove', onMagMove)
       document.removeEventListener('mouseleave', onLeave)
       document.removeEventListener('mouseenter', onEnter)
       document.removeEventListener('mouseover', onOver)
       document.removeEventListener('mouseout', onOut)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
     }
   }, [])
 

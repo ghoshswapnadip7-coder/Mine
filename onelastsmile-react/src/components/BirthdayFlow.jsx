@@ -1,8 +1,18 @@
 import { useState, useEffect, useRef } from 'react'
 
 const TOTAL_STEPS = 7
+const SCREENS = [1, 2, 3, 4, 5, 6, 7]
+const SCREEN_DATA = {
+  1: { icon:'fas fa-gift',               ornament:'3 January',   heading:"Hey\u2026 today is your day.",              text:"I didn\u2019t want to just text you like everyone else.\nSo I made something.", btnLabel:'Start' },
+  2: { icon:'fas fa-cake-candles',        ornament:'For You',    heading:'Happy Birthday, Anushka.',                 text:"Not just another year\u2026\nbut another version of you\nthe world gets to become.", btnLabel:'Next' },
+  3: { icon:'fas fa-heart',               ornament:'Honestly',   heading:'You matter more than you probably realize.',text:"I don\u2019t say this often.\nBut it\u2019s true, and it needed to be said.", btnLabel:'Continue' },
+  4: { icon:'fas fa-sun',                 ornament:'Today',      heading:"Today isn\u2019t about anything complicated.",text:"No past. No confusion.\n\nJust you.", btnLabel:'Next' },
+  5: { icon:'fas fa-envelope-open-heart', ornament:'A Gift',     heading:'This is just something I wanted to give you.',text:'No expectations attached to it.', btnLabel:'See More' },
+  6: { icon:'fas fa-star',                ornament:'Real Things', heading:"Some things don\u2019t need to be loud to be real.", text:'Quiet can still mean genuine.', btnLabel:'Continue' },
+  7: { icon:'fas fa-dove',                ornament:'Always',     heading:"So yeah\u2026 Happy Birthday.",              text:"I hope life gives you everything you deserve.\nAnd I genuinely mean that.", btnLabel:'Finish' },
+}
 
-export default function BirthdayFlow({ onEnter, isPlaying, setIsPlaying }) {
+export default function BirthdayFlow({ onEnter, setIsPlaying }) {
   const [screen, setScreen] = useState(1)      // 1-7, then 'final'
   const [exiting, setExiting] = useState(false)
   const [olsActive, setOlsActive] = useState(false)
@@ -11,20 +21,55 @@ export default function BirthdayFlow({ onEnter, isPlaying, setIsPlaying }) {
   const canvasRef = useRef(null)
   const audioRef  = useRef(null)
   const musicStarted = useRef(false)
+  const exitingRef = useRef(false)
+  const timeoutsRef = useRef(new Set())
+  const intervalsRef = useRef(new Set())
+
+  const scheduleTimeout = (fn, delay) => {
+    const id = window.setTimeout(() => {
+      timeoutsRef.current.delete(id)
+      fn()
+    }, delay)
+    timeoutsRef.current.add(id)
+    return id
+  }
+
+  const scheduleInterval = (fn, delay) => {
+    const id = window.setInterval(fn, delay)
+    intervalsRef.current.add(id)
+    return id
+  }
+
+  const clearManagedInterval = (id) => {
+    window.clearInterval(id)
+    intervalsRef.current.delete(id)
+  }
+
+  useEffect(() => () => {
+    timeoutsRef.current.forEach(id => window.clearTimeout(id))
+    intervalsRef.current.forEach(id => window.clearInterval(id))
+    exitingRef.current = false
+  }, [])
 
   /* ── particle canvas ── */
   useEffect(() => {
     const canvas = canvasRef.current
     if (!canvas) return
     const ctx = canvas.getContext('2d')
-    canvas.width = window.innerWidth; canvas.height = window.innerHeight
-    const resize = () => { canvas.width = window.innerWidth; canvas.height = window.innerHeight }
+    const resize = () => {
+      const nextWidth = window.innerWidth
+      const nextHeight = window.innerHeight
+      if (canvas.width !== nextWidth || canvas.height !== nextHeight) {
+        canvas.width = nextWidth
+        canvas.height = nextHeight
+      }
+    }
+    resize()
     window.addEventListener('resize', resize, { passive: true })
 
     const particles = Array.from({ length: 70 }, () => makePart(canvas))
 
     function makePart(c) {
-      const types = ['heart', 'star', 'dot']
       const colors = ['255,77,133', '162,57,202', '255,179,198', '255,255,255']
       return {
         x: Math.random() * c.width, y: Math.random() * c.height,
@@ -35,21 +80,43 @@ export default function BirthdayFlow({ onEnter, isPlaying, setIsPlaying }) {
       }
     }
 
-    let rafId
+    let rafId = 0
+    let running = true
     function animate() {
+      if (!running) return
       ctx.clearRect(0, 0, canvas.width, canvas.height)
-      particles.forEach(p => {
+      for (let i = 0; i < particles.length; i += 1) {
+        const p = particles[i]
         p.phase += p.twinkle
         const alpha = p.opacity * (0.5 + 0.5 * Math.sin(p.phase))
         ctx.fillStyle = `rgba(${p.color},${alpha})`
         ctx.beginPath(); ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2); ctx.fill()
         p.y -= p.speed; p.x += Math.sin(p.y * 0.009) * 0.25
         if (p.y < -10) { p.y = canvas.height + 10; p.x = Math.random() * canvas.width }
-      })
+      }
       rafId = requestAnimationFrame(animate)
     }
-    animate()
-    return () => { cancelAnimationFrame(rafId); window.removeEventListener('resize', resize) }
+    const stop = () => {
+      running = false
+      if (rafId) cancelAnimationFrame(rafId)
+      rafId = 0
+    }
+    const start = () => {
+      if (running) return
+      running = true
+      rafId = requestAnimationFrame(animate)
+    }
+    const onVisibilityChange = () => {
+      if (document.hidden) stop()
+      else start()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    rafId = requestAnimationFrame(animate)
+    return () => {
+      stop()
+      window.removeEventListener('resize', resize)
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+    }
   }, [])
 
   /* ── music helpers ── */
@@ -67,18 +134,18 @@ export default function BirthdayFlow({ onEnter, isPlaying, setIsPlaying }) {
   const goNext = (from) => {
     const next = from + 1
     setExiting(true)
-    setTimeout(() => {
+    scheduleTimeout(() => {
       setExiting(false)
       if (next > TOTAL_STEPS) {
         setScreen('final')
         setDotsVisible(false)
-        setTimeout(() => setOlsActive(true), 900)
+        scheduleTimeout(() => setOlsActive(true), 900)
         // Lower volume
         const audio = audioRef.current
         if (audio) {
-          const iv = setInterval(() => {
+          const iv = scheduleInterval(() => {
             if (audio.volume > 0.38) audio.volume = Math.max(0.38, audio.volume - 0.025)
-            else clearInterval(iv)
+            else clearManagedInterval(iv)
           }, 80)
         }
       } else {
@@ -91,15 +158,20 @@ export default function BirthdayFlow({ onEnter, isPlaying, setIsPlaying }) {
 
   /* ── cinematic exit ── */
   const bdEnter = () => {
-    if (window._olsExiting) return
-    window._olsExiting = true
+    if (exitingRef.current) return
+    exitingRef.current = true
 
     // fade audio out
     const audio = audioRef.current
     if (audio) {
-      const fadeOut = setInterval(() => {
+      const fadeOut = scheduleInterval(() => {
         if (audio.volume > 0.03) audio.volume = Math.max(0, audio.volume - 0.018)
-        else { audio.volume = 0; audio.pause(); clearInterval(fadeOut) }
+        else {
+          audio.volume = 0
+          audio.pause()
+          setIsPlaying(false)
+          clearManagedInterval(fadeOut)
+        }
       }, 60)
     }
 
@@ -109,32 +181,25 @@ export default function BirthdayFlow({ onEnter, isPlaying, setIsPlaying }) {
       blackout.style.transition = 'opacity 1.8s cubic-bezier(0.4,0,0.2,1)'
       blackout.classList.add('active')
     }
-    setTimeout(() => {
+    scheduleTimeout(() => {
       if (blackout) blackout.classList.add('glow-pulse')
     }, 1900)
-    setTimeout(() => {
-      try { sessionStorage.setItem('allowAccess', 'true') } catch (_) {}
+    scheduleTimeout(() => {
+      try {
+        sessionStorage.setItem('allowAccess', 'true')
+      } catch {
+        /* storage can be unavailable in private browsing */
+      }
+      setIsPlaying(false)
       onEnter()
-      window._olsExiting = false
-      setTimeout(() => {
+      exitingRef.current = false
+      scheduleTimeout(() => {
         if (blackout) {
           blackout.style.transition = 'opacity 1.6s ease'
           blackout.classList.remove('active', 'glow-pulse')
         }
       }, 600)
     }, 3600)
-  }
-
-  const screens = [1,2,3,4,5,6,7]
-
-  const screenData = {
-    1: { icon:'fas fa-gift',               ornament:'3 January',   heading:"Hey\u2026 today is your day.",              text:"I didn\u2019t want to just text you like everyone else.\nSo I made something.", btnLabel:'Start',    btnAction: bdStart },
-    2: { icon:'fas fa-cake-candles',        ornament:'For You',    heading:'Happy Birthday, Anushka.',                 text:"Not just another year\u2026\nbut another version of you\nthe world gets to become.", btnLabel:'Next',     btnAction:()=>goNext(2) },
-    3: { icon:'fas fa-heart',               ornament:'Honestly',   heading:'You matter more than you probably realize.',text:"I don\u2019t say this often.\nBut it\u2019s true, and it needed to be said.", btnLabel:'Continue', btnAction:()=>goNext(3) },
-    4: { icon:'fas fa-sun',                 ornament:'Today',      heading:"Today isn\u2019t about anything complicated.",text:"No past. No confusion.\n\nJust you.", btnLabel:'Next', btnAction:()=>goNext(4) },
-    5: { icon:'fas fa-envelope-open-heart', ornament:'A Gift',     heading:'This is just something I wanted to give you.',text:'No expectations attached to it.', btnLabel:'See More', btnAction:()=>goNext(5) },
-    6: { icon:'fas fa-star',                ornament:'Real Things', heading:"Some things don\u2019t need to be loud to be real.", text:'Quiet can still mean genuine.', btnLabel:'Continue', btnAction:()=>goNext(6) },
-    7: { icon:'fas fa-dove',                ornament:'Always',     heading:"So yeah\u2026 Happy Birthday.",              text:"I hope life gives you everything you deserve.\nAnd I genuinely mean that.", btnLabel:'Finish', btnAction:()=>goNext(7) },
   }
 
   return (
@@ -152,10 +217,11 @@ export default function BirthdayFlow({ onEnter, isPlaying, setIsPlaying }) {
       )}
 
       {/* Screens 1-7 */}
-      {screens.map(n => {
-        const d = screenData[n]
+      {SCREENS.map(n => {
+        const d = SCREEN_DATA[n]
         const isActive = screen === n && !exiting
         const isExit   = screen === n && exiting
+        const action = n === 1 ? bdStart : () => goNext(n)
         return (
           <div key={n} className={`bd-screen${isActive?' active':''}${isExit?' exiting':''}`} id={`bdScreen${n}`}>
             <i className={`bd-icon ${d.icon}`}></i>
@@ -167,7 +233,7 @@ export default function BirthdayFlow({ onEnter, isPlaying, setIsPlaying }) {
             {d.text.split('\n').map((line, i) =>
               line === '' ? <br key={i}/> : <p key={i} className="bd-text">{line}</p>
             )}
-            <button className="bd-btn" onClick={d.btnAction}>
+            <button className="bd-btn" onClick={action}>
               <span>{d.btnLabel}</span> <i className="fas fa-chevron-right"></i>
             </button>
           </div>
@@ -200,7 +266,7 @@ export default function BirthdayFlow({ onEnter, isPlaying, setIsPlaying }) {
       {/* Step dots */}
       {dotsVisible && (
         <div id="bdDots">
-          {screens.map(n => (
+          {SCREENS.map(n => (
             <span key={n} className={`bd-dot${screen===n?' active':''}`}></span>
           ))}
         </div>

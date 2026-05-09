@@ -3,6 +3,28 @@ import { useState, useEffect, useRef } from 'react'
 export default function ProposeSection({ isPlaying, setIsPlaying, audioRef }) {
   const [accepted, setAccepted] = useState(false)
   const ref = useRef(null)
+  const timeoutsRef = useRef(new Set())
+  const intervalsRef = useRef(new Set())
+
+  const scheduleTimeout = (fn, delay) => {
+    const id = window.setTimeout(() => {
+      timeoutsRef.current.delete(id)
+      fn()
+    }, delay)
+    timeoutsRef.current.add(id)
+    return id
+  }
+
+  const scheduleInterval = (fn, delay) => {
+    const id = window.setInterval(fn, delay)
+    intervalsRef.current.add(id)
+    return id
+  }
+
+  const clearManagedInterval = (id) => {
+    window.clearInterval(id)
+    intervalsRef.current.delete(id)
+  }
 
   useEffect(() => {
     const obs = new IntersectionObserver(entries => {
@@ -12,12 +34,18 @@ export default function ProposeSection({ isPlaying, setIsPlaying, audioRef }) {
     return () => obs.disconnect()
   }, [])
 
+  useEffect(() => () => {
+    timeoutsRef.current.forEach(id => window.clearTimeout(id))
+    intervalsRef.current.forEach(id => window.clearInterval(id))
+  }, [])
+
   const sayYes = () => {
     setAccepted(true)
     createFireworks()
     if (!isPlaying && audioRef.current) {
-      audioRef.current.play().catch(() => {})
-      setIsPlaying(true)
+      audioRef.current.play()
+        .then(() => setIsPlaying(true))
+        .catch(() => setIsPlaying(false))
     }
   }
 
@@ -32,18 +60,18 @@ export default function ProposeSection({ isPlaying, setIsPlaying, audioRef }) {
       const vel = Math.random() * 100 + 50
       const tx = Math.cos(angle) * vel, ty = Math.sin(angle) * vel
       container.appendChild(heart)
-      setTimeout(() => { heart.style.transform = `translate(calc(-50% + ${tx}px),calc(-50% + ${ty}px)) scale(0)`; heart.style.opacity = '0' }, 50)
-      setTimeout(() => heart.remove(), 1050)
+      scheduleTimeout(() => { heart.style.transform = `translate(calc(-50% + ${tx}px),calc(-50% + ${ty}px)) scale(0)`; heart.style.opacity = '0' }, 50)
+      scheduleTimeout(() => heart.remove(), 1050)
     }
-    const iv = setInterval(() => {
+    const iv = scheduleInterval(() => {
       const h = document.createElement('i')
       h.className = 'fas fa-heart'
       h.style.cssText = `position:absolute;color:${Math.random()>0.5?'#ff4d85':'#a239ca'};left:${Math.random()*100}%;top:-20px;font-size:${Math.random()*15+10}px;opacity:0.7;transition:top 3s linear,opacity 3s linear;`
       container.appendChild(h)
-      setTimeout(() => { h.style.top='100%'; h.style.opacity='0' }, 50)
-      setTimeout(() => h.remove(), 3050)
+      scheduleTimeout(() => { h.style.top='100%'; h.style.opacity='0' }, 50)
+      scheduleTimeout(() => h.remove(), 3050)
     }, 300)
-    setTimeout(() => clearInterval(iv), 10000)
+    scheduleTimeout(() => clearManagedInterval(iv), 10000)
   }
 
   return (

@@ -20,6 +20,7 @@ export default function LoveLetter() {
   const ivRef       = useRef(null)
   const idxRef      = useRef(0)
   const sectionRef  = useReveal()
+  const startTimeoutRef = useRef(null)
 
   const startTypewriter = useCallback(() => {
     if (startedRef.current) return
@@ -40,9 +41,10 @@ export default function LoveLetter() {
 
   const replay = useCallback(() => {
     clearInterval(ivRef.current)
+    clearTimeout(startTimeoutRef.current)
     startedRef.current = false
     setDisplayed(''); setDone(false)
-    setTimeout(startTypewriter, 50)
+    startTimeoutRef.current = setTimeout(startTypewriter, 50)
   }, [startTypewriter])
 
   useEffect(() => {
@@ -52,13 +54,17 @@ export default function LoveLetter() {
       entries.forEach(e => {
         if (e.isIntersecting) {
           section.querySelectorAll('.reveal').forEach(el => el.classList.add('active'))
-          setTimeout(startTypewriter, 500)
+          startTimeoutRef.current = setTimeout(startTypewriter, 500)
           obs.disconnect()
         }
       })
     }, { threshold: 0.3 })
     obs.observe(section)
-    return () => { obs.disconnect(); clearInterval(ivRef.current) }
+    return () => {
+      obs.disconnect()
+      clearInterval(ivRef.current)
+      clearTimeout(startTimeoutRef.current)
+    }
   }, [sectionRef, startTypewriter])
 
   return (

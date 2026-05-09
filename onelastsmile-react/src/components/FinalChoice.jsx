@@ -24,6 +24,28 @@ export default function FinalChoice({ isPlaying, setIsPlaying, audioRef }) {
     return () => obs.disconnect()
   }, [])
 
+  useEffect(() => {
+    if (!fadeActive) return
+    const previousOverflow = document.body.style.overflow
+    const canvas = document.getElementById('heartCanvas')
+    const previousCanvasTransition = canvas?.style.transition || ''
+    const previousCanvasOpacity = canvas?.style.opacity || ''
+
+    document.body.style.overflow = 'hidden'
+    if (canvas) {
+      canvas.style.transition = 'opacity 3s ease'
+      canvas.style.opacity = '0'
+    }
+
+    return () => {
+      document.body.style.overflow = previousOverflow
+      if (canvas) {
+        canvas.style.transition = previousCanvasTransition
+        canvas.style.opacity = previousCanvasOpacity
+      }
+    }
+  }, [fadeActive])
+
   const keepStory = () => {
     sendDecisionEmail('keep')
     localStorage.setItem('decision', 'keep')
@@ -43,11 +65,6 @@ export default function FinalChoice({ isPlaying, setIsPlaying, audioRef }) {
       audioRef.current?.pause()
       setIsPlaying(false)
     }
-    document.body.style.overflow = 'hidden'
-
-    // canvas fade
-    const canvas = document.getElementById('heartCanvas')
-    if (canvas) { canvas.style.transition = 'opacity 3s ease'; canvas.style.opacity = '0' }
   }
 
   const showConfirmation = () => setConfirmation(true)

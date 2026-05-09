@@ -18,18 +18,28 @@ import SiteFooter from './SiteFooter'
 import HeartCanvas from './HeartCanvas'
 
 export default function MainSite({ isPlaying, setIsPlaying }) {
-  const [viewOnce, setViewOnce] = useState(false)
+  const [viewOnce, setViewOnce] = useState(() => {
+    try {
+      return localStorage.getItem('hasVisited') === 'true' && !sessionStorage.getItem('allowAccess')
+    } catch {
+      return false
+    }
+  })
   const audioRef = useRef(null)
 
   useEffect(() => {
-    // view-once check
-    if (localStorage.getItem('hasVisited') === 'true' && !sessionStorage.getItem('allowAccess')) {
-      setViewOnce(true)
+    if (viewOnce) {
       document.body.style.overflow = 'hidden'
     } else {
-      localStorage.setItem('hasVisited', 'true')
+      try {
+        localStorage.setItem('hasVisited', 'true')
+      } catch {
+        /* storage can be unavailable in private browsing */
+      }
+      document.body.style.overflow = ''
     }
-  }, [])
+    return () => { document.body.style.overflow = '' }
+  }, [viewOnce])
 
   const openAgain = () => {
     sessionStorage.setItem('allowAccess', 'true')

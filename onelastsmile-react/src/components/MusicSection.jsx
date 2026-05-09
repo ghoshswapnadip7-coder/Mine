@@ -65,23 +65,43 @@ export default function MusicSection({ audioRef, isPlaying, setIsPlaying }) {
     if (isPlayingRef.current) {
       audio.pause()
       cancelAnimationFrame(rafId.current)
+      setIsPlaying(false)
     } else {
-      audio.play().catch(e => console.log('Audio blocked', e))
       if (lyricsBoxRef.current) exactScrollRef.current = lyricsBoxRef.current.scrollTop
-      startLyricsScroll()
+      audio.play()
+        .then(() => {
+          setIsPlaying(true)
+          startLyricsScroll()
+        })
+        .catch(() => {
+          cancelAnimationFrame(rafId.current)
+          setIsPlaying(false)
+        })
     }
-    setIsPlaying(p => !p)
   }, [audioRef, setIsPlaying, startLyricsScroll])
 
   /* Start/stop lyrics when isPlaying changes */
   useEffect(() => {
     if (isPlaying) startLyricsScroll()
     else cancelAnimationFrame(rafId.current)
-    return () => cancelAnimationFrame(rafId.current)
+    return () => {
+      cancelAnimationFrame(rafId.current)
+      clearTimeout(userScrollTmr.current)
+    }
   }, [isPlaying, startLyricsScroll])
 
   return (
     <section className="music-section" id="music" ref={sectionRef}>
+      <audio
+        ref={audioRef}
+        id="mainAudio"
+        loop
+        preload="none"
+        onPlay={() => setIsPlaying(true)}
+        onPause={() => setIsPlaying(false)}
+      >
+        <source src="/song.mp3" type="audio/mpeg"/>
+      </audio>
       <div className="music-bg-overlay"></div>
       <div className="section-header reveal">
         <p className="section-label"><i className="fas fa-music"></i> Swapnadip Sings For You</p>

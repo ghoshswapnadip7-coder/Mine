@@ -14,15 +14,29 @@ export default function QuotesCarousel() {
   const timerRef = useRef(null)
   const ref = useReveal()
 
-  const resetTimer = useCallback(() => {
+  const clearTimer = useCallback(() => {
     clearInterval(timerRef.current)
-    timerRef.current = setInterval(() => setCurrent(c => (c + 1) % quotes.length), 5000)
+    timerRef.current = null
   }, [])
+
+  const resetTimer = useCallback(() => {
+    clearTimer()
+    if (document.hidden) return
+    timerRef.current = setInterval(() => setCurrent(c => (c + 1) % quotes.length), 5000)
+  }, [clearTimer])
 
   useEffect(() => {
     resetTimer()
-    return () => clearInterval(timerRef.current)
-  }, [resetTimer])
+    const onVisibilityChange = () => {
+      if (document.hidden) clearTimer()
+      else resetTimer()
+    }
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    return () => {
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      clearTimer()
+    }
+  }, [clearTimer, resetTimer])
 
   const goTo = useCallback(i => { setCurrent(i); resetTimer() }, [resetTimer])
   const prev  = useCallback(() => { setCurrent(c => (c - 1 + quotes.length) % quotes.length); resetTimer() }, [resetTimer])

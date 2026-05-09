@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, memo } from 'react'
+import React, { useState, useEffect, memo } from 'react'
 import { useReveal } from '../hooks/useReveal'
 
 function pad(n, len = 2) { return String(n).padStart(len, '0') }

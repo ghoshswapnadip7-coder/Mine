@@ -1,22 +1,30 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
+  const scrolledRef = useRef(false)
 
   useEffect(() => {
-    let ticking = false
+    let rafId = 0
     const onScroll = () => {
-      if (!ticking) {
-        requestAnimationFrame(() => {
-          setScrolled(window.scrollY > 50)
-          ticking = false
+      if (!rafId) {
+        rafId = requestAnimationFrame(() => {
+          rafId = 0
+          const next = window.scrollY > 50
+          if (next !== scrolledRef.current) {
+            scrolledRef.current = next
+            setScrolled(next)
+          }
         })
-        ticking = true
       }
     }
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    onScroll()
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (rafId) cancelAnimationFrame(rafId)
+    }
   }, [])
 
   const closeMenu = () => setMenuOpen(false)
