@@ -1,0 +1,132 @@
+/*
+ * perf.css — GPU compositing + layout containment hints
+ * Import this AFTER legacy.css so it can override where needed.
+ * All transforms use translate3d / translateZ(0) to promote elements
+ * to their own compositor layer, keeping the main thread free.
+ */
+
+/* ── Canvas elements → GPU layer ── */
+#heartCanvas,
+#bdCanvas {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  will-change: contents;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* ── Sections: layout + style containment so browser can skip offscreen ── */
+.hero,
+.about-section,
+.birthday-section,
+.letter-section,
+.reasons-section,
+.quotes-section,
+.timeline-section,
+.music-section,
+.story-section,
+.confession-section,
+.propose-section,
+.final-choice-section,
+footer.footer {
+  contain: layout style;
+}
+
+/* ── Reveal animation: compositor-only (opacity + transform) ── */
+.reveal {
+  opacity: 0;
+  transform: translate3d(0, 30px, 0);
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+.reveal.active {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+}
+
+/* ── Hero fade-in-up: GPU only ── */
+.fade-in-up {
+  opacity: 0;
+  animation: fadeInUpGPU 0.9s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  will-change: opacity, transform;
+}
+@keyframes fadeInUpGPU {
+  from { opacity: 0; transform: translate3d(0, 28px, 0); }
+  to   { opacity: 1; transform: translate3d(0, 0, 0); }
+}
+
+/* ── Vinyl / equalizer on GPU layer ── */
+.vinyl {
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+.vinyl.playing {
+  animation: spin 4s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg) translateZ(0); }
+}
+
+/* ── Equalizer bars: height is the only changing property ── */
+.equalizer .bar {
+  will-change: transform;
+  transform-origin: bottom center;
+}
+
+/* ── Birthday flow: screens use opacity + transform only ── */
+.bd-screen {
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+}
+
+/* ── Custom cursor: already on its own layer via will-change in index.css ── */
+
+/* ── Quotes carousel transitions ── */
+.quote-card {
+  will-change: opacity, transform;
+  backface-visibility: hidden;
+}
+
+/* ── Timeline items: stagger handled by .reveal delay already ── */
+.timeline-item {
+  will-change: opacity, transform;
+}
+
+/* ── Ring / glow animations ── */
+.ring-outer,
+.ring-glow,
+.about-image-ring {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+}
+
+/* ── Loader: off-screen after hide, avoid repaints ── */
+.loader {
+  will-change: opacity;
+  contain: layout style paint;
+}
+
+/* ── Navbar: GPU during scroll ── */
+.navbar {
+  will-change: background-color, box-shadow;
+  contain: layout style;
+}
+
+/* ── Hearts divider ── */
+.hearts-divider i {
+  will-change: transform, opacity;
+}
+
+/* ── OLS final screen lines ── */
+.ols-line {
+  will-change: opacity, transform;
+}
+
+/* ── Blackout overlay ── */
+#olsBlackout {
+  will-change: opacity;
+}

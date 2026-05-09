@@ -1,0 +1,62 @@
+/* React global resets + cursor */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body, * {
+  cursor: none !important;
+}
+
+/* ── Outer ring ── */
+#customCursor {
+  position: fixed;
+  top: 0; left: 0;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 999999;
+  background: transparent;
+  border: 2px solid rgba(255, 45, 117, 0.85);
+  box-shadow:
+    0 0  8px rgba(255,  45, 117, 0.55),
+    0 0 18px rgba(255,  45, 117, 0.25),
+    0 0 28px rgba(168,  85, 247, 0.20),
+    inset 0 0 6px rgba(255, 45, 117, 0.08);
+  will-change: transform;
+  opacity: 0;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
+}
+#customCursor.ring-hovering {
+  border-color: rgba(255, 45, 117, 1);
+  box-shadow:
+    0 0 14px rgba(255,  45, 117, 0.85),
+    0 0 30px rgba(255,  45, 117, 0.45),
+    0 0 50px rgba(168,  85, 247, 0.40);
+}
+
+/* ── Inner dot ── */
+#cursorDot {
+  position: fixed;
+  top: 0; left: 0;
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1000000;
+  background: #ff2d75;
+  box-shadow: 0 0 6px rgba(255,45,117,0.9), 0 0 12px rgba(255,45,117,0.45);
+  will-change: transform;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+#cursorDot.dot-hovering {
+  box-shadow: 0 0 10px rgba(255,45,117,1), 0 0 22px rgba(255,45,117,0.55);
+}
+
+@media (hover: none) and (pointer: coarse) {
+  html, body, * { cursor: auto !important; }
+  #customCursor, #cursorDot { display: none !important; }
+}
