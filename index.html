@@ -3,6 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <meta name="theme-color" content="#0f0514"/>
   <title>Anushka 💕 — My Forever</title>
   <meta name="description" content="A love letter to Anushka — from Swapnadip Ghosh, with all his heart."/>
   <!-- Favicon -->
@@ -26,6 +27,10 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <link rel="stylesheet" href="style.css"/>
   <style>
+    /* Flicker-Free First Paint */
+    body { opacity: 0; }
+    body.loaded { opacity: 1; transition: opacity 0.8s ease; }
+
     /* ====================================================
        DUAL-LAYER CURSOR — outer ring + inner dot
        Both sit above every overlay (z-index ≥ 999999)
@@ -50,23 +55,49 @@
       background: transparent;
       border: 2px solid rgba(255, 45, 117, 0.85);
       box-shadow:
-        0 0  8px rgba(255,  45, 117, 0.55),
-        0 0 18px rgba(255,  45, 117, 0.25),
-        0 0 28px rgba(168,  85, 247, 0.20),
-        inset 0 0 6px rgba(255, 45, 117, 0.08);
+        0 0 6px rgba(255,  45, 117, 0.40),
+        0 0 14px rgba(255,  45, 117, 0.15),
+        inset 0 0 4px rgba(255, 45, 117, 0.08);
       will-change: transform;
       opacity: 0;
       /* Only glow + opacity via CSS transition; size/position in JS */
-      transition: border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
+      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
     }
 
-    /* Ring hover — brighter glow, wider border */
+    /* Hardware-accelerated heartbeat pulse glow */
+    #customCursor::after {
+      content: '';
+      position: absolute;
+      inset: -2px; /* cover the border */
+      border-radius: 50%;
+      box-shadow:
+        0 0 10px rgba(255,  45, 117, 0.50),
+        0 0 20px rgba(255,  45, 117, 0.25),
+        0 0 30px rgba(168,  85, 247, 0.15),
+        inset 0 0 6px rgba(255, 45, 117, 0.1);
+      opacity: 0;
+      will-change: opacity;
+      animation: ringPulseOpacity 2.4s infinite ease-in-out;
+      pointer-events: none;
+    }
+
+    @keyframes ringPulseOpacity {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+
+    /* Ring hover — brighter glow, wider border, pauses heartbeat */
     #customCursor.ring-hovering {
       border-color: rgba(255, 45, 117, 1);
       box-shadow:
-        0 0 14px rgba(255,  45, 117, 0.85),
-        0 0 30px rgba(255,  45, 117, 0.45),
-        0 0 50px rgba(168,  85, 247, 0.40);
+        0 0 16px rgba(255,  45, 117, 0.90),
+        0 0 35px rgba(255,  45, 117, 0.50),
+        0 0 60px rgba(168,  85, 247, 0.45) !important;
+    }
+    
+    #customCursor.ring-hovering::after {
+      animation-play-state: paused;
+      opacity: 0;
     }
 
     /* ── Inner dot (near-instant, solid pink) ── */
@@ -80,8 +111,8 @@
       z-index: 1000000;   /* always above ring */
       background: #ff2d75;
       box-shadow:
-        0 0  6px rgba(255, 45, 117, 0.9),
-        0 0 12px rgba(255, 45, 117, 0.45);
+        0 0  4px rgba(255, 45, 117, 0.7),
+        0 0 8px rgba(255, 45, 117, 0.35);
       will-change: transform;
       opacity: 0;
       transition: opacity 0.3s ease;
@@ -90,8 +121,8 @@
     /* Dot hover — slightly larger */
     #cursorDot.dot-hovering {
       box-shadow:
-        0 0 10px rgba(255, 45, 117, 1),
-        0 0 22px rgba(255, 45, 117, 0.55);
+        0 0 8px rgba(255, 45, 117, 0.85),
+        0 0 16px rgba(255, 45, 117, 0.45);
     }
 
     /* Mobile / touch — restore native cursor, hide both layers */
@@ -107,6 +138,70 @@
   </style>
 </head>
 <body>
+
+  <!-- ====================================================
+       WARNING SCREEN — shown before the OneLastSmile gift.
+       Fullscreen overlay over the birthday flow.
+       "I Understand" button triggers warningContinue().
+       ==================================================== -->
+  <div id="warningScreen" style="display:none;">
+    <div class="warning-content">
+      <p class="warning-pre">Before you go further&hellip;</p>
+      <div class="warning-body">
+        <p>This isn&rsquo;t just a page.</p>
+        <p>It&rsquo;s something that was written once&hellip;<br>and meant to be felt once.</p>
+        <p>So if you choose to continue,<br>read it slowly.</p>
+      </div>
+      <p class="warning-soft">Some things don&rsquo;t come back twice.</p>
+      <button class="warning-btn" onclick="warningContinue()" style="touch-action:manipulation;">I Understand &rarr;</button>
+    </div>
+  </div>
+
+  <!-- ====================================================
+       GIFT INTRO PAGE — cinematic, personal, line-by-line.
+       Clicking "Open It" triggers giftIntroNext().
+       ==================================================== -->
+  <div id="giftIntro" style="display:none;">
+    <!-- Slow-zooming background -->
+    <div class="gi-bg"></div>
+    <!-- Soft floating particles -->
+    <canvas id="giftIntroCanvas"></canvas>
+    <!-- All text content -->
+    <div class="gi-content">
+      <!-- Line 1 heading -->
+      <p class="gi-heading">This is for you.</p>
+      <!-- Lines 2–6 individual -->
+      <div class="gi-body">
+        <p class="gi-line gi-l1">I didn&rsquo;t know how to say everything&hellip;</p>
+        <p class="gi-line gi-l2">so I made something instead.</p>
+        <p class="gi-line gi-l3">It&rsquo;s simple.</p>
+        <p class="gi-line gi-l4">But it&rsquo;s honest.</p>
+        <p class="gi-line gi-l5">And it&rsquo;s from me&hellip; to you.</p>
+      </div>
+      <!-- Her name -->
+      <p class="gi-name gi-name-glow">Anushka</p>
+      <!-- Ghost soft line -->
+      <p class="gi-soft">Think of it as&hellip; a small gift.</p>
+      <!-- CTA -->
+      <button class="gi-btn" onclick="giftIntroNext()" style="touch-action:manipulation;">Open It &rarr;</button>
+    </div>
+    <!-- Music fallback prompt (shown only if autoplay blocked) -->
+    <button id="giMusicPrompt" onclick="giTapPlay()" style="display:none; touch-action:manipulation;">
+      <i class="fas fa-music"></i>&nbsp; Tap to start
+    </button>
+  </div>
+
+  <!-- ====================================================
+       LOCK SCREEN — shown when gift is already viewed.
+       Appears via cinematic transition after warning.
+       ==================================================== -->
+  <div id="lockScreen" style="display:none;">
+    <div class="lock-content">
+      <p class="lock-line lock-line-1">You&rsquo;ve already seen it once.</p>
+      <p class="lock-line lock-line-2">Some things are meant to stay like that.</p>
+      <p class="lock-line lock-line-3">And maybe&hellip;<br>that&rsquo;s what makes them real.</p>
+    </div>
+  </div>
 
   <!-- Dual-layer cursor: outer trailing ring + inner instant dot -->
   <div id="customCursor"></div>   <!-- outer ring -->
@@ -288,26 +383,6 @@
   <!-- ====== MAIN SITE — hidden until birthday flow completes ====== -->
   <div id="mainSite" style="display:none;">
 
-  <!-- ====== VIEW ONCE SCREEN ====== -->
-  <div class="view-once-screen" id="viewOnceScreen" style="display: none;">
-    <div class="view-once-content">
-      <p>This story was meant to be seen once.</p>
-      <p>If you're here again,<br>maybe it already meant something.</p>
-      <button class="btn-open-again" onclick="openAgain()">Open Again</button>
-    </div>
-  </div>
-
-  <!-- ====== DESTROY SCREEN (PERMANENT LOCK) ====== -->
-  <div class="destroy-screen" id="destroyScreen" style="display: none;">
-    <div class="destroy-text">
-      <p>This page once held feelings<br>that were never meant to disappear.</p>
-      <br>
-      <p>But some stories are not meant to stay forever.</p>
-      <br>
-      <p>So this page faded away —<br>just like the moments I never got to keep.</p>
-    </div>
-  </div>
-
   <!-- ====== CANVAS PARTICLES ====== -->
   <canvas id="heartCanvas"></canvas>
 
@@ -339,7 +414,7 @@
       <li><a href="#timeline" class="nav-link"><i class="fas fa-infinity"></i> Our Story</a></li>
       <li><a href="#music" class="nav-link"><i class="fas fa-music"></i> Song</a></li>
       <li><a href="#anushka-story" class="nav-link"><i class="fas fa-pen-fancy"></i> Poem</a></li>
-      <li><a href="#confession" class="nav-link"><i class="fas fa-hand-holding-heart"></i> My Truth</a></li>
+      <li><a href="#things-i-never-said" class="nav-link"><i class="fas fa-hand-holding-heart"></i> My Truth</a></li>
       <li><a href="#propose" class="nav-link propose-nav"><i class="fas fa-ring"></i> Proposal</a></li>
     </ul>
     <div class="hamburger" id="hamburger">
@@ -390,7 +465,7 @@
         <div class="about-image-ring"></div>
         <div class="about-image-ring ring2"></div>
         <div class="about-avatar">
-          <img src="anushka_portrait.png" alt="Anushka" class="about-portrait"/>
+          <img src="anushka_portrait.png" alt="Anushka" class="about-portrait" loading="lazy"/>
         </div>
         <div class="about-badge"><i class="fas fa-heart"></i> Very Special</div>
       </div>
@@ -803,6 +878,7 @@
 
   <!-- ====== THINGS I NEVER SAID ====== -->
   <section class="confession-section" id="things-i-never-said">
+    <a id="confession"></a>
     <div class="confession-bg"></div>
     <div class="confession-container reveal">
       <div class="confession-icon"><i class="fas fa-comment-slash"></i></div>
@@ -876,6 +952,9 @@
           <span>Even if life takes us in different directions,<br>a part of my story will always carry your name.</span>
         </p>
       </div>
+
+
+
       <div class="propose-buttons" id="proposeButtons">
         <button class="btn-yes" id="yesBtn" onclick="sayYes()">
           <i class="fas fa-heart"></i> I Understand
@@ -912,6 +991,8 @@
       <div class="keep-message" id="keepMessage" style="display: none;">
         <p>Then this story stays —<br>quietly,<br>without expectations.</p>
       </div>
+      <!-- Hidden emotional detail: appears after 3.5s on this section -->
+      <p id="stayMessage">You stayed till the end.</p>
     </div>
   </section>
 
@@ -932,12 +1013,23 @@
     <p class="footer-copy">Silent Memories — 2026</p>
   </footer>
 
-  <!-- Final Fade Screen -->
-  <div class="fade-out-screen" id="fadeOutScreen">
-    <div class="fade-out-text" id="fadeOutText">
-      <p id="fadeText1">If this story doesn't belong in your life,<br>I'll let it fade quietly.</p>
-      <p id="fadeText2">Not because it didn't matter,<br>but because loving you<br>was never about forcing you to stay.</p>
-      <p id="fadeText3">Some stories don't last forever,<br>but they still remain real.</p>
+  <!-- ====== DYNAMIC ENDING SCREEN ====== -->
+  <div class="dynamic-ending-screen" id="dynamicEndingScreen">
+    <!-- Visual layers -->
+    <div class="de-bg" id="deBg"></div>
+    <div class="de-vignette" id="deVignette"></div>
+
+    <!-- Text layers -->
+    <div class="de-content" id="deContent">
+      <p class="de-line" id="deLine1"></p>
+      <p class="de-line" id="deLine2"></p>
+      <p class="de-line" id="deLine3"></p>
+      <p class="de-line de-final" id="deLine4"></p>
+      
+      <p class="de-line de-signature" id="deSig" style="display:none;">— OneLastSmile</p>
+      <p class="de-line de-extra" id="deExtra"></p>
+
+      <p class="de-line de-final-silence" id="deFinalSilence">Some things are better left as they are.</p>
     </div>
   </div>
 
@@ -992,17 +1084,23 @@
       };
     }
 
-    function animateBdParticles() {
+    var bdLastTs = 0;
+    function animateBdParticles(ts) {
+      if (!bdLastTs) bdLastTs = ts;
+      var dt = Math.min(ts - bdLastTs, 50);
+      bdLastTs = ts;
+      var f = dt * 0.06; // dt / 16.67
+
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       bdParticles.forEach(function (p) {
-        p.phase += p.twinkle;
+        p.phase += p.twinkle * f;
         var alpha = p.opacity * (0.5 + 0.5 * Math.sin(p.phase));
         ctx.fillStyle = 'rgba(' + p.color + ',' + alpha + ')';
         ctx.beginPath();
         ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
         ctx.fill();
-        p.y -= p.speed;
-        p.x += Math.sin(p.y * 0.009) * 0.25;
+        p.y -= p.speed * f;
+        p.x += Math.sin(p.y * 0.009) * 0.25 * f;
         if (p.y < -10) {
           p.y = canvas.height + 10;
           p.x = Math.random() * canvas.width;
@@ -1010,7 +1108,7 @@
       });
       requestAnimationFrame(animateBdParticles);
     }
-    animateBdParticles();
+    requestAnimationFrame(animateBdParticles);
 
     /* ---------- dot updater ---------- */
     function updateDots(n) {
@@ -1140,16 +1238,15 @@
           blackout.classList.add('active');
         }
 
-        // ── Step 3: Fade music out smoothly ──
+        // ── Step 3: Fade music UP slightly for the main section ──
         var audio = document.getElementById('bgAudio');
-        if (audio) {
-          var fadeOut = setInterval(function () {
-            if (audio.volume > 0.03) {
-              audio.volume = Math.max(0, audio.volume - 0.018);
+        if (audio && !audio.paused) {
+          var targetVol = 0.45;
+          var fadeUp = setInterval(function () {
+            if (audio.volume < targetVol) {
+              audio.volume = Math.min(targetVol, audio.volume + 0.015);
             } else {
-              audio.volume = 0;
-              audio.pause();
-              clearInterval(fadeOut);
+              clearInterval(fadeUp);
             }
           }, 60);
         }
@@ -1162,13 +1259,6 @@
 
       // ── Step 5: Silence moment — then reveal main site (3.6s after click) ──
       setTimeout(function () {
-        // Bypass view-once on repeat visits (uses the existing key openAgain() uses)
-        try { sessionStorage.setItem('allowAccess', 'true'); } catch (e) {}
-
-        // Hide view-once screen if it was activated
-        var vos = document.getElementById('viewOnceScreen');
-        if (vos) vos.style.display = 'none';
-
         // Restore body scroll
         document.body.style.overflow = '';
 
@@ -1179,9 +1269,14 @@
         mainSite.offsetHeight;          // forces reflow — DO NOT REMOVE
         mainSite.style.transition = 'opacity 1.4s ease';
         mainSite.style.opacity    = '1';
+        window._olsStartTime      = Date.now(); // track time spent on main site
 
-        // Scroll to top
+        // Scroll to top instantly (no smooth scroll fighting the transition)
+        document.documentElement.classList.add('instant-scroll');
         window.scrollTo(0, 0);
+        setTimeout(function () {
+          document.documentElement.classList.remove('instant-scroll');
+        }, 100);
 
         // Hide birthday flow
         if (flow) flow.style.display = 'none';
@@ -1202,8 +1297,259 @@
       }, 3600);
     };
 
-    // bdEnter is an alias so onclick="bdEnter()" on the button still works
-    window.bdEnter = window.revealMainSite;
+    // ─────────────────────────────────────────────────────────
+    //  CONTROLLED VIEWING FLOW
+    //  Birthday → Gift Intro → Warning → OneLastSmile (once) → Lock
+    // ─────────────────────────────────────────────────────────
+
+    // ── Gift Intro particle canvas (40 soft floating dots) ──
+    var _giAnimId  = null;
+    var _giResize  = null;
+
+    function startGiftIntroParticles() {
+      var c = document.getElementById('giftIntroCanvas');
+      if (!c) return;
+      var ctx = c.getContext('2d');
+
+      function resize() {
+        c.width  = window.innerWidth;
+        c.height = window.innerHeight;
+      }
+      resize();
+      _giResize = resize;
+      window.addEventListener('resize', _giResize, { passive: true });
+
+      var pts = [];
+      var colors = ['255,77,133', '162,57,202', '255,179,198', '210,150,220'];
+      for (var i = 0; i < 40; i++) {
+        pts.push({
+          x: Math.random() * c.width,
+          y: Math.random() * c.height,
+          r: Math.random() * 2.0 + 0.5,
+          speed: Math.random() * 0.38 + 0.08,
+          phase: Math.random() * Math.PI * 2,
+          tw:    Math.random() * 0.014 + 0.006,
+          color: colors[Math.floor(Math.random() * colors.length)]
+        });
+      }
+
+      var giLastTs = 0;
+      function loop(ts) {
+        if (!giLastTs) giLastTs = ts;
+        var dt = Math.min(ts - giLastTs, 50);
+        giLastTs = ts;
+        var f = dt * 0.06;
+
+        ctx.clearRect(0, 0, c.width, c.height);
+        pts.forEach(function (p) {
+          p.phase += p.tw * f;
+          var a = 0.32 * (0.5 + 0.5 * Math.sin(p.phase));
+          ctx.fillStyle = 'rgba(' + p.color + ',' + a + ')';
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+          p.y -= p.speed * f;
+          p.x += Math.sin(p.y * 0.007) * 0.2 * f;
+          if (p.y < -6) {
+            p.y = c.height + 6;
+            p.x = Math.random() * c.width;
+          }
+        });
+        _giAnimId = requestAnimationFrame(loop);
+      }
+      _giAnimId = requestAnimationFrame(loop);
+    }
+
+    function stopGiftIntroParticles() {
+      if (_giAnimId) { cancelAnimationFrame(_giAnimId); _giAnimId = null; }
+      if (_giResize) { window.removeEventListener('resize', _giResize); _giResize = null; }
+    }
+
+    // ── bdEnter: “One Last Smile” → show Gift Intro + start music ──
+    var _giShowing = false;  // double-trigger guard
+    window.bdEnter = function () {
+      if (_giShowing) return;          // prevent double-tap on mobile
+      _giShowing = true;
+      var gi = document.getElementById('giftIntro');
+      if (!gi) { _giShowing = false; return; }
+
+      // Show overlay + trigger CSS transitions
+      gi.style.display = 'flex';
+      gi.offsetHeight;                        // force reflow
+      gi.classList.add('gift-intro-visible');
+
+      // Start particles
+      startGiftIntroParticles();
+
+      // ── Music: fade in to 25% volume over 2 s ──
+      var audio = document.getElementById('bgAudio');
+      if (audio) {
+        var targetVol = 0.25;
+        // If audio isn't playing yet, start it silently
+        if (audio.paused) {
+          audio.volume = 0;
+          var playPromise = audio.play();
+          if (playPromise !== undefined) {
+            playPromise.then(function () {
+              // Successfully started — fade up over 2 s
+              var step = 0;
+              var steps = 40;       // 40 × 50ms = 2000ms
+              var giVolTimer = setInterval(function () {
+                step++;
+                audio.volume = Math.min(targetVol, (step / steps) * targetVol);
+                if (step >= steps) clearInterval(giVolTimer);
+              }, 50);
+              // Sync isPlaying flag and UI icons
+              var playIcon = document.getElementById('playIcon');
+              var vinyl    = document.getElementById('vinyl');
+              var eq       = document.getElementById('equalizer');
+              if (playIcon) playIcon.className = 'fas fa-pause';
+              if (vinyl)    vinyl.classList.add('playing');
+              if (eq)       eq.classList.add('active');
+              window.dispatchEvent(new Event('bdMusicStarted'));
+              var prompt = document.getElementById('giMusicPrompt');
+              if (prompt) prompt.style.display = 'none';
+            }).catch(function () {
+              // Autoplay blocked — show tap prompt
+              var prompt = document.getElementById('giMusicPrompt');
+              if (prompt) prompt.style.display = 'block';
+            });
+          }
+        } else {
+          // Already playing from earlier screen — gently adjust to 25%
+          var curVol = audio.volume;
+          if (curVol !== targetVol) {
+            var diff   = targetVol - curVol;
+            var steps2 = 40;
+            var step2  = 0;
+            var giVolTimer2 = setInterval(function () {
+              step2++;
+              audio.volume = Math.max(0, Math.min(1, curVol + diff * (step2 / steps2)));
+              if (step2 >= steps2) clearInterval(giVolTimer2);
+            }, 50);
+          }
+        }
+      }
+    };
+
+    // ── giTapPlay: tap-to-start fallback for mobile autoplay block ──
+    window.giTapPlay = function () {
+      var audio  = document.getElementById('bgAudio');
+      var prompt = document.getElementById('giMusicPrompt');
+      if (!audio) return;
+      audio.volume = 0;
+      audio.play().then(function () {
+        if (prompt) prompt.style.display = 'none';
+        var step = 0, steps = 40;
+        var t = setInterval(function () {
+          step++;
+          audio.volume = Math.min(0.25, (step / steps) * 0.25);
+          if (step >= steps) clearInterval(t);
+        }, 50);
+        var playIcon = document.getElementById('playIcon');
+        var vinyl    = document.getElementById('vinyl');
+        var eq       = document.getElementById('equalizer');
+        if (playIcon) playIcon.className = 'fas fa-pause';
+        if (vinyl)    vinyl.classList.add('playing');
+        if (eq)       eq.classList.add('active');
+        window.dispatchEvent(new Event('bdMusicStarted'));
+      }).catch(function () {});
+    };
+
+    // ── giftIntroNext: “Open It” button → hide intro, show warning ──
+    window.giftIntroNext = function () {
+      var gi = document.getElementById('giftIntro');
+      var ws = document.getElementById('warningScreen');
+
+      // Fade out gift intro
+      if (gi) {
+        gi.classList.remove('gift-intro-visible');
+        gi.style.pointerEvents = 'none';
+        setTimeout(function () {
+          gi.style.display = 'none';
+          gi.style.pointerEvents = '';
+          stopGiftIntroParticles();
+          _giShowing = false;  // reset guard so bdEnter can be called again if needed
+        }, 620);
+      }
+
+      // Show warning screen (slight delay so fade-out starts first)
+      setTimeout(function () {
+        if (ws) {
+          ws.style.display = 'flex';
+          ws.offsetHeight;
+          ws.classList.add('warning-visible');
+        }
+      }, 380);
+    };
+
+    // ── warningContinue: called when "I Understand" is clicked ──
+    window.warningContinue = function () {
+      var ws = document.getElementById('warningScreen');
+
+      // Fade out the warning screen
+      if (ws) {
+        ws.classList.remove('warning-visible');
+        ws.style.pointerEvents = 'none';
+        setTimeout(function () {
+          ws.style.display = 'none';
+          ws.style.pointerEvents = '';
+        }, 600);
+      }
+
+      // Check if already viewed
+      if (localStorage.getItem('onelastsmile_viewed') === 'true') {
+        // ── ALREADY VIEWED — cinematic lock screen transition ──
+        var blackout  = document.getElementById('olsBlackout');
+        var flow      = document.getElementById('birthdayFlow');
+        var lockScreen = document.getElementById('lockScreen');
+
+        setTimeout(function () {
+          // Fade to black
+          if (blackout) {
+            blackout.style.transition = 'opacity 1.8s cubic-bezier(0.4,0,0.2,1)';
+            blackout.classList.add('active');
+          }
+          // Fade music if playing
+          var audio = document.getElementById('bgAudio');
+          if (audio && !audio.paused) {
+            var fo = setInterval(function () {
+              if (audio.volume > 0.03) {
+                audio.volume = Math.max(0, audio.volume - 0.018);
+              } else {
+                audio.volume = 0; audio.pause();
+                clearInterval(fo);
+              }
+            }, 60);
+          }
+        }, 200);
+
+        // After blackout — reveal lock screen
+        setTimeout(function () {
+          if (flow)      flow.style.display = 'none';
+          document.body.style.overflow = 'hidden';
+
+          if (lockScreen) {
+            lockScreen.style.display = 'flex';
+            lockScreen.offsetHeight;           // force reflow
+            lockScreen.classList.add('lock-visible');
+          }
+          // Fade out blackout
+          if (blackout) {
+            blackout.style.transition = 'opacity 1.6s ease';
+            blackout.classList.remove('active');
+            setTimeout(function () {
+              blackout.style.pointerEvents = 'none';
+            }, 1700);
+          }
+        }, 2400);
+
+      } else {
+        // ── FIRST TIME — mark as viewed and open the gift ──
+        try { localStorage.setItem('onelastsmile_viewed', 'true'); } catch (e) {}
+        window.revealMainSite();
+      }
+    };
 
     /* sync isPlaying in script.js when birthday flow starts music */
     window.addEventListener('bdMusicStarted', function () {
@@ -1250,9 +1596,19 @@
     var DOT_BASE   = 0.050;
     var SCALE_BASE = 0.880;
 
-    // Heartbeat: 2.4 s period, ±8% scale
-    var BEAT_OMEGA = 6.2832 / 2.4;   // 2π / period  (rad per second)
+    // Heartbeat: 1.25 s period, ±8% scale
+    var BEAT_OMEGA = 6.2832 / 1.25;   // 2π / period  (rad per second)
     var BEAT_AMP   = 0.08;
+
+    /* ── Trail Dots ── */
+    var trailEls = [];
+    var NUM_TRAILS = 2;
+    for (var i = 0; i < NUM_TRAILS; i++) {
+      var t = document.createElement('div');
+      t.style.cssText = 'position:fixed; top:0; left:0; width:5px; height:5px; background:rgba(255,45,117,' + (0.5 - i*0.15) + '); border-radius:50%; pointer-events:none; z-index:999997; will-change:transform;';
+      document.body.appendChild(t);
+      trailEls.push({ el: t, x: mx, y: my });
+    }
 
     /* ── Mouse tracking ── */
     document.addEventListener('mousemove', function (e) {
@@ -1355,6 +1711,17 @@
       dot.style.transform =
         'translate3d(' + (dx | 0) + 'px,' + (dy | 0) + 'px,0)translate(-50%,-50%)' +
         (isHovering ? 'scale(1.35)' : '');
+
+      /* Update trails */
+      var prevX = rx, prevY = ry;
+      for (var i = 0; i < NUM_TRAILS; i++) {
+        var tr = trailEls[i];
+        tr.x += (prevX - tr.x) * 0.45;
+        tr.y += (prevY - tr.y) * 0.45;
+        tr.el.style.transform = 'translate3d(' + (tr.x | 0) + 'px,' + (tr.y | 0) + 'px,0)translate(-50%,-50%)scale(' + (1 - i*0.2) + ')';
+        prevX = tr.x;
+        prevY = tr.y;
+      }
 
       requestAnimationFrame(animate);
     }
