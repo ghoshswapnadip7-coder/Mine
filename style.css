@@ -20,7 +20,20 @@
   padding: 0;
   box-sizing: border-box;
   scroll-behavior: smooth;
-  cursor: none !important;
+  /* cursor: none is set by specific device-type media queries below */
+}
+
+/* Custom cursor: hide native cursor only on devices with a real pointer (not touch) */
+@media (hover: hover) and (pointer: fine) {
+  html, body, * {
+    cursor: none !important;
+  }
+}
+
+/* Prevent horizontal overflow on all screens */
+html {
+  overflow-x: hidden;
+  max-width: 100%;
 }
 
 body {
@@ -28,6 +41,7 @@ body {
   color: var(--text-light);
   font-family: var(--font-body);
   overflow-x: hidden;
+  max-width: 100vw;
   line-height: 1.6;
 }
 
@@ -300,7 +314,7 @@ body {
   color: var(--primary-color);
   margin-bottom: 40px;
 }
-.hero-buttons { display: flex; gap: 20px; justify-content: center; }
+.hero-buttons { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
 .btn-primary, .btn-secondary {
   padding: 15px 35px;
   border-radius: 30px;
@@ -787,6 +801,12 @@ section { padding: 100px 5%; position: relative; }
   background: url('couple_silhouette.png') no-repeat center center/cover;
   background-attachment: fixed;
 }
+/* iOS doesn't support fixed background-attachment inside scroll; use scroll fallback */
+@supports (-webkit-touch-callout: none) {
+  .music-section {
+    background-attachment: scroll;
+  }
+}
 .music-bg-overlay {
   position: absolute;
   top: 0; left: 0; width: 100%; height: 100%;
@@ -1094,7 +1114,21 @@ section { padding: 100px 5%; position: relative; }
   .navbar.scrolled { padding: 8px 25px; }
 }
 @media (max-width: 768px) {
-  .hero-name { font-size: 5rem; }
+  .hero-name { font-size: 4.5rem; }
+  .hero-tagline { font-size: 1.2rem; }
+  .hero-from { font-size: 1.6rem; margin-bottom: 30px; }
+  .hero-buttons {
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+  }
+  .btn-primary, .btn-secondary {
+    width: 100%;
+    max-width: 280px;
+    justify-content: center;
+    padding: 14px 28px;
+    font-size: 1rem;
+  }
   .navbar { padding: 12px 20px; }
   .navbar.scrolled { padding: 10px 20px; }
   .nav-links {
@@ -1105,41 +1139,94 @@ section { padding: 100px 5%; position: relative; }
     transition: right 0.5s cubic-bezier(0.25, 0.8, 0.25, 1); gap: 10px;
     border-left: 1px solid rgba(255, 77, 133, 0.2);
     box-shadow: -10px 0 40px rgba(0,0,0,0.5);
+    z-index: 1000;
   }
   .nav-links.active { right: 0; }
   .nav-link {
     font-size: 0.85rem;
-    padding: 10px 24px;
-    width: 200px;
+    padding: 12px 24px;
+    width: 210px;
     justify-content: flex-start;
     border-radius: 12px;
+    min-height: 44px; /* WCAG touch target */
   }
   .nav-link i { font-size: 0.95rem; }
   .hamburger { display: flex; z-index: 1001; }
+  .hamburger span { width: 28px; height: 3px; } /* bigger touch area */
   .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
   .hamburger.active span:nth-child(2) { opacity: 0; }
   .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
-  .propose-title { font-size: 3.5rem; }
-  .section-title { font-size: 2.5rem; }
-  .bengali-title { font-size: 1.8rem !important; }
+  .propose-title { font-size: 3rem; }
+  .section-title { font-size: 2.2rem; }
+  .bengali-title { font-size: 1.6rem !important; }
   
+  /* About section stack */
+  .about-container { flex-direction: column; gap: 30px; text-align: center; }
+  .about-image-wrap { width: 260px; height: 260px; margin: 0 auto; }
+  .about-text { padding: 0 10px; }
+  .about-traits { justify-content: center; }
+
   /* Music Section Phone Adjustments */
+  .music-section { background-attachment: scroll; } /* Fix iOS parallax */
   .music-player { padding: 25px 20px; gap: 20px; flex-direction: column; text-align: center; }
-  .vinyl-wrap { width: 180px; height: 180px; margin: 0 auto; }
+  .vinyl-wrap { width: 160px; height: 160px; margin: 0 auto; }
+  .song-title { font-size: 1.5rem; }
+  .song-artist { font-size: 0.95rem; }
   .lyrics-box { height: 200px; padding: 15px; }
   .music-controls { justify-content: center; }
+  .music-btn { width: 54px; height: 54px; font-size: 1.3rem; } /* bigger touch target */
   
+  /* Story section */
   .story-container { padding: 30px 20px; }
-  .letter-paper { padding: 40px 25px; }
-  .letter-greeting { font-size: 2rem; }
-  .confession-container { padding: 40px 25px; }
-  .confession-title { font-size: 2.2rem; }
+  .story-scroll-box { max-height: 320px; font-size: 1rem; }
+
+  /* Letter */
+  .letter-paper { padding: 40px 20px; }
+  .letter-greeting { font-size: 1.8rem; }
+  .letter-body { font-size: 1rem; }
+
+  /* Confession */
+  .confession-container { padding: 40px 20px; }
+  .confession-title { font-size: 2rem; }
+  .confession-content p { font-size: 1rem; }
+
+  /* Countdown */
   .countdown-number { font-size: 1.8rem; }
-  .quote-card { padding: 40px 25px; }
-  .quote-text { font-size: 1.1rem; }
+  .countdown-item { padding: 12px 14px; min-width: 65px; }
+  .countdown-separator { font-size: 1.8rem; }
+
+  /* Quotes */
+  .quotes-carousel { min-height: 400px; }
+  .quotes-dots { margin-top: 420px; }
+  .quotes-nav { width: calc(100% + 10px); left: -5px; }
+  .quote-card { padding: 35px 20px; }
+  .quote-text { font-size: 1.05rem; }
+  .quote-nav-btn { width: 38px; height: 38px; min-height: 38px; } /* touch-friendly */
+
+  /* Reasons grid */
+  .reasons-grid { grid-template-columns: 1fr; }
+  .reason-card { padding: 30px 20px; }
+
+  /* Propose section */
+  .propose-container { padding: 40px 20px; margin: 0 15px; }
+  .propose-big-text { font-size: 1.5rem !important; }
+  .propose-big-text span { font-size: 1.8rem; }
+  .propose-buttons { gap: 16px; }
+  .btn-yes { padding: 14px 30px; font-size: 1rem; min-height: 48px; }
+
+  /* Final choice */
   .final-choice-container { padding: 40px 20px; }
   .final-choice-title { font-size: 2rem; }
-  .btn-keep, .btn-fade { width: 100%; }
+  .final-buttons { flex-direction: column; align-items: center; }
+  .btn-keep, .btn-fade { width: 100%; max-width: 260px; min-height: 48px; }
+
+  /* Timeline */
+  .timeline-content h4 { font-size: 1.1rem; }
+  .timeline-content p { font-size: 0.9rem; }
+
+  /* Sections general */
+  section { padding: 70px 4%; }
+  .section-header { margin-bottom: 40px; }
 }
 
 /* ====== FINAL CHOICE SECTION ====== */
@@ -1435,9 +1522,11 @@ section { padding: 100px 5%; position: relative; }
 
 /* Responsive */
 @media (max-width: 600px) {
-  .ols-heading   { font-size: 2.8rem !important; }
-  .ols-glow-blob { width: 280px; height: 280px; }
-  .ols-btn       { padding: 14px 36px !important; }
+  .ols-heading   { font-size: 2.4rem !important; }
+  .ols-glow-blob { width: 240px; height: 240px; }
+  .ols-btn       { padding: 14px 32px !important; font-size: 0.95rem !important; }
+  .ols-sub       { font-size: 1rem !important; }
+  .ols-support   { font-size: 0.9rem !important; }
 }
 
 /* ====================================================
@@ -1683,10 +1772,18 @@ section { padding: 100px 5%; position: relative; }
 
 /* --- Responsive --- */
 @media (max-width: 600px) {
-  .bd-heading { font-size: 2.2rem; }
-  .bd-text    { font-size: 1.05rem; }
-  .bd-btn     { padding: 13px 32px; font-size: 0.95rem; }
-  #bdDots     { bottom: 24px; }
+  .bd-heading { font-size: 1.9rem; }
+  .bd-text    { font-size: 1rem; margin-bottom: 1.8rem; }
+  .bd-btn     { padding: 14px 32px; font-size: 0.95rem; min-height: 50px; }
+  #bdDots     { bottom: 20px; }
+  .bd-icon    { font-size: 2.2rem; margin-bottom: 1rem; }
+  .bd-screen  { padding: 2rem 1.2rem 5rem; /* extra bottom padding so btn clears dots */ }
+}
+
+@media (max-width: 390px) {
+  .bd-heading { font-size: 1.7rem; }
+  .bd-text    { font-size: 0.95rem; }
+  .bd-btn     { padding: 12px 28px; font-size: 0.9rem; }
 }
 
 /* ====================================================
@@ -1695,9 +1792,11 @@ section { padding: 100px 5%; position: relative; }
    birthday overlay (#birthdayFlow z-index: 99999)
    ==================================================== */
 
-/* Hide native cursor on all elements */
-html, body, * {
-  cursor: none !important;
+/* Hide native cursor on all pointer (non-touch) devices */
+@media (hover: hover) and (pointer: fine) {
+  html, body, * {
+    cursor: none !important;
+  }
 }
 
 /* The glow circle element */
@@ -1757,4 +1856,38 @@ html, body, * {
 /* Tap highlight off on mobile */
 .bd-btn {
   -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation; /* prevent double-tap zoom delay */
+}
+
+/* General touch improvements for all interactive elements */
+a, button, [onclick], .trait, .dot, .quote-nav-btn, .music-btn,
+.btn-keep, .btn-fade, .btn-yes, .btn-open-again, .hamburger {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Ensure touch devices get auto cursor back */
+@media (hover: none) and (pointer: coarse) {
+  html, body, * {
+    cursor: auto !important;
+  }
+  .cursor, .cursor-trail, #customCursor, #cursorDot {
+    display: none !important;
+  }
+}
+
+/* Small phone extra adjustments (≤380px) */
+@media (max-width: 380px) {
+  .hero-name { font-size: 3.8rem; }
+  .section-title { font-size: 1.9rem; }
+  .birthday-card { padding: 35px 18px; }
+  .countdown-container { gap: 8px; }
+  .countdown-item { padding: 10px 10px; min-width: 55px; }
+  .countdown-number { font-size: 1.5rem; }
+  .countdown-separator { font-size: 1.5rem; }
+  .propose-title { font-size: 2.5rem; }
+  .confession-title { font-size: 1.7rem; }
+  .letter-greeting { font-size: 1.5rem; }
+  .quotes-carousel { min-height: 450px; }
+  .quotes-dots { margin-top: 470px; }
 }

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
   <title>Anushka 💕 — My Forever</title>
   <meta name="description" content="A love letter to Anushka — from Swapnadip Ghosh, with all his heart."/>
   <!-- Favicon -->
@@ -31,9 +31,11 @@
        Both sit above every overlay (z-index ≥ 999999)
        ==================================================== */
 
-    /* Hide native cursor everywhere */
-    html, body, * {
-      cursor: none !important;
+    /* Hide native cursor only on real pointer devices (not touch) */
+    @media (hover: hover) and (pointer: fine) {
+      html, body, * {
+        cursor: none !important;
+      }
     }
 
     /* ── Outer ring (trailing, glowing, transparent center) ── */
@@ -97,6 +99,11 @@
       html, body, * { cursor: auto !important; }
       #customCursor, #cursorDot { display: none !important; }
     }
+    /* Also restore cursor on small screens (phones with pointer:fine but hover:none) */
+    @media (max-width: 768px) and (pointer: coarse) {
+      html, body, * { cursor: auto !important; }
+      #customCursor, #cursorDot { display: none !important; }
+    }
   </style>
 </head>
 <body>
@@ -116,7 +123,7 @@
     <canvas id="bdCanvas"></canvas>
 
     <!-- Music tap-to-play fallback prompt -->
-    <button id="bdMusicPrompt" onclick="bdTapPlay()">
+    <button id="bdMusicPrompt" onclick="bdTapPlay()" style="touch-action:manipulation;">
       <i class="fas fa-music"></i>&nbsp; Tap to start music
     </button>
 
@@ -129,7 +136,7 @@
         I didn&rsquo;t want to just text you like everyone else.<br>
         So I made something.
       </p>
-      <button class="bd-btn" onclick="bdStart()">
+      <button class="bd-btn" onclick="bdStart()" style="touch-action:manipulation;">
         <span>Start</span> <i class="fas fa-chevron-right"></i>
       </button>
     </div>
@@ -144,7 +151,7 @@
         but another version of you<br>
         the world gets to become.
       </p>
-      <button class="bd-btn" onclick="bdNext(2)">
+      <button class="bd-btn" onclick="bdNext(2)" style="touch-action:manipulation;">
         <span>Next</span> <i class="fas fa-chevron-right"></i>
       </button>
     </div>
@@ -158,7 +165,7 @@
         I don&rsquo;t say this often.<br>
         But it&rsquo;s true, and it needed to be said.
       </p>
-      <button class="bd-btn" onclick="bdNext(3)">
+      <button class="bd-btn" onclick="bdNext(3)" style="touch-action:manipulation;">
         <span>Continue</span> <i class="fas fa-chevron-right"></i>
       </button>
     </div>
@@ -174,7 +181,7 @@
       <p class="bd-text">
         Just you.
       </p>
-      <button class="bd-btn" onclick="bdNext(4)">
+      <button class="bd-btn" onclick="bdNext(4)" style="touch-action:manipulation;">
         <span>Next</span> <i class="fas fa-chevron-right"></i>
       </button>
     </div>
@@ -187,7 +194,7 @@
       <p class="bd-text">
         No expectations attached to it.
       </p>
-      <button class="bd-btn" onclick="bdNext(5)">
+      <button class="bd-btn" onclick="bdNext(5)" style="touch-action:manipulation;">
         <span>See More</span> <i class="fas fa-chevron-right"></i>
       </button>
     </div>
@@ -200,7 +207,7 @@
       <p class="bd-text">
         Quiet can still mean genuine.
       </p>
-      <button class="bd-btn" onclick="bdNext(6)">
+      <button class="bd-btn" onclick="bdNext(6)" style="touch-action:manipulation;">
         <span>Continue</span> <i class="fas fa-chevron-right"></i>
       </button>
     </div>
@@ -214,7 +221,7 @@
         I hope life gives you everything you deserve.<br>
         And I genuinely mean that.
       </p>
-      <button class="bd-btn" onclick="bdNext(7)">
+      <button class="bd-btn" onclick="bdNext(7)" style="touch-action:manipulation;">
         <span>Finish</span> <i class="fas fa-chevron-right"></i>
       </button>
     </div>
@@ -251,7 +258,7 @@
 
         <!-- CTA button -->
         <button class="bd-btn bd-enter-btn ols-btn ols-line ols-line-4"
-                id="enterBtn" onclick="bdEnter()">
+                id="enterBtn" onclick="bdEnter()" style="touch-action:manipulation;">
           <span>One Last Smile</span>
           <i class="fas fa-arrow-right"></i>
         </button>
