@@ -76,20 +76,16 @@ window.onpopstate = () => history.go(1);
 // ====== FLICKER-FREE FIRST PAINT RESOLUTION ======
 document.addEventListener('DOMContentLoaded', () => {
   document.body.classList.add('loaded');
-  try {
-    if (window.matchMedia && (window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(pointer: coarse)').matches)) {
-      document.documentElement.classList.add('ols-mobile');
-    }
-  } catch (e) { /* ignore */ }
 });
 
-// ====== LOCAL-ONLY VISIT & ENGAGEMENT (ols_* — no network) ======
+// ====== LIGHTWEIGHT PRIVACY-SAFE ANALYTICS ======
 (function() {
   try {
     const now = Date.now();
     let visitCount = parseInt(localStorage.getItem('ols_visit_count') || '0', 10);
     const lastVisit = parseInt(localStorage.getItem('ols_last_visit_time') || '0', 10);
-
+    
+    // 3. Return Detection
     if (lastVisit > 0) {
       const hoursSince = (now - lastVisit) / (1000 * 60 * 60);
       if (hoursSince >= 24) {
@@ -99,92 +95,369 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         window._olsReturnStatus = 'active_session';
       }
-      if (hoursSince >= 6) visitCount++;
+      
+      // If returning, increment visit
+      if (hoursSince >= 6) {
+        visitCount++;
+      }
     } else {
       visitCount = 1;
-      localStorage.setItem('ols_first_visit_time', String(now));
-      localStorage.setItem('ols_first_visit_at', String(now));
+      localStorage.setItem('ols_first_visit_time', now.toString());
       window._olsReturnStatus = 'first_visit';
     }
 
-    localStorage.setItem('ols_visit_count', String(visitCount));
-    localStorage.setItem('ols_last_visit_time', String(now));
+    localStorage.setItem('ols_visit_count', visitCount.toString());
+    localStorage.setItem('ols_last_visit_time', now.toString());
     window._olsVisitCount = visitCount;
 
-    if (!localStorage.getItem('ols_sections_visited')) {
-      localStorage.setItem('ols_sections_visited', '[]');
-    }
-
+    // 2. Time Spent Tracking
     const sessionStart = now;
-    let visibleSince = typeof document !== 'undefined' && document.visibilityState === 'visible' ? now : null;
-
-    function flushActiveMs(extraMs) {
-      const add = Math.max(0, extraMs | 0);
-      const prev = parseInt(localStorage.getItem('ols_active_ms') || '0', 10);
-      localStorage.setItem('ols_active_ms', String(prev + add));
-    }
-
-    document.addEventListener('visibilitychange', () => {
-      const t = Date.now();
-      if (document.visibilityState === 'hidden') {
-        if (visibleSince != null) flushActiveMs(t - visibleSince);
-        visibleSince = null;
-      } else {
-        visibleSince = t;
-      }
-    });
-
-    setInterval(() => {
-      if (document.visibilityState !== 'visible' || visibleSince == null) return;
-      const t = Date.now();
-      const delta = t - visibleSince;
-      if (delta < 8000) return;
-      flushActiveMs(delta);
-      visibleSince = t;
-    }, 10000);
-
     window.addEventListener('beforeunload', () => {
       const sessionDuration = Date.now() - sessionStart;
-      localStorage.setItem('ols_last_session_time', String(sessionDuration));
-      if (document.visibilityState === 'visible' && visibleSince != null) {
-        flushActiveMs(Date.now() - visibleSince);
+      const totalTime = parseInt(localStorage.getItem('ols_total_time_spent') || '0', 10);
+      localStorage.setItem('ols_total_time_spent', (totalTime + sessionDuration).toString());
+      localStorage.setItem('ols_last_session_time', sessionDuration.toString());
+    });
+
+    // 4. Section Visit Tracking — private, localStorage only
+    const sectionIds = ['home','about','birthday','letter','reasons','quotes',
+                        'timeline','music','anushka-story','things-i-never-said',
+                        'propose','final-choice'];
+    const visitedSections = JSON.parse(localStorage.getItem('ols_sections_visited') || '[]');
+
+    const sectionObs = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const id = entry.target.id;
+          if (id && !visitedSections.includes(id)) {
+            visitedSections.push(id);
+            try { localStorage.setItem('ols_sections_visited', JSON.stringify(visitedSections)); } catch(e){}
+          }
+          // Track ending reached
+          if (id === 'final-choice') {
+            try { localStorage.setItem('ols_ending_reached', 'true'); } catch(e){}
+          }
+        }
+      });
+    }, { threshold: 0.3 });
+
+    // Observe after DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      sectionIds.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) sectionObs.observe(el);
+      });
+    });
+
+  } catch(e) {
+    // Fail silently
+  }
+})();
+
+// ====== CINEMATIC INTRO SEQUENCE ======
+var _ciExited = false;
+var _ciAnimId = null;
+
+function showCinematicIntro() {
+  var ci = document.getElementById('cinematicIntro');
+  if (!ci) { window.revealMainSite(); return; }
+
+  _ciExited = false;
+  ci.style.display = 'flex';
+  ci.offsetHeight;
+  ci.classList.add('ci-active');
+  startCiParticles();
+
+  // Staggered line reveals
+  var delays = [
+    ['ci-brand',  1100],
+    ['ci-l1',     3000],
+    ['ci-l2',     5800],
+    ['ci-l3',     8600],
+    ['ci-l4',    10900],
+    ['ciEnterBtn',12500]
+  ];
+  delays.forEach(function(pair) {
+    setTimeout(function() {
+      var el = ci.querySelector('.' + pair[0]) || document.getElementById(pair[0]);
+      if (el) el.classList.add('ci-visible');
+    }, pair[1]);
+  });
+
+  // Click anywhere after 7s to advance
+  var _clickSkip = null;
+  setTimeout(function() {
+    _clickSkip = function() { cinematicIntroEnter(); };
+    ci.addEventListener('click', _clickSkip, { once: true });
+  }, 7000);
+
+  // Auto-advance after 17s
+  setTimeout(function() { cinematicIntroEnter(); }, 17000);
+}
+
+function cinematicIntroEnter() {
+  if (_ciExited) return;
+  _ciExited = true;
+
+  var ci = document.getElementById('cinematicIntro');
+  if (ci) {
+    ci.style.transition = 'opacity 1.4s ease';
+    ci.classList.remove('ci-active');
+    setTimeout(function() {
+      ci.style.display = 'none';
+      if (_ciAnimId) { cancelAnimationFrame(_ciAnimId); _ciAnimId = null; }
+    }, 1500);
+  }
+
+  window.revealMainSite();
+}
+
+function startCiParticles() {
+  var c = document.getElementById('ciCanvas');
+  if (!c) return;
+  var ctx = c.getContext('2d');
+  c.width  = window.innerWidth;
+  c.height = window.innerHeight;
+
+  var isMob = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  var n = isMob ? 18 : 35;
+  var pts = [];
+  var colors = ['255,77,133','162,57,202','255,179,198','200,120,200'];
+
+  for (var i = 0; i < n; i++) {
+    pts.push({
+      x: Math.random() * c.width,  y: Math.random() * c.height,
+      r: Math.random() * 1.6 + 0.4, speed: Math.random() * 0.28 + 0.06,
+      phase: Math.random() * Math.PI * 2, tw: Math.random() * 0.010 + 0.004,
+      color: colors[Math.floor(Math.random() * colors.length)]
+    });
+  }
+
+  var lastTs = 0;
+  function loop(ts) {
+    if (!lastTs) lastTs = ts;
+    var dt = Math.min(ts - lastTs, 50); lastTs = ts;
+    var f = dt * 0.06;
+    ctx.clearRect(0, 0, c.width, c.height);
+    pts.forEach(function(p) {
+      p.phase += p.tw * f;
+      var a = 0.28 * (0.5 + 0.5 * Math.sin(p.phase));
+      ctx.fillStyle = 'rgba(' + p.color + ',' + a + ')';
+      ctx.beginPath(); ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2); ctx.fill();
+      p.y -= p.speed * f;
+      if (p.y < -6) { p.y = c.height + 6; p.x = Math.random() * c.width; }
+    });
+    _ciAnimId = requestAnimationFrame(loop);
+  }
+  _ciAnimId = requestAnimationFrame(loop);
+}
+
+// ====== HIDDEN MEMORY FRAGMENTS ======
+function initMemoryFragments() {
+  var memories = [
+    { sel: '.about-text p:first-of-type', word: 'daily life',
+      text: 'You always stayed longer in my mind\nthan you probably knew.' },
+    { sel: '.about-text p:nth-of-type(2)', word: 'silently and patiently',
+      text: 'Some conversations never really end.' },
+    { sel: '.timeline-content p', word: 'quiet feeling',
+      text: 'I still remember small things\nI probably shouldn\'t.' },
+    { sel: '.confession-content p:nth-of-type(2)', word: 'completely silent',
+      text: 'Maybe silence also says something.' },
+    { sel: '.reason-card:nth-child(3) p', word: 'stayed in my thoughts',
+      text: 'You became part of my ordinary days\nwithout even trying.' },
+    { sel: '.reason-card:nth-child(6) p', word: 'slow down',
+      text: 'Some feelings stay unfinished forever.' },
+    { sel: '.story-scroll-box p:first-of-type', word: 'quietly watch',
+      text: 'The ordinary moments were\nthe ones I kept.' },
+    { sel: '.propose-message p:first-of-type', word: 'final memory',
+      text: 'I never told you how often\nI thought about this.' }
+  ];
+
+  var tooltip = document.getElementById('memoryTooltip');
+  var activeFragment = null;
+  var hideTimer = null;
+
+  function showTip(el, text) {
+    if (!tooltip) return;
+    tooltip.textContent = text;
+    var r = el.getBoundingClientRect();
+    var tipX = r.left + r.width / 2;
+    var tipY = r.top - 14;
+    // Keep in viewport
+    tipX = Math.min(Math.max(tipX, 120), window.innerWidth - 120);
+    tooltip.style.left = tipX + 'px';
+    tooltip.style.top  = tipY + 'px';
+    tooltip.style.transform = 'translateX(-50%) translateY(-100%) translateY(8px)';
+    tooltip.classList.add('visible');
+  }
+  function hideTip() {
+    if (tooltip) tooltip.classList.remove('visible');
+    activeFragment = null;
+  }
+
+  memories.forEach(function(m) {
+    var els = document.querySelectorAll(m.sel);
+    els.forEach(function(el) {
+      var html = el.innerHTML;
+      // Only wrap if the word exists and we haven't already wrapped it
+      if (html.indexOf('memory-fragment') === -1 && html.indexOf(m.word) !== -1) {
+        el.innerHTML = html.replace(
+          m.word,
+          '<span class="memory-fragment" data-memory="' + m.text.replace(/"/g, '&quot;') + '">' + m.word + '</span>'
+        );
       }
     });
-  } catch (e) { /* ignore */ }
-})();
+  });
 
-// ====== SECTION VISITS (IntersectionObserver, localStorage only) ======
-(function () {
-  function recordSection(id) {
-    try {
-      const raw = localStorage.getItem('ols_sections_visited') || '[]';
-      const arr = JSON.parse(raw);
-      if (!Array.isArray(arr) || arr.indexOf(id) >= 0) return;
-      arr.push(id);
-      localStorage.setItem('ols_sections_visited', JSON.stringify(arr));
-    } catch (e) { /* ignore */ }
-  }
+  // Delegate events for performance
+  var isMob = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+  document.addEventListener('mouseover', function(e) {
+    if (isMob) return;
+    var f = e.target && e.target.closest && e.target.closest('.memory-fragment');
+    if (f) { clearTimeout(hideTimer); showTip(f, f.dataset.memory); activeFragment = f; }
+  }, { passive: true });
+  document.addEventListener('mouseout', function(e) {
+    if (isMob) return;
+    var f = e.target && e.target.closest && e.target.closest('.memory-fragment');
+    if (f) { hideTimer = setTimeout(hideTip, 250); }
+  }, { passive: true });
 
-  function init() {
-    var ids = ['home', 'about', 'birthday', 'letter', 'reasons', 'quotes', 'timeline', 'music', 'anushka-story', 'things-i-never-said', 'if-you-never-read-this', 'propose', 'final-choice'];
-    var obs = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) {
-        if (en.isIntersecting && en.target.id) recordSection(en.target.id);
-      });
-    }, { threshold: 0.22, rootMargin: '0px 0px -12% 0px' });
-    ids.forEach(function (id) {
-      var el = document.getElementById(id);
-      if (el) obs.observe(el);
+  // Mobile tap to reveal
+  document.addEventListener('click', function(e) {
+    if (!isMob) return;
+    var f = e.target && e.target.closest && e.target.closest('.memory-fragment');
+    if (f && activeFragment !== f) {
+      showTip(f, f.dataset.memory);
+      activeFragment = f;
+      clearTimeout(hideTimer);
+      hideTimer = setTimeout(hideTip, 3000);
+    } else {
+      hideTip();
+    }
+  }, { passive: true });
+}
+
+// ====== DYNAMIC ATMOSPHERE SYSTEM ======
+function initAtmosphereSystem() {
+  var map = {
+    'home': 'atm-hero', 'about': 'atm-about',
+    'birthday': 'atm-hero', 'letter': 'atm-story',
+    'reasons': 'atm-about', 'quotes': 'atm-story',
+    'timeline': 'atm-story', 'music': 'atm-music',
+    'anushka-story': 'atm-story', 'things-i-never-said': 'atm-end',
+    'propose': 'atm-end', 'final-choice': 'atm-end'
+  };
+  var atmClasses = ['atm-hero','atm-about','atm-music','atm-end','atm-story'];
+
+  var obs = new IntersectionObserver(function(entries) {
+    entries.forEach(function(entry) {
+      if (entry.isIntersecting) {
+        var cls = map[entry.target.id];
+        if (cls) {
+          atmClasses.forEach(function(c) { document.body.classList.remove(c); });
+          document.body.classList.add(cls);
+        }
+      }
     });
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+  }, { threshold: 0.4 });
+
+  Object.keys(map).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) obs.observe(el);
+  });
+}
+
+// ====== ENHANCED MUSIC CONTROLS ======
+var _isMuted = false;
+var _volBeforeMute = 0.45;
+
+function toggleMute() {
+  var audio = document.getElementById('bgAudio');
+  var icon  = document.getElementById('muteIcon');
+  if (!audio) return;
+  _isMuted = !_isMuted;
+  if (_isMuted) {
+    _volBeforeMute = audio.volume;
+    audio.volume = 0;
+    if (icon) icon.className = 'fas fa-volume-mute';
   } else {
-    init();
+    audio.volume = _volBeforeMute || 0.45;
+    var slider = document.getElementById('volumeSlider');
+    if (slider) slider.value = Math.round(audio.volume * 100);
+    if (icon) icon.className = 'fas fa-volume-up';
   }
+}
+
+function setVolume(val) {
+  var audio = document.getElementById('bgAudio');
+  if (!audio) return;
+  var v = parseFloat(val) / 100;
+  audio.volume = v;
+  _volBeforeMute = v;
+  _isMuted = (v === 0);
+  var icon = document.getElementById('muteIcon');
+  if (icon) icon.className = v === 0 ? 'fas fa-volume-mute' : (v < 0.4 ? 'fas fa-volume-low' : 'fas fa-volume-up');
+}
+
+function restartMusic() {
+  var audio = document.getElementById('bgAudio');
+  if (!audio) return;
+  audio.currentTime = 0;
+  if (audio.paused) {
+    var v = audio.volume || 0.45;
+    audio.volume = 0;
+    audio.play().then(function() {
+      var step = 0;
+      var t = setInterval(function() {
+        step++;
+        audio.volume = Math.min(v, (step / 20) * v);
+        if (step >= 20) clearInterval(t);
+      }, 50);
+      var pi = document.getElementById('playIcon');
+      var vn = document.getElementById('vinyl');
+      var eq = document.getElementById('equalizer');
+      if (pi) pi.className = 'fas fa-pause';
+      if (vn) vn.classList.add('playing');
+      if (eq) eq.classList.add('active');
+    }).catch(function(){});
+  }
+}
+
+// ====== INIT ALL NEW SYSTEMS on mainSite reveal ======
+// Called once after revealMainSite() makes #mainSite visible
+(function() {
+  var _featureInited = false;
+  function initNewFeatures() {
+    if (_featureInited) return;
+    var mainSite = document.getElementById('mainSite');
+    if (!mainSite || mainSite.style.display === 'none') return;
+    _featureInited = true;
+    setTimeout(function() {
+      initMemoryFragments();
+      initAtmosphereSystem();
+    }, 1200); // slight delay so DOM is fully painted
+  }
+
+  // Watch for mainSite becoming visible
+  var siteObserver = new MutationObserver(function(mutations) {
+    mutations.forEach(function(m) {
+      if (m.type === 'attributes' && m.attributeName === 'style') {
+        var target = m.target;
+        if (target.id === 'mainSite' && target.style.display !== 'none') {
+          initNewFeatures();
+        }
+      }
+    });
+  });
+
+  document.addEventListener('DOMContentLoaded', function() {
+    var ms = document.getElementById('mainSite');
+    if (ms) siteObserver.observe(ms, { attributes: true });
+    // Also check immediately (returning visits)
+    initNewFeatures();
+  });
 })();
 
-// ====== ONE-TIME ACCESS — CONTROLLED VIEWING FLOW ======
 // The birthday section is ALWAYS shown on every visit.
 // Access to the OneLastSmile gift is controlled via:
 //   1. Warning screen (shown when user clicks "One Last Smile")
@@ -209,12 +482,6 @@ window.addEventListener('load', () => {
 // ====== GLOBAL INTERACTION & RIPPLE EFFECT ======
 window._olsClickCount = 0;
 const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-try {
-  if (typeof document !== 'undefined' && window.matchMedia &&
-      (window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(pointer: coarse)').matches)) {
-    document.documentElement.classList.add('ols-mobile');
-  }
-} catch (e) { /* ignore */ }
 
 document.addEventListener('click', function(e) {
   window._olsClickCount++;
@@ -235,13 +502,15 @@ const navbar = document.getElementById('navbar');
 const hamburger = document.getElementById('hamburger');
 const navLinks = document.getElementById('navLinks');
 
-let _navScrollRaf = null;
+let isScrolling = false;
 window.addEventListener('scroll', () => {
-  if (_navScrollRaf != null) return;
-  _navScrollRaf = requestAnimationFrame(() => {
-    _navScrollRaf = null;
-    if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 50);
-  });
+  if (!isScrolling) {
+    window.requestAnimationFrame(() => {
+      if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 50);
+      isScrolling = false;
+    });
+    isScrolling = true;
+  }
 }, { passive: true });
 
 if (hamburger) hamburger.addEventListener('click', () => {
@@ -255,19 +524,6 @@ if (navLinks) navLinks.querySelectorAll('a').forEach(link => {
     navLinks.classList.remove('active');
   });
 });
-
-if (navLinks && hamburger && isTouchDevice) {
-  let _navCloseRaf = null;
-  window.addEventListener('scroll', () => {
-    if (!navLinks.classList.contains('active')) return;
-    if (_navCloseRaf != null) return;
-    _navCloseRaf = requestAnimationFrame(() => {
-      _navCloseRaf = null;
-      hamburger.classList.remove('active');
-      navLinks.classList.remove('active');
-    });
-  }, { passive: true });
-}
 
 // ====== REVEAL ANIMATIONS ======
 const revealElements = document.querySelectorAll('.reveal');
@@ -283,27 +539,16 @@ revealElements.forEach(el => revealObserver.observe(el));
 
 // ====== CANVAS HEARTS (Upgraded with stars) ======
 const canvas = document.getElementById('heartCanvas');
-const ctx = canvas ? canvas.getContext('2d') : null;
-const _olsReduceMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-const _olsMobileCanvas = typeof window !== 'undefined' && window.matchMedia &&
-  (window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(pointer: coarse)').matches);
-const HEART_PARTICLE_TARGET = _olsReduceMotion ? 18 : (_olsMobileCanvas ? 32 : 60);
-
-if (canvas && ctx) {
-  canvas.width = window.innerWidth;
-  canvas.height = window.innerHeight;
-}
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
 
 const particles = [];
-let _heartAnimId = null;
-let _heartCanvasStopped = false;
 
 class Particle {
   constructor() {
-    const w = canvas ? canvas.width : innerWidth;
-    const h = canvas ? canvas.height : innerHeight;
-    this.x = Math.random() * w;
-    this.y = Math.random() * h;
+    this.x = Math.random() * canvas.width;
+    this.y = Math.random() * canvas.height;
     this.size = Math.random() * 2.5 + 0.5;
     this.speed = Math.random() * 0.8 + 0.2;
     this.opacity = Math.random() * 0.5 + 0.1;
@@ -324,7 +569,6 @@ class Particle {
     ctx.fill();
   }
   update() {
-    if (!canvas) return;
     this.y -= this.speed;
     this.x += Math.sin(this.y * 0.008) * 0.3;
     if (this.y < -10) {
@@ -335,50 +579,26 @@ class Particle {
   }
 }
 
-if (canvas && ctx) {
-  for (let i = 0; i < HEART_PARTICLE_TARGET; i++) particles.push(new Particle());
-}
+// Fewer particles on mobile for better FPS
+const _isMobilePerfMode = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
+const _particleCount = _isMobilePerfMode ? 25 : 60;
+for (let i = 0; i < _particleCount; i++) particles.push(new Particle());
 
+let _heartAnimId = null;
 function animateParticles() {
-  if (!canvas || !ctx || _heartCanvasStopped) return;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   particles.forEach(p => p.update());
   _heartAnimId = requestAnimationFrame(animateParticles);
 }
-if (canvas && ctx) animateParticles();
-
-function olsCalmHeartCanvasForEnding() {
-  if (window._olsHeartCalmDone) return;
-  window._olsHeartCalmDone = true;
-  particles.forEach(p => {
-    p.speed *= 0.18;
-    p.opacity *= 0.45;
-    p.twinkleSpeed *= 0.35;
-  });
-  const hc = document.getElementById('heartCanvas');
-  if (hc) {
-    var op = 1;
-    try { op = parseFloat(getComputedStyle(hc).opacity); } catch (e) { /* ignore */ }
-    if (op > 0.18) {
-      hc.style.transition = 'opacity 2.8s ease';
-      hc.style.opacity = '0.35';
-    }
-  }
-  setTimeout(() => {
-    _heartCanvasStopped = true;
-    if (_heartAnimId) cancelAnimationFrame(_heartAnimId);
-    _heartAnimId = null;
-    if (canvas && ctx) ctx.clearRect(0, 0, canvas.width, canvas.height);
-    if (hc) hc.style.opacity = '0';
-  }, 2800);
-}
+animateParticles();
 
 window.addEventListener('resize', () => {
-  if (!canvas || !ctx) return;
-  canvas.width = window.innerWidth;
+  // Resize without interrupting the loop — canvas clears automatically next frame
+  canvas.width  = window.innerWidth;
   canvas.height = window.innerHeight;
+  // Re-randomise particles that are now out of bounds
   particles.forEach(p => {
-    if (p.x > canvas.width) p.x = Math.random() * canvas.width;
+    if (p.x > canvas.width)  p.x = Math.random() * canvas.width;
     if (p.y > canvas.height) p.y = Math.random() * canvas.height;
   });
 }, { passive: true });
@@ -561,7 +781,7 @@ function toggleMusic() {
         if (equalizer) equalizer.classList.add('active');
         if (lyricsBox) exactScrollTop = lyricsBox.scrollTop;
         scrollLyrics();
-      }).catch(function () { /* autoplay blocked */ });
+      }).catch(e => console.log('Audio play blocked:', e));
     }
   }
 }
@@ -684,52 +904,6 @@ function createFireworks(container) {
   }, { passive: true });
 })();
 
-// ====== BEFORE YOU GO (after dynamic ending — one shot) ======
-window._olsBeforeYouGoShown = false;
-function olsShowBeforeYouGo() {
-  if (window._olsBeforeYouGoShown) return;
-  window._olsBeforeYouGoShown = true;
-  try { localStorage.setItem('ols_before_you_go_shown', 'true'); } catch (e) { /* ignore */ }
-
-  olsCalmHeartCanvasForEnding();
-
-  var deContent = document.getElementById('deContent');
-  if (deContent) {
-    deContent.style.transition = 'opacity 2.2s ease';
-    deContent.style.opacity = '0';
-  }
-
-  var el = document.getElementById('beforeYouGoScreen');
-  if (!el) return;
-  document.body.classList.add('ols-before-you-go');
-  el.setAttribute('aria-hidden', 'false');
-  requestAnimationFrame(function () {
-    el.classList.add('active');
-  });
-}
-
-// ====== SAVE MEMORY — small offline HTML keepsake (no deps) ======
-window.olsDownloadMemoryKeepsake = function () {
-  try {
-    var decision = '';
-    try { decision = localStorage.getItem('final_decision') || ''; } catch (e) { /* ignore */ }
-    var stamp = new Date().toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
-    var html = '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>OneLastSmile — a quiet keepsake</title><style>body{margin:0;min-height:100vh;background:#0a0510;color:#e8c8d8;font:300 1.05rem/1.75 Lato,system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:32px;box-sizing:border-box}.wrap{max-width:34rem;border:1px solid rgba(255,77,133,.22);border-radius:20px;padding:2rem 2.2rem;background:linear-gradient(165deg,rgba(30,10,40,.95),rgba(12,6,18,.98));box-shadow:0 0 40px rgba(162,57,202,.12)}h1{font:400 1.6rem "Playfair Display",Georgia,serif;font-style:italic;margin:0 0 1.2rem;color:#ffb6c8;letter-spacing:.02em}p{margin:.85rem 0;opacity:.92}.sig{margin-top:2rem;font-size:.82rem;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,182,210,.45)}.soft{color:rgba(255,200,220,.55);font-size:.95rem;font-style:italic}</style><link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400&family=Playfair+Display:ital@0;1&display=swap" rel="stylesheet"/></head><body><div class="wrap"><h1>A small keepsake</h1><p>This page was saved from <strong>OneLastSmile</strong> — not to convince you of anything, only to hold a few honest lines.</p><p>I didn’t know how to say everything… so I made something instead. It’s simple, but it’s honest.</p><p class="soft">Some things are meant to be felt once. That doesn’t make them less real.</p><p class="soft">If love is true, no effort ever goes to waste — even when nothing comes back the way we hoped.</p>' +
-      (decision ? '<p class="soft">Your choice here was private; this file doesn’t know the details. It only carries the quiet of the moment.</p>' : '') +
-      '<p class="sig">— OneLastSmile · ' + stamp.replace(/</g, '') + '</p></div></body></html>';
-
-    var blob = new Blob([html], { type: 'text/html;charset=utf-8' });
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement('a');
-    a.href = url;
-    a.download = 'onelastsmile-memory.html';
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    setTimeout(function () { URL.revokeObjectURL(url); }, 400);
-  } catch (e) { /* ignore */ }
-};
-
 // ====== DYNAMIC ENDING LOGIC (CONNECTED TO EMAILJS) ======
 function handleEndingDecision(decision) {
   if (localStorage.getItem("final_decision_locked") === "true") return;
@@ -738,7 +912,6 @@ function handleEndingDecision(decision) {
     localStorage.setItem("final_decision_locked", "true");
     localStorage.setItem("epilogue_ready", "true");
     localStorage.setItem("epilogue_time", Date.now().toString());
-    localStorage.setItem("ols_final_ending_reached", "true");
   } catch(e){}
   
   window._olsExiting = true; // Signal behavioral layer to stop interfering
@@ -775,7 +948,7 @@ function handleEndingDecision(decision) {
         visit_count: window._olsVisitCount || 1,
         return_status: window._olsReturnStatus || "first_visit",
         time: new Date().toLocaleString()
-    }).catch(function () { /* silent */ });
+    }).catch(err => console.log("EmailJS logged silently")); 
   }
 
   // 2. Pause for 0.5s (Emotional Weight)
@@ -841,10 +1014,10 @@ function handleEndingDecision(decision) {
       else extraText = "You chose to let it go.";
       extra.innerHTML = extraText;
       
-      var heartFade = document.getElementById('heartCanvas');
-      if (heartFade) {
-        heartFade.style.transition = 'opacity 3s ease';
-        heartFade.style.opacity = '0';
+      const canvas = document.getElementById('heartCanvas');
+      if (canvas) {
+        canvas.style.transition = 'opacity 3s ease';
+        canvas.style.opacity = '0';
       }
     }
 
@@ -877,10 +1050,13 @@ function handleEndingDecision(decision) {
       
       setTimeout(() => {
         if (finalSilenceText) finalSilenceText.classList.add('visible');
-        setTimeout(function () {
-          olsShowBeforeYouGo();
-        }, 5600);
       }, 2500); 
+
+      // "Before You Go" cinematic ending fires after silence settles
+      setTimeout(() => {
+        showBeforeYouGo();
+      }, 8000);
+
     }, timeOffset + 10500); 
 
   }, 500); // 0.5s pause before fading to black
@@ -890,6 +1066,335 @@ function keepStory() { handleEndingDecision('keep'); }
 function fadeAway()  { handleEndingDecision('fade'); }
 function triggerSecretEnding() { /* Safely deprecated */ }
 // Auto Scroll Lyrics logic integrated into music player
+
+// ====== SAVE THIS MEMORY — Cinematic HTML Keepsake ======
+function saveThisMemory() {
+  const btn = document.getElementById('saveMemoryBtn');
+  if (btn) {
+    btn.style.opacity = '0.45';
+    btn.style.pointerEvents = 'none';
+    setTimeout(() => {
+      btn.style.opacity = '';
+      btn.style.pointerEvents = '';
+    }, 2200);
+  }
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('en-GB', {
+    day: 'numeric', month: 'long', year: 'numeric'
+  });
+
+  // Self-contained cinematic HTML keepsake — no external dependencies
+  const html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>OneLastSmile — A Kept Memory</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;1,400&family=Lato:wght@300;400&display=swap');
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%; min-height: 100vh;
+    background: #06030d;
+    color: rgba(255, 210, 225, 0.82);
+    font-family: 'Playfair Display', Georgia, serif;
+    display: flex; align-items: center; justify-content: center;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background: radial-gradient(ellipse at 50% 40%,
+      rgba(255, 78, 205, 0.06) 0%,
+      rgba(168, 85, 247, 0.03) 40%,
+      transparent 72%);
+    pointer-events: none; z-index: 0;
+    animation: glowBreathe 10s ease-in-out infinite alternate;
+  }
+  @keyframes glowBreathe {
+    0%   { opacity: 0.5; transform: scale(0.96); }
+    100% { opacity: 1.0; transform: scale(1.06); }
+  }
+
+  /* Soft floating particles */
+  .particles {
+    position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+  }
+  .particle {
+    position: absolute; border-radius: 50%;
+    background: rgba(255, 105, 160, 0.30);
+    animation: floatUp linear infinite;
+  }
+  @keyframes floatUp {
+    0%   { transform: translateY(0) scale(1);   opacity: 0; }
+    10%  { opacity: 1; }
+    90%  { opacity: 0.6; }
+    100% { transform: translateY(-100vh) scale(0.6); opacity: 0; }
+  }
+
+  .page {
+    position: relative; z-index: 1;
+    width: 100%; max-width: 640px;
+    padding: 80px 48px 90px;
+    display: flex; flex-direction: column;
+    align-items: center; text-align: center;
+    animation: pageIn 2s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes pageIn {
+    from { opacity: 0; transform: translateY(22px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .brand {
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(2rem, 6vw, 3.2rem);
+    color: rgba(255, 78, 205, 0.22);
+    letter-spacing: 1.5px;
+    margin-bottom: 4rem;
+    animation: brandIn 2.2s ease 0.4s both;
+  }
+  @keyframes brandIn {
+    from { opacity: 0; transform: scale(0.94); }
+    to   { opacity: 1; transform: scale(1); }
+  }
+
+  .divider {
+    width: 48px; height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(255,77,133,0.30), transparent);
+    margin: 2.6rem auto;
+  }
+
+  .stanza {
+    margin-bottom: 0;
+    opacity: 0;
+    animation: lineIn 1.4s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .stanza:nth-child(3)  { animation-delay: 0.6s; }
+  .stanza:nth-child(4)  { animation-delay: 1.4s; }
+  .stanza:nth-child(5)  { animation-delay: 2.2s; }
+  .stanza:nth-child(6)  { animation-delay: 3.2s; }
+  .stanza:nth-child(7)  { animation-delay: 4.2s; }
+  .stanza:nth-child(8)  { animation-delay: 5.4s; }
+  .stanza:nth-child(9)  { animation-delay: 6.6s; }
+  .stanza:nth-child(10) { animation-delay: 7.8s; }
+
+  @keyframes lineIn {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .stanza p {
+    font-size: clamp(0.98rem, 2.4vw, 1.15rem);
+    font-style: italic;
+    line-height: 2.0;
+    color: rgba(255, 210, 225, 0.78);
+    font-weight: 400;
+  }
+  .stanza p.lighter {
+    font-size: clamp(0.88rem, 2vw, 1.02rem);
+    color: rgba(220, 175, 200, 0.52);
+    font-style: normal;
+    letter-spacing: 0.04em;
+    line-height: 1.8;
+    margin-top: 0.35rem;
+  }
+  .stanza p.softer {
+    font-size: clamp(0.82rem, 1.8vw, 0.94rem);
+    color: rgba(190, 150, 175, 0.40);
+    font-style: normal;
+    letter-spacing: 0.06em;
+    line-height: 1.75;
+    margin-top: 0.3rem;
+  }
+
+  .signature {
+    margin-top: 4.5rem;
+    font-family: 'Great Vibes', cursive;
+    font-size: clamp(1.3rem, 4vw, 1.8rem);
+    color: rgba(255, 78, 205, 0.18);
+    letter-spacing: 1px;
+    opacity: 0;
+    animation: lineIn 1.4s ease 9s both;
+  }
+
+  .date-stamp {
+    margin-top: 1.4rem;
+    font-family: 'Lato', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 300;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: rgba(180, 130, 160, 0.28);
+    opacity: 0;
+    animation: lineIn 1.2s ease 10s both;
+  }
+
+  @media (max-width: 540px) {
+    .page { padding: 60px 28px 70px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Particles -->
+<div class="particles" id="pts"></div>
+
+<div class="page">
+
+  <p class="brand">OneLastSmile</p>
+
+  <div class="stanza">
+    <p>I don&rsquo;t think every feeling needs an ending.</p>
+    <p class="lighter">Some things just&hellip; remain.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="stanza">
+    <p>Some people leave quietly&hellip;<br>but somehow stay in your everyday life.</p>
+    <p class="lighter">In small things. In passing thoughts.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="stanza">
+    <p>Maybe this was only a small moment for the world.<br>But for me, it became a memory.</p>
+    <p class="softer">And I kept it.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="stanza">
+    <p>I wasn&rsquo;t trying to make something perfect.<br>I just wanted you to feel cared for.</p>
+    <p class="lighter">Even from a distance.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="stanza">
+    <p>And even if time changes everything&hellip;<br>some feelings remain strangely familiar.</p>
+    <p class="softer">That&rsquo;s how I&rsquo;ll always remember this.</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="stanza">
+    <p>Not every story is meant to stay.</p>
+    <p class="lighter">But some feelings do.</p>
+    <p class="softer">And maybe that&rsquo;s enough.</p>
+  </div>
+
+  <p class="signature">OneLastSmile</p>
+  <p class="date-stamp">Saved &mdash; ${dateStr}</p>
+
+</div>
+
+<script>
+  // Gentle floating particles — pure JS, no dependencies
+  var pts = document.getElementById('pts');
+  for (var i = 0; i < 22; i++) {
+    var p = document.createElement('div');
+    p.className = 'particle';
+    var size = Math.random() * 3 + 1;
+    p.style.cssText = [
+      'width:'  + size + 'px',
+      'height:' + size + 'px',
+      'left:'   + (Math.random() * 100) + '%',
+      'bottom:' + (-size) + 'px',
+      'animation-duration:' + (Math.random() * 18 + 14) + 's',
+      'animation-delay:'    + (Math.random() * 12) + 's',
+      'opacity: 0'
+    ].join(';');
+    pts.appendChild(p);
+  }
+</script>
+</body>
+</html>`;
+
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href     = url;
+  a.download = 'OneLastSmile-memory.html';
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => { URL.revokeObjectURL(url); a.remove(); }, 1200);
+
+  try { localStorage.setItem('ols_keepsake_saved', 'true'); } catch(e) {}
+}
+
+// ====== "BEFORE YOU GO" — Cinematic Final Ending ======
+function showBeforeYouGo() {
+  const el = document.getElementById('beforeYouGo');
+  if (!el) return;
+
+  // Show the overlay
+  el.style.display = 'flex';
+  el.offsetHeight; // force reflow
+  el.classList.add('byg-active');
+
+  // Track ending reached in analytics
+  try { localStorage.setItem('ols_ending_reached', 'true'); } catch(e) {}
+
+  // Start fading particles inside the ending
+  const c = document.getElementById('bygCanvas');
+  if (c) {
+    const ctx = c.getContext('2d');
+    c.width  = window.innerWidth;
+    c.height = window.innerHeight;
+
+    // Reduced particle set — just 25 soft dots for the ending
+    const pts = [];
+    const colors = ['255,77,133','162,57,202','255,179,198','200,120,200'];
+    for (let i = 0; i < 25; i++) {
+      pts.push({
+        x:     Math.random() * c.width,
+        y:     Math.random() * c.height,
+        r:     Math.random() * 1.8 + 0.4,
+        speed: Math.random() * 0.25 + 0.05,
+        phase: Math.random() * Math.PI * 2,
+        tw:    Math.random() * 0.010 + 0.004,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        // Particles slowly fade out in the ending
+        life:  1.0,
+        decay: Math.random() * 0.0004 + 0.0001
+      });
+    }
+
+    let bygLastTs = 0;
+    let bygAnimId = null;
+    function bygLoop(ts) {
+      if (!bygLastTs) bygLastTs = ts;
+      const dt = Math.min(ts - bygLastTs, 50);
+      bygLastTs = ts;
+      const f = dt * 0.06;
+
+      ctx.clearRect(0, 0, c.width, c.height);
+      let anyAlive = false;
+      pts.forEach(p => {
+        p.life = Math.max(0, p.life - p.decay * f);
+        if (p.life <= 0) return;
+        anyAlive = true;
+        p.phase += p.tw * f;
+        const alpha = p.life * 0.35 * (0.5 + 0.5 * Math.sin(p.phase));
+        ctx.fillStyle = 'rgba(' + p.color + ',' + alpha + ')';
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        p.y -= p.speed * f;
+        if (p.y < -6) { p.y = c.height + 6; p.x = Math.random() * c.width; }
+      });
+
+      if (anyAlive) bygAnimId = requestAnimationFrame(bygLoop);
+    }
+    bygAnimId = requestAnimationFrame(bygLoop);
+  }
+}
+
 
 // ====== SYNC WITH BIRTHDAY FLOW MUSIC START ======
 window.addEventListener('bdMusicStarted', function () {
@@ -971,8 +1476,8 @@ function _cursorHoverOff() { if (cursor) cursor.classList.remove('hovering'); }
       _pRaf = null;
       var sy = window.scrollY;
       if (sy > hero.offsetTop + hero.offsetHeight) return;
-      parallaxBg.style.transform  = 'translate3d(0,' + (sy * 0.25) + 'px,0)';
-      if (heroContent) heroContent.style.transform = 'translate3d(0,' + (-sy * 0.06) + 'px,0)';
+      parallaxBg.style.transform  = 'translateY(' + (sy * 0.25) + 'px)';
+      if (heroContent) heroContent.style.transform = 'translateY(' + (-sy * 0.06) + 'px)';
     }
     window.addEventListener('scroll', function () {
       if (!_pRaf) _pRaf = requestAnimationFrame(applyParallax);
@@ -991,15 +1496,14 @@ function _cursorHoverOff() { if (cursor) cursor.classList.remove('hovering'); }
   //  3. PARTICLE REFINEMENT — fewer, slower, softer
   // ─────────────────────────────────────────────────────────────
   setTimeout(function () {
-    if (typeof particles !== 'undefined' && Array.isArray(particles) && particles.length > 42) {
-      particles.splice(0, 20);
-    }
     if (typeof particles !== 'undefined' && Array.isArray(particles)) {
-      var soft = document.documentElement.classList.contains('ols-mobile') ? 0.62 : 0.55;
+      // Remove ~20 particles (down from 80 → ~60)
+      particles.splice(0, 20);
+      // Slow + soften survivors
       particles.forEach(function (p) {
-        p.speed        = p.speed        * soft;
-        p.opacity      = Math.max(0.04, p.opacity * (document.documentElement.classList.contains('ols-mobile') ? 0.68 : 0.72));
-        p.twinkleSpeed = p.twinkleSpeed * (document.documentElement.classList.contains('ols-mobile') ? 0.5 : 0.60);
+        p.speed        = p.speed        * 0.55;
+        p.opacity      = Math.max(0.04, p.opacity * 0.72);
+        p.twinkleSpeed = p.twinkleSpeed * 0.60;
         p.twinklePhase = Math.random() * Math.PI * 2;
       });
     }

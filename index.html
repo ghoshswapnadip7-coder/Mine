@@ -13,20 +13,19 @@
   <meta property="og:type" content="website"/>
   <meta property="og:title" content="Anushka 💕 — My Forever"/>
   <meta property="og:description" content="A love letter to Anushka — from Swapnadip Ghosh, with all his heart."/>
-  <!-- Absolute URL for social crawlers; set to your real GitHub Pages / Vercel origin if different -->
-  <meta property="og:image" content="https://ghoshswapnadip7-coder.github.io/OneLastSmile/anushka_portrait.png"/>
+  <meta property="og:image" content="anushka_portrait.png"/>
   <meta property="og:image:width" content="800"/>
   <meta property="og:image:height" content="800"/>
-  <meta property="og:url" content="https://ghoshswapnadip7-coder.github.io/OneLastSmile/"/>
   <!-- Twitter Card -->
   <meta name="twitter:card" content="summary_large_image"/>
   <meta name="twitter:title" content="Anushka 💕 — My Forever"/>
   <meta name="twitter:description" content="A love letter to Anushka — from Swapnadip Ghosh, with all his heart."/>
-  <meta name="twitter:image" content="https://ghoshswapnadip7-coder.github.io/OneLastSmile/anushka_portrait.png"/>
+  <meta name="twitter:image" content="anushka_portrait.png"/>
+  <!-- Preconnect for performance -->
   <link rel="preconnect" href="https://fonts.googleapis.com"/>
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+  <link rel="dns-prefetch" href="https://cdnjs.cloudflare.com"/>
   <!-- Google Fonts -->
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cinzel+Decorative:wght@400;700&family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" as="style"/>
   <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Cinzel+Decorative:wght@400;700&family=Lato:wght@300;400;700&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet"/>
   <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
@@ -385,8 +384,27 @@
   <!-- Full-screen blackout used for the cinematic exit transition -->
   <div id="olsBlackout"></div>
 
+  <!-- ====== CINEMATIC INTRO SEQUENCE ====== -->
+  <div id="cinematicIntro">
+    <canvas id="ciCanvas"></canvas>
+    <div class="ci-ambient-glow"></div>
+    <div class="ci-content">
+      <p class="ci-brand">OneLastSmile</p>
+      <p class="ci-line ci-l1">Some things don&rsquo;t leave all at once.</p>
+      <p class="ci-line ci-l2">Maybe this was never meant to last forever&hellip;<br>but it still mattered.</p>
+      <p class="ci-line ci-l3">This isn&rsquo;t really a goodbye.</p>
+      <p class="ci-line ci-l4">Just&hellip; something I wanted you to feel.</p>
+      <button class="ci-enter-btn" id="ciEnterBtn" onclick="cinematicIntroEnter()">Continue &rarr;</button>
+    </div>
+    <span class="ci-skip" onclick="cinematicIntroEnter()">skip</span>
+  </div>
+
   <!-- ====== MAIN SITE — hidden until birthday flow completes ====== -->
   <div id="mainSite" style="display:none;">
+  <!-- Atmosphere glow overlay — shifts subtly with sections -->
+  <div id="atmosphereGlow"></div>
+  <!-- Global memory tooltip -->
+  <div id="memoryTooltip" class="memory-tooltip"></div>
 
   <!-- ====== CANVAS PARTICLES ====== -->
   <canvas id="heartCanvas"></canvas>
@@ -438,8 +456,7 @@
       <p class="hero-tagline fade-in-up" style="animation-delay:0.9s">
         I never asked you to love me.<br>
         I only wished to stay somewhere in your world.<br>
-        This is just what I felt, honestly and quietly.<br>
-        <span class="ols-whisper-line">No performance — just the truth, held gently.</span>
+        This is just what I felt, honestly and quietly.
       </p>
       <div class="hero-from fade-in-up" style="animation-delay:1.2s">
         <span>— Written patiently from my heart, Swapnadip</span>
@@ -485,7 +502,6 @@
           You are sometimes kind, sometimes distant, and sometimes hard to understand. But I never hated you. 
           I just learned to accept you exactly as you are, loving you silently and patiently.
         </p>
-        <p class="ols-whisper-line">Some people stay in your heart without needing a label.</p>
         <div class="about-traits">
           <div class="trait"><i class="fas fa-star"></i><span>Genuine</span></div>
           <div class="trait"><i class="fas fa-heart"></i><span>Kind</span></div>
@@ -553,7 +569,6 @@
         <div class="letter-seal"><i class="fas fa-heart"></i></div>
         <p class="letter-date">April 2026</p>
         <p class="letter-greeting">My Dearest Anushka,</p>
-        <p class="ols-whisper-line letter-whisper">I wrote this slowly, the way I mean it.</p>
         <div class="letter-body" id="letterBody">
           <p id="typewriterText"></p>
         </div>
@@ -853,6 +868,18 @@
             <div class="bar"></div><div class="bar"></div>
           </div>
         </div>
+        <!-- Enhanced music controls -->
+        <div class="music-controls-enhanced" id="musicControlsEnhanced">
+          <button class="music-icon-btn" id="muteBtn" onclick="toggleMute()" title="Mute/Unmute">
+            <i class="fas fa-volume-up" id="muteIcon"></i>
+          </button>
+          <div class="volume-track">
+            <input type="range" id="volumeSlider" class="volume-slider" min="0" max="100" value="45" oninput="setVolume(this.value)" title="Volume">
+          </div>
+          <button class="music-icon-btn" id="restartBtn" onclick="restartMusic()" title="Restart from beginning">
+            <i class="fas fa-redo-alt"></i>
+          </button>
+        </div>
       </div>
     </div>
     <!-- Audio element -->
@@ -991,7 +1018,6 @@
       <h2 class="final-choice-title">One Last Choice</h2>
       <div class="final-choice-content" id="finalChoiceContent">
         <p>This website carries memories that mattered to me.<br>But memories only stay if they are allowed to.</p>
-        <p class="ols-whisper-line">Whatever you choose, thank you for reading this far.</p>
         <div class="final-buttons" id="finalButtons">
           <button id="keepBtn" class="btn-keep" onclick="keepStory()">Keep This Story</button>
           <button id="fadeBtn" class="btn-fade" onclick="fadeAway()">Let It Fade Away</button>
@@ -1004,6 +1030,15 @@
       <p id="stayMessage">You stayed till the end.</p>
     </div>
   </section>
+
+  <!-- ====== SAVE THIS MEMORY — Keepsake Button ====== -->
+  <div class="save-memory-wrap">
+    <button class="save-memory-btn" id="saveMemoryBtn" onclick="saveThisMemory()" style="touch-action:manipulation;">
+      <i class="fas fa-feather-alt"></i>
+      Save This Memory
+    </button>
+    <p class="save-memory-hint">Opens as a quiet page &mdash; something you can keep.</p>
+  </div>
 
   <!-- ====== FOOTER ====== -->
   <footer class="footer">
@@ -1019,8 +1054,6 @@
     <p class="footer-sub">
       If love is true, no effort ever goes to waste.
     </p>
-    <p class="footer-whisper ols-whisper-line">Carry what felt real; leave the rest with the night.</p>
-    <button type="button" class="btn-save-memory" id="olsSaveMemoryBtn" onclick="olsDownloadMemoryKeepsake()">Save This Memory</button>
     <p class="footer-copy">Silent Memories — 2026</p>
   </footer>
 
@@ -1037,24 +1070,30 @@
       <p class="de-line" id="deLine3"></p>
       <p class="de-line de-final" id="deLine4"></p>
       
-      <p class="de-line de-signature" id="deSig" style="display:none;">— OneLastSmile</p>
+      <p class="de-line de-signature" id="deSig">— OneLastSmile</p>
       <p class="de-line de-extra" id="deExtra"></p>
 
       <p class="de-line de-final-silence" id="deFinalSilence">Some things are better left as they are.</p>
     </div>
   </div>
 
-  <!-- Quiet closing beat after the final choice (does not alter lock / decision logic) -->
-  <div id="beforeYouGoScreen" class="before-you-go-screen" aria-hidden="true">
-    <div class="byg-ambient"></div>
-    <div class="byg-inner">
-      <p class="byg-text">Before you go —</p>
-      <p class="byg-text byg-soft">I hope something here felt gentle, not heavy. You don’t owe this page a reply. It was always meant to be a quiet corner, not a spotlight.</p>
+  </div><!-- /mainSite -->
+
+  <!-- ====== "BEFORE YOU GO" — Cinematic Final Ending ====== -->
+  <div id="beforeYouGo">
+    <canvas id="bygCanvas"></canvas>
+    <div class="byg-glow"></div>
+    <div class="byg-content">
       <p class="byg-brand">OneLastSmile</p>
+      <p class="byg-line byg-line-1">Thank you for staying till the end.</p>
+      <p class="byg-line byg-line-2">Maybe in another life&hellip;<br>things happen differently.</p>
+      <p class="byg-line byg-line-3">But even this version mattered to me.</p>
+      <p class="byg-line byg-line-4">Some people become memories slowly.<br>And some stay with you quietly forever.</p>
+      <p class="byg-line byg-line-5">You were never just another chapter.</p>
+      <p class="byg-line byg-line-6">And maybe&hellip;<br>that&rsquo;s enough.</p>
+      <p class="byg-signature">OneLastSmile</p>
     </div>
   </div>
-
-  </div><!-- /mainSite -->
 
   <script src="script.js"></script>
 
@@ -1085,8 +1124,7 @@
     resizeBdCanvas();
     window.addEventListener('resize', resizeBdCanvas, { passive: true });
 
-    var _bdCount = (window.matchMedia && (window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(pointer: coarse)').matches)) ? 36 : 70;
-    for (var i = 0; i < _bdCount; i++) {
+    for (var i = 0; i < 70; i++) {
       bdParticles.push(makeBdParticle());
     }
 
@@ -1343,8 +1381,7 @@
 
       var pts = [];
       var colors = ['255,77,133', '162,57,202', '255,179,198', '210,150,220'];
-      var _giCount = (window.matchMedia && (window.matchMedia('(max-width: 768px)').matches || window.matchMedia('(pointer: coarse)').matches)) ? 22 : 40;
-      for (var i = 0; i < _giCount; i++) {
+      for (var i = 0; i < 40; i++) {
         pts.push({
           x: Math.random() * c.width,
           y: Math.random() * c.height,
@@ -1568,9 +1605,13 @@
         }, 2400);
 
       } else {
-        // ── FIRST TIME — mark as viewed and open the gift ──
+        // ── FIRST TIME — mark as viewed and show cinematic intro ──
         try { localStorage.setItem('onelastsmile_viewed', 'true'); } catch (e) {}
-        window.revealMainSite();
+        if (typeof showCinematicIntro === 'function') {
+          showCinematicIntro();
+        } else {
+          window.revealMainSite();
+        }
       }
     };
 
@@ -1657,7 +1698,7 @@
 
     /* ── Hover detection (event delegation — zero per-element overhead) ── */
     var clickSel = 'a,button,[onclick],[role="button"],.bd-btn,.nav-link,' +
-                   '.dot,.trait,.quote-nav-btn,.music-btn,.btn-keep,.btn-fade,#olsSaveMemoryBtn';
+                   '.dot,.trait,.quote-nav-btn,.music-btn,.btn-keep,.btn-fade';
     document.addEventListener('mouseover', function (e) {
       if (e.target && e.target.closest && e.target.closest(clickSel)) {
         isHovering = true;
@@ -1683,8 +1724,8 @@
           magEl = el;
         }
         var r  = el.getBoundingClientRect();
-        var fx = (e.clientX - r.left - r.width  * 0.5) * 0.14;
-        var fy = (e.clientY - r.top  - r.height * 0.5) * 0.14;
+        var fx = (e.clientX - r.left - r.width  * 0.5) * 0.10;
+        var fy = (e.clientY - r.top  - r.height * 0.5) * 0.10;
         el.style.transition = 'transform 0.15s ease';
         el.style.transform  = 'translate(' + fx + 'px,' + fy + 'px)';
       } else if (magEl) {
