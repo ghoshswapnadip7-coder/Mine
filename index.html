@@ -40,9 +40,11 @@
        Both sit above every overlay (z-index ≥ 999999)
        ==================================================== */
 
-    /* Hide native cursor only on real pointer devices (not touch) */
+    /* Hide native cursor only while the custom cursor is confirmed active */
     @media (hover: hover) and (pointer: fine) {
-      html, body, * {
+      html.custom-cursor-active,
+      html.custom-cursor-active body,
+      html.custom-cursor-active * {
         cursor: none !important;
       }
     }
@@ -64,8 +66,9 @@
         inset 0 0 4px rgba(255, 45, 117, 0.08);
       will-change: transform;
       opacity: 0;
-      /* Only glow + opacity via CSS transition; size/position in JS */
-      transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, opacity 0.3s ease;
+      backface-visibility: hidden;
+      /* Position and scale are driven only by requestAnimationFrame. */
+      transition: border-color 0.18s ease, box-shadow 0.18s ease, opacity 0.22s ease;
     }
 
     /* Hardware-accelerated heartbeat pulse glow */
@@ -119,7 +122,23 @@
         0 0 8px rgba(255, 45, 117, 0.35);
       will-change: transform;
       opacity: 0;
-      transition: opacity 0.3s ease;
+      backface-visibility: hidden;
+      transition: opacity 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .cursor-trail-dot {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 999998;
+      opacity: 0;
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+      transition: opacity 0.18s ease;
     }
 
     /* Dot hover — slightly larger */
@@ -132,12 +151,12 @@
     /* Mobile / touch — restore native cursor, hide both layers */
     @media (hover: none) and (pointer: coarse) {
       html, body, * { cursor: auto !important; }
-      #customCursor, #cursorDot { display: none !important; }
+      #customCursor, #cursorDot, .cursor-trail-dot { display: none !important; }
     }
     /* Also restore cursor on small screens (phones with pointer:fine but hover:none) */
     @media (max-width: 768px) and (pointer: coarse) {
       html, body, * { cursor: auto !important; }
-      #customCursor, #cursorDot { display: none !important; }
+      #customCursor, #cursorDot, .cursor-trail-dot { display: none !important; }
     }
   </style>
 </head>
@@ -404,7 +423,7 @@
   <!-- Atmosphere glow overlay — shifts subtly with sections -->
   <div id="atmosphereGlow"></div>
   <!-- Global memory tooltip -->
-  <div id="memoryTooltip" class="memory-tooltip"></div>
+<!-- memoryTooltip removed -->
 
   <!-- ====== CANVAS PARTICLES ====== -->
   <canvas id="heartCanvas"></canvas>
@@ -416,10 +435,6 @@
     </div>
     <p class="loader-text">Loading Love<span class="dots">...</span></p>
   </div>
-
-  <!-- ====== CURSOR ====== -->
-  <div class="cursor" id="cursor"></div>
-  <div class="cursor-trail" id="cursorTrail"></div>
 
   <!-- ====== NAV ====== -->
   <nav class="navbar" id="navbar">
@@ -452,7 +467,10 @@
       <p class="hero-subtitle fade-in-up" style="animation-delay:0.3s">
         <i class="fas fa-music"></i> &nbsp;A Song From My Heart To Yours&nbsp; <i class="fas fa-music"></i>
       </p>
-      <h1 class="hero-name fade-in-up" style="animation-delay:0.6s">Anushka</h1>
+      <div class="trace-reveal-container" id="heroTraceTrigger">
+        <h1 class="hero-name fade-in-up" style="animation-delay:0.6s">Anushka</h1>
+        <div class="trace-reveal-msg" id="heroTraceMsg">A name that still feels like home.</div>
+      </div>
       <p class="hero-tagline fade-in-up" style="animation-delay:0.9s">
         I never asked you to love me.<br>
         I only wished to stay somewhere in your world.<br>
@@ -888,6 +906,8 @@
     </audio>
   </section>
 
+  <!-- Memory Fragments section removed -->
+
   <!-- ====== ANUSHKA STORY SECTION ====== -->
   <section class="story-section" id="anushka-story">
     <div class="story-bg-overlay"></div>
@@ -943,22 +963,52 @@
   </section>
 
   <!-- ====== IF YOU NEVER READ THIS ====== -->
-  <section class="confession-section" id="if-you-never-read-this" style="background: rgba(15, 10, 20, 0.95);">
-    <div class="confession-container reveal">
-      <div class="confession-icon"><i class="fas fa-envelope"></i></div>
-      <h2 class="confession-title">If You Never Read This</h2>
-      <div class="confession-content">
-        <p>
+  <section class="cinematic-letter-section" id="if-you-never-read-this">
+    <div class="letter-reveal reveal">
+      <div class="letter-content">
+        <p class="letter-paragraph">
           Even if you never understand my feelings, I want you to know that the love was still real. 
           Even if you never read this, I don't regret loving you.
         </p>
-        <p>
+        <p class="letter-paragraph">
           This website was not made to force you or make you feel guilty. 
           It was made simply to release the emotions I couldn't hold inside anymore. 
         </p>
-        <p>
+        <p class="letter-paragraph">
           Loving you changed me, even if nothing came from it. And I have accepted that.
         </p>
+      </div>
+      <div class="letter-footer">
+        <span class="letter-sign-small">— Swapnadip</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== ONE LAST REPLY ====== -->
+  <section class="reply-section" id="one-last-reply">
+    <div class="reply-bg-overlay"></div>
+    <div class="reply-container reveal">
+      <div class="reply-icon"><i class="fas fa-feather-alt"></i></div>
+      <h2 class="reply-title">One Last Reply</h2>
+      <div class="reply-intro">
+        <p>You never really owed a reply.</p>
+        <p>But if there’s something your heart still wants to leave behind...<br>you can.</p>
+        <br>
+        <p>Not everything needs an answer.<br>But sometimes memories still want to speak.</p>
+      </div>
+
+      <div class="reply-form-wrapper" id="replyFormWrapper">
+        <textarea id="replyText" class="reply-textarea" placeholder="Maybe there's something you never said..." spellcheck="false"></textarea>
+        <button class="btn-reply bd-btn" id="btnReplySubmit" onclick="submitReply()">
+          <i class="fas fa-paper-plane"></i> Leave A Memory Behind
+        </button>
+      </div>
+
+      <div class="reply-success" id="replySuccess" style="display: none;">
+        <i class="fas fa-dove reply-success-icon"></i>
+        <p>Your words have been kept.</p>
+        <p>Some memories deserve a place to stay.</p>
+        <p class="reply-success-thanks">Thank you for leaving something behind.</p>
       </div>
     </div>
   </section>
@@ -1031,14 +1081,7 @@
     </div>
   </section>
 
-  <!-- ====== SAVE THIS MEMORY — Keepsake Button ====== -->
-  <div class="save-memory-wrap">
-    <button class="save-memory-btn" id="saveMemoryBtn" onclick="saveThisMemory()" style="touch-action:manipulation;">
-      <i class="fas fa-feather-alt"></i>
-      Save This Memory
-    </button>
-    <p class="save-memory-hint">Opens as a quiet page &mdash; something you can keep.</p>
-  </div>
+<!-- save-memory removed -->
 
   <!-- ====== FOOTER ====== -->
   <footer class="footer">
@@ -1055,6 +1098,7 @@
       If love is true, no effort ever goes to waste.
     </p>
     <p class="footer-copy">Silent Memories — 2026</p>
+    <div class="late-night-hint">The world is quiet, but my heart is still speaking to you.</div>
   </footer>
 
   <!-- ====== DYNAMIC ENDING SCREEN ====== -->
@@ -1100,7 +1144,9 @@
   <script src="https://cdn.jsdelivr.net/npm/emailjs-com@3/dist/email.min.js"></script>
   <script>
     (function(){
-      emailjs.init("Vgp1Tvu88MeOV6IdI");
+      if (window.emailjs) {
+        emailjs.init("Vgp1Tvu88MeOV6IdI");
+      }
     })();
   </script>
 
@@ -1623,174 +1669,210 @@
   })();
   </script>
 
-  <!-- ====== CURSOR SCRIPT — frame-rate independent (60/90/120/144 Hz) ====== -->
+  <!-- ====== CURSOR SCRIPT: single rAF loop, desktop only ====== -->
   <script>
   (function () {
     var ring = document.getElementById('customCursor');
-    var dot  = document.getElementById('cursorDot');
+    var dot = document.getElementById('cursorDot');
     if (!ring || !dot) return;
 
-    /* ── Touch bail-out ── */
-    if (('ontouchstart' in window) || navigator.maxTouchPoints > 0) {
-      ring.style.display = dot.style.display = 'none';
-      var s = document.createElement('style');
-      s.textContent = 'html,body,*{cursor:auto!important}';
-      document.head.appendChild(s);
-      return;
+    var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
+    var smallScreen = window.matchMedia('(max-width: 768px)');
+    var enabled = false;
+    var visible = false;
+    var hovering = false;
+    var lastTs = 0;
+    var rafId = 0;
+
+    var mx = window.innerWidth / 2;
+    var my = window.innerHeight / 2;
+    var rx = mx;
+    var ry = my;
+    var dx = mx;
+    var dy = my;
+    var scale = 1;
+
+    var trails = [];
+    var TRAIL_COUNT = 3;
+    var hoverSelector = [
+      'a',
+      'button',
+      '[onclick]',
+      '[role="button"]',
+      '.nav-logo',
+      '.nav-link',
+      '.dot',
+      '.trait',
+      '.quote-nav-btn',
+      '.music-btn',
+      '.music-icon-btn',
+      '.btn-keep',
+      '.btn-fade',
+      '.btn-yes',
+      '.btn-reply',
+      '.bd-btn',
+      '.gi-btn',
+      '.warning-btn',
+      '.ci-enter-btn'
+    ].join(',');
+
+    function shouldEnable() {
+      return finePointer.matches && !smallScreen.matches;
     }
 
-    /* ── Mutable state (all primitives — no object allocation in loop) ── */
-    var mx = window.innerWidth  >> 1;   // real mouse X  (bit-shift = fast /2)
-    var my = window.innerHeight >> 1;   // real mouse Y
-    var rx = mx, ry = my;              // ring position
-    var dx = mx, dy = my;              // dot  position
-    var ringScale  = 1.0;
-    var isHovering = false;
-    var cursorVisible = false;
-    var beatPhase  = 0.0;
-    var lastTs     = 0.0;
-
-    /* ── Pre-computed constants ── */
-    // Exponential-decay bases (per 16.67 ms reference frame).
-    // At any fps: factor = 1 - base^(dt/16.67)
-    // Ring trails  → base 0.880  (≈12% per 16.67ms at 60fps)
-    // Dot instant  → base 0.050  (≈95% per 16.67ms at 60fps)
-    // Scale lerp   → base 0.880  (matches ring)
-    var RING_BASE  = 0.880;
-    var DOT_BASE   = 0.050;
-    var SCALE_BASE = 0.880;
-
-    // Heartbeat: 1.25 s period, ±8% scale
-    var BEAT_OMEGA = 6.2832 / 1.25;   // 2π / period  (rad per second)
-    var BEAT_AMP   = 0.08;
-
-    /* ── Trail Dots ── */
-    var trailEls = [];
-    var NUM_TRAILS = 2;
-    for (var i = 0; i < NUM_TRAILS; i++) {
-      var t = document.createElement('div');
-      t.style.cssText = 'position:fixed; top:0; left:0; width:5px; height:5px; background:rgba(255,45,117,' + (0.5 - i*0.15) + '); border-radius:50%; pointer-events:none; z-index:999997; will-change:transform;';
-      document.body.appendChild(t);
-      trailEls.push({ el: t, x: mx, y: my });
+    function setNativeCursorHidden(active) {
+      document.documentElement.classList.toggle('custom-cursor-active', !!active);
     }
 
-    /* ── Mouse tracking ── */
-    document.addEventListener('mousemove', function (e) {
+    function ensureTrails() {
+      while (trails.length < TRAIL_COUNT) {
+        var trail = document.createElement('div');
+        trail.className = 'cursor-trail-dot';
+        trail.style.background = 'rgba(255,45,117,' + (0.34 - trails.length * 0.08) + ')';
+        trail.style.boxShadow = '0 0 ' + (10 + trails.length * 5) + 'px rgba(255,45,117,0.28)';
+        document.body.appendChild(trail);
+        trails.push({ el: trail, x: rx, y: ry });
+      }
+    }
+
+    function setOpacity(value) {
+      ring.style.opacity = value;
+      dot.style.opacity = value;
+      for (var i = 0; i < trails.length; i++) trails[i].el.style.opacity = value;
+    }
+
+    function hideCursor() {
+      visible = false;
+      setNativeCursorHidden(false);
+      setOpacity('0');
+      hovering = false;
+      ring.classList.remove('ring-hovering');
+      dot.classList.remove('dot-hovering');
+    }
+
+    function enableCursor() {
+      if (enabled || !shouldEnable()) return;
+      enabled = true;
+      ring.style.display = '';
+      dot.style.display = '';
+      ensureTrails();
+      if (!rafId) rafId = requestAnimationFrame(animate);
+    }
+
+    function disableCursor() {
+      if (!enabled) return;
+      enabled = false;
+      hideCursor();
+      setNativeCursorHidden(false);
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+      lastTs = 0;
+      ring.style.display = 'none';
+      dot.style.display = 'none';
+      for (var i = 0; i < trails.length; i++) trails[i].el.remove();
+      trails = [];
+    }
+
+    function refreshMode() {
+      if (shouldEnable()) enableCursor();
+      else disableCursor();
+    }
+
+    function showCursor() {
+      if (!enabled) return;
+      visible = true;
+      setNativeCursorHidden(true);
+      setOpacity('1');
+    }
+
+    function updateHover(target) {
+      var next = !!(target && target.closest && target.closest(hoverSelector));
+      if (next === hovering) return;
+      hovering = next;
+      ring.classList.toggle('ring-hovering', hovering);
+      dot.classList.toggle('dot-hovering', hovering);
+    }
+
+    document.addEventListener('pointermove', function (e) {
+      if (!enabled || e.pointerType === 'touch') return;
       mx = e.clientX;
       my = e.clientY;
-      if (!cursorVisible) {
-        cursorVisible = true;
-        ring.style.opacity = '1';
-        dot.style.opacity  = '1';
-      }
+      showCursor();
+      updateHover(e.target);
     }, { passive: true });
 
-    document.addEventListener('mouseleave', function () {
-      cursorVisible = false;
-      ring.style.opacity = '0';
-      dot.style.opacity  = '0';
+    document.addEventListener('pointerover', function (e) {
+      if (!enabled || e.pointerType === 'touch') return;
+      updateHover(e.target);
+    }, { passive: true });
+
+    document.addEventListener('pointerout', function (e) {
+      if (!enabled || e.pointerType === 'touch') return;
+      var to = e.relatedTarget;
+      if (!to || !document.documentElement.contains(to)) {
+        hideCursor();
+        return;
+      }
+      updateHover(to);
+    }, { passive: true });
+
+    window.addEventListener('blur', hideCursor, { passive: true });
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) hideCursor();
     });
-    document.addEventListener('mouseenter', function () {
-      cursorVisible = true;
-      ring.style.opacity = '1';
-      dot.style.opacity  = '1';
-    });
 
-    /* ── Hover detection (event delegation — zero per-element overhead) ── */
-    var clickSel = 'a,button,[onclick],[role="button"],.bd-btn,.nav-link,' +
-                   '.dot,.trait,.quote-nav-btn,.music-btn,.btn-keep,.btn-fade';
-    document.addEventListener('mouseover', function (e) {
-      if (e.target && e.target.closest && e.target.closest(clickSel)) {
-        isHovering = true;
-        ring.classList.add('ring-hovering');
-        dot.classList.add('dot-hovering');
-      }
-    }, { passive: true });
-    document.addEventListener('mouseout', function (e) {
-      if (e.target && e.target.closest && e.target.closest(clickSel)) {
-        isHovering = false;
-        ring.classList.remove('ring-hovering');
-        dot.classList.remove('dot-hovering');
-      }
-    }, { passive: true });
+    if (finePointer.addEventListener) {
+      finePointer.addEventListener('change', refreshMode);
+      smallScreen.addEventListener('change', refreshMode);
+    } else {
+      finePointer.addListener(refreshMode);
+      smallScreen.addListener(refreshMode);
+    }
+    window.addEventListener('resize', refreshMode, { passive: true });
 
-    /* ── Magnetic — single delegated mousemove, not N element listeners ── */
-    var magEl = null;
-    document.addEventListener('mousemove', function (e) {
-      var el = e.target && e.target.closest && e.target.closest('.bd-btn');
-      if (el) {
-        if (magEl !== el) {
-          if (magEl) { magEl.style.transition = 'transform 0.4s ease'; magEl.style.transform = ''; }
-          magEl = el;
-        }
-        var r  = el.getBoundingClientRect();
-        var fx = (e.clientX - r.left - r.width  * 0.5) * 0.10;
-        var fy = (e.clientY - r.top  - r.height * 0.5) * 0.10;
-        el.style.transition = 'transform 0.15s ease';
-        el.style.transform  = 'translate(' + fx + 'px,' + fy + 'px)';
-      } else if (magEl) {
-        magEl.style.transition = 'transform 0.4s ease';
-        magEl.style.transform  = 'translate(0,0)';
-        var _el = magEl;
-        magEl = null;
-        setTimeout(function () { _el.style.transform = ''; _el.style.transition = ''; }, 420);
-      }
-    }, { passive: true });
-
-    /* ── rAF loop — frame-rate independent via exponential decay ── */
     function animate(ts) {
-      /* Delta time in ms, clamped to 50ms to absorb tab-switch spikes */
-      var dt  = lastTs ? Math.min(ts - lastTs, 50) : 16.67;
-      lastTs  = ts;
+      rafId = 0;
+      if (!enabled) return;
 
-      /* Frame-rate independent lerp factors using exponential decay:
-         factor = 1 - base^(dt / 16.67)
-         At 60fps (dt=16.67): factor = 1 - base^1.0
-         At 120fps (dt=8.33):  factor = 1 - base^0.5  (smaller per frame, same real-time result) */
-      var norm   = dt * 0.06;            // dt / 16.67  (multiply is faster than divide)
-      var ringF  = 1 - Math.pow(RING_BASE,  norm);
-      var dotF   = 1 - Math.pow(DOT_BASE,   norm);
-      var scaleF = 1 - Math.pow(SCALE_BASE, norm);
+      var dt = lastTs ? Math.min(ts - lastTs, 48) : 16.67;
+      lastTs = ts;
+      var frame = dt / 16.67;
+      var ringF = 1 - Math.pow(0.82, frame);
+      var dotF = 1 - Math.pow(0.18, frame);
+      var scaleF = 1 - Math.pow(0.78, frame);
 
-      /* Position lerp */
       dx += (mx - dx) * dotF;
       dy += (my - dy) * dotF;
       rx += (mx - rx) * ringF;
       ry += (my - ry) * ringF;
 
-      /* Heartbeat — time-based (sounds the same at every refresh rate) */
-      beatPhase += BEAT_OMEGA * (dt * 0.001);   // dt/1000 = seconds
-      var beat = 1 + Math.sin(beatPhase) * BEAT_AMP;
+      var targetScale = hovering ? 1.58 : 1;
+      scale += (targetScale - scale) * scaleF;
 
-      /* Scale lerp */
-      var targetScale = (isHovering ? 1.65 : 1.0) * beat;
-      ringScale += (targetScale - ringScale) * scaleF;
-
-      /* Write transforms — two strings, built with minimal allocation.
-         |0 truncates float to int for the position part (sub-pixel not
-         needed for a 26px circle; saves toString work in string concat). */
       ring.style.transform =
-        'translate3d(' + (rx | 0) + 'px,' + (ry | 0) + 'px,0)translate(-50%,-50%)scale(' + ringScale + ')';
-
+        'translate3d(' + rx.toFixed(2) + 'px,' + ry.toFixed(2) + 'px,0) translate(-50%,-50%) scale(' + scale.toFixed(3) + ')';
       dot.style.transform =
-        'translate3d(' + (dx | 0) + 'px,' + (dy | 0) + 'px,0)translate(-50%,-50%)' +
-        (isHovering ? 'scale(1.35)' : '');
+        'translate3d(' + dx.toFixed(2) + 'px,' + dy.toFixed(2) + 'px,0) translate(-50%,-50%) scale(' + (hovering ? 1.24 : 1) + ')';
 
-      /* Update trails */
-      var prevX = rx, prevY = ry;
-      for (var i = 0; i < NUM_TRAILS; i++) {
-        var tr = trailEls[i];
-        tr.x += (prevX - tr.x) * 0.45;
-        tr.y += (prevY - tr.y) * 0.45;
-        tr.el.style.transform = 'translate3d(' + (tr.x | 0) + 'px,' + (tr.y | 0) + 'px,0)translate(-50%,-50%)scale(' + (1 - i*0.2) + ')';
-        prevX = tr.x;
-        prevY = tr.y;
+      var px = rx;
+      var py = ry;
+      for (var i = 0; i < trails.length; i++) {
+        var tr = trails[i];
+        var lag = 0.32 - i * 0.05;
+        tr.x += (px - tr.x) * lag;
+        tr.y += (py - tr.y) * lag;
+        tr.el.style.transform =
+          'translate3d(' + tr.x.toFixed(2) + 'px,' + tr.y.toFixed(2) + 'px,0) translate(-50%,-50%) scale(' + (1 - i * 0.16) + ')';
+        px = tr.x;
+        py = tr.y;
       }
 
-      requestAnimationFrame(animate);
+      rafId = requestAnimationFrame(animate);
     }
 
-    requestAnimationFrame(animate);
+    refreshMode();
   })();
   </script>
 

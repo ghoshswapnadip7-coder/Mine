@@ -15,9 +15,9 @@
   --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* ====== ONE-TIME ACCESS — WARNING + LOCK SCREENS ====== */
+/* ====== ONE-TIME ACCESS â€” WARNING + LOCK SCREENS ====== */
 
-/* ── Shared base: all three screens are fullscreen dark overlays ── */
+/* â”€â”€ Shared base: all three screens are fullscreen dark overlays â”€â”€ */
 #warningScreen,
 #giftIntro,
 #lockScreen {
@@ -36,16 +36,16 @@
   transition: opacity 0.6s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
-/* Shown states — added by JS after display:flex + reflow */
+/* Shown states â€” added by JS after display:flex + reflow */
 #warningScreen.warning-visible,
 #giftIntro.gift-intro-visible,
 #lockScreen.lock-visible {
   opacity: 1;
 }
 
-/* ─────────────────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     WARNING SCREEN
-───────────────────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .warning-content {
   max-width: 560px;
   display: flex;
@@ -128,11 +128,11 @@
   to   { opacity: 1; transform: translateY(0);     }
 }
 
-/* ─────────────────────────────────────────────────────────
-    GIFT INTRO PAGE  — cinematic line-by-line experience
-───────────────────────────────────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    GIFT INTRO PAGE  â€” cinematic line-by-line experience
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
-/* ── Zooming background layer (sits behind canvas and content) ── */
+/* â”€â”€ Zooming background layer (sits behind canvas and content) â”€â”€ */
 .gi-bg {
   position: absolute;
   inset: -4%;          /* slightly oversized so zoom never shows edges */
@@ -147,7 +147,7 @@
   to   { transform: scale(1.04); }
 }
 
-/* ── Particle canvas — softly fades in after screen opens ── */
+/* â”€â”€ Particle canvas â€” softly fades in after screen opens â”€â”€ */
 #giftIntroCanvas {
   position: absolute;
   inset: 0;
@@ -163,7 +163,7 @@
   opacity: 1;
 }
 
-/* ── Content wrapper ── */
+/* â”€â”€ Content wrapper â”€â”€ */
 .gi-content {
   position: relative;
   z-index: 2;
@@ -175,7 +175,7 @@
   padding: 0 20px;
 }
 
-/* ── Main heading: "This is for you." — Great Vibes, zoom-in ── */
+/* â”€â”€ Main heading: "This is for you." â€” Great Vibes, zoom-in â”€â”€ */
 .gi-heading {
   font-family: 'Great Vibes', cursive;
   font-size: clamp(2.8rem, 8vw, 5rem);
@@ -194,7 +194,7 @@
   to { opacity: 1; transform: scale(1) translateY(0); }
 }
 
-/* ── Body: individual italic lines ── */
+/* â”€â”€ Body: individual italic lines â”€â”€ */
 .gi-body {
   display: flex;
   flex-direction: column;
@@ -216,14 +216,14 @@
   animation: warnFadeUp 1.0s both ease;
 }
 
-/* Line-by-line staggered delays — calm, deliberate pacing */
-.gi-l1 { animation-delay: 2.0s;  }   /* I didn't know how to say everything… */
+/* Line-by-line staggered delays â€” calm, deliberate pacing */
+.gi-l1 { animation-delay: 2.0s;  }   /* I didn't know how to say everythingâ€¦ */
 .gi-l2 { animation-delay: 3.0s;  }   /* so I made something instead.          */
 .gi-l3 { animation-delay: 4.1s;  }   /* It's simple.                          */
 .gi-l4 { animation-delay: 5.3s;  }   /* But it's honest.                      */
-.gi-l5 { animation-delay: 6.7s;  }   /* And it's from me… to you.             */
+.gi-l5 { animation-delay: 6.7s;  }   /* And it's from meâ€¦ to you.             */
 
-/* ── Name: "Anushka" — soft glow, scale-pulse entrance ── */
+/* â”€â”€ Name: "Anushka" â€” soft glow, scale-pulse entrance â”€â”€ */
 .gi-name {
   font-family: 'Great Vibes', cursive;
   font-size: clamp(2.4rem, 7vw, 4rem);
@@ -244,7 +244,7 @@
 }
 
 /* Subtle breathing glow after the name appears.
-   Override only the animation list — keep fill-mode via forwards on giNameIn. */
+   Override only the animation list â€” keep fill-mode via forwards on giNameIn. */
 .gi-name-glow {
   /* giNameIn runs once (forwards fills opacity+scale), removed giNamePulse loop for 60fps */
   animation-name:            giNameIn;
@@ -257,7 +257,7 @@
 
 /* @keyframes giNamePulse removed for 60fps */
 
-/* ── Soft ghost line: "Think of it as… a small gift." ── */
+/* â”€â”€ Soft ghost line: "Think of it asâ€¦ a small gift." â”€â”€ */
 .gi-soft {
   font-family: 'Lato', sans-serif;
   font-size: clamp(0.8rem, 2.5vw, 0.95rem);
@@ -268,7 +268,7 @@
   animation: warnFadeUp 1.2s 7.6s both ease;
 }
 
-/* ── "Open It →" button — fades in last, gentle pulse ── */
+/* â”€â”€ "Open It â†’" button â€” fades in last, gentle pulse â”€â”€ */
 .gi-btn {
   margin-top: 10px;
   padding: 14px 44px;
@@ -301,7 +301,7 @@
 
 /* @keyframes giPulseGlow removed for 60fps */
 
-/* ── Music tap prompt (shown if autoplay blocked) ── */
+/* â”€â”€ Music tap prompt (shown if autoplay blocked) â”€â”€ */
 #giMusicPrompt {
   position: fixed;
   bottom: 28px;
@@ -334,9 +334,9 @@
   .gi-body    { gap: 8px;  }
 }
 
-/* ─────────────────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     LOCK SCREEN
-───────────────────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .lock-content {
   max-width: 560px;
   display: flex;
@@ -383,7 +383,7 @@
   text-shadow: none;
 }
 
-/* ── END ONE-TIME ACCESS SCREENS ── */
+/* â”€â”€ END ONE-TIME ACCESS SCREENS â”€â”€ */
 
 * {
   margin: 0;
@@ -393,9 +393,11 @@
   /* cursor: none is set by specific device-type media queries below */
 }
 
-/* Custom cursor: hide native cursor only on devices with a real pointer (not touch) */
+/* Custom cursor: hide native cursor only while the JS cursor is confirmed active */
 @media (hover: hover) and (pointer: fine) {
-  html, body, * {
+  html.custom-cursor-active,
+  html.custom-cursor-active body,
+  html.custom-cursor-active * {
     cursor: none !important;
   }
 }
@@ -428,49 +430,6 @@ body {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: linear-gradient(var(--secondary-color), var(--primary-color));
-}
-
-/* ====== CUSTOM CURSOR ====== */
-.cursor {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 20px;
-  height: 20px;
-  border: 2px solid var(--primary-color);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transition: width 0.2s, height 0.2s, background-color 0.2s;
-  box-shadow: 0 0 10px var(--primary-color);
-  will-change: transform;
-}
-.cursor.hovering {
-  width: 40px;
-  height: 40px;
-  background-color: rgba(255, 77, 133, 0.2);
-  border-color: var(--secondary-color);
-  box-shadow: 0 0 15px var(--secondary-color);
-}
-.cursor-trail {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 8px;
-  height: 8px;
-  background-color: var(--primary-color);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9998;
-  box-shadow: 0 0 8px var(--primary-color);
-  will-change: transform;
-  /* Hidden: custom cursor disabled in favour of native cursor */
-  display: none !important;
-}
-
-/* Custom cursor ring also hidden */
-.cursor {
-  display: none !important;
 }
 
 /* ====== LOADER ====== */
@@ -625,7 +584,7 @@ body {
   box-shadow: 0 6px 22px rgba(255, 77, 133, 0.7);
   background: linear-gradient(45deg, var(--secondary-color), var(--primary-color));
 }
-.hamburger { display: none; cursor: none; flex-direction: column; gap: 5px; flex-shrink: 0; }
+.hamburger { display: none; cursor: pointer; flex-direction: column; gap: 5px; flex-shrink: 0; }
 .hamburger span { width: 26px; height: 2px; background: var(--text-light); transition: var(--transition); border-radius: 3px; }
 
 
@@ -647,21 +606,29 @@ body {
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle, rgba(15, 5, 20, 0.2) 0%, var(--bg-dark) 100%);
-  z-index: -1;
+  background:
+    radial-gradient(ellipse at 50% 48%, rgba(20, 6, 24, 0.30) 0%, rgba(15, 5, 20, 0.62) 58%, rgba(7, 2, 12, 0.96) 100%),
+    linear-gradient(180deg, rgba(4, 1, 8, 0.22) 0%, rgba(4, 1, 8, 0.06) 42%, rgba(4, 1, 8, 0.58) 100%);
+  z-index: 1;
 }
 .hero-content {
+  position: relative;
   z-index: 2;
   padding: 0 20px;
+  isolation: isolate;
 }
 .hero-subtitle {
   font-family: var(--font-body);
   font-size: 1.2rem;
   letter-spacing: 4px;
-  color: var(--secondary-color);
+  color: rgba(235, 196, 255, 0.98);
   text-transform: uppercase;
   margin-bottom: 20px;
   font-weight: 700;
+  text-shadow:
+    0 0 10px rgba(255, 105, 160, 0.32),
+    0 0 20px rgba(162, 57, 202, 0.55),
+    0 2px 10px rgba(0, 0, 0, 0.72);
 }
 .hero-name {
   font-family: var(--font-cursive);
@@ -671,27 +638,37 @@ body {
   -webkit-text-fill-color: transparent;
   line-height: 1;
   margin-bottom: 20px;
-  /* Fix 1: Ensure name is always visible and stacked correctly */
   opacity: 1 !important;
   visibility: visible !important;
   position: relative;
   z-index: 10;
-  /* Fix 3: Reduce glow bloom */
-  text-shadow: 0 5px 15px rgba(255, 77, 133, 0.15);
+  filter:
+    drop-shadow(0 0 16px rgba(255, 77, 133, 0.68))
+    drop-shadow(0 0 38px rgba(162, 57, 202, 0.36))
+    drop-shadow(0 8px 16px rgba(0, 0, 0, 0.45));
 }
 .hero-tagline {
   font-family: var(--font-serif);
   font-size: 1.5rem;
   font-style: italic;
-  color: var(--text-muted);
+  color: rgba(255, 236, 245, 0.98);
   max-width: 600px;
   margin: 0 auto 30px;
+  text-shadow:
+    0 0 10px rgba(255, 105, 160, 0.42),
+    0 0 28px rgba(255, 105, 160, 0.22),
+    0 2px 12px rgba(0, 0, 0, 0.78);
+  line-height: 1.75;
 }
 .hero-from {
   font-family: var(--font-cursive);
   font-size: 2rem;
-  color: var(--primary-color);
+  color: #ff8fb6;
   margin-bottom: 40px;
+  text-shadow:
+    0 0 10px rgba(255, 77, 133, 0.55),
+    0 0 28px rgba(162, 57, 202, 0.24),
+    0 2px 10px rgba(0, 0, 0, 0.72);
 }
 .hero-buttons { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
 .btn-primary, .btn-secondary {
@@ -736,6 +713,7 @@ body {
   gap: 10px;
   opacity: 0.7;
   animation: float 3s ease-in-out infinite;
+  z-index: 2;
 }
 .scroll-mouse {
   width: 25px;
@@ -775,8 +753,9 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
   font-family: var(--font-heading);
   font-size: 3.5rem;
   color: #fff;
-  /* Fix 3: Reduce glow bloom */
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.15);
+  text-shadow:
+    0 0 12px rgba(255, 255, 255, 0.35),
+    0 0 30px rgba(255, 77, 133, 0.20);
   position: relative;
   z-index: 5;
 }
@@ -1111,7 +1090,7 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
   font-size: 0.95rem;
 }
 
-/* Dots — pushed below the tallest card */
+/* Dots â€” pushed below the tallest card */
 .quotes-dots {
   display: flex;
   justify-content: center;
@@ -1248,8 +1227,7 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
 .song-title { font-family: var(--font-heading); font-size: 2rem; color: #fff; margin-bottom: 5px; }
 .song-artist { color: var(--primary-color); font-weight: bold; margin-bottom: 20px; font-size: 1.1rem; }
 .lyrics-box {
-  background: rgba(0, 0, 0, 0.45);
-  backdrop-filter: blur(12px);
+  background: rgba(10, 5, 15, 0.85);
   border-radius: 20px;
   padding: 22px;
   height: 250px;
@@ -1382,7 +1360,7 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
 .forever-text { font-family: var(--font-cursive); font-size: 2rem; color: var(--text-muted); }
 .firework-container { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: -1; }
 
-@keyframes pulse { 0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 215, 0, 0.7); } 70% { transform: scale(1); box-shadow: 0 0 0 20px rgba(255, 215, 0, 0); } 100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(255, 215, 0, 0); } }
+@keyframes pulse { 0% { transform: scale(0.95); } 50% { transform: scale(1.02); } 100% { transform: scale(0.95); } }
 @keyframes glow { 0% { opacity: 0.5; transform: scale(1); } 100% { opacity: 1; transform: scale(1.2); } }
 @keyframes popIn { 0% { opacity: 0; transform: scale(0.5); } 100% { opacity: 1; transform: scale(1); } }
 @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
@@ -1460,6 +1438,130 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
 .confession-sign { text-align: center; margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(255,77,133,0.15); }
 .confession-sign p:first-child { font-family: var(--font-cursive); font-size: 2.2rem; color: var(--primary-color); }
 .confession-subtitle { color: var(--text-muted); margin-top: 5px; }
+
+/* ====== CINEMATIC LETTER SECTION ====== */
+.cinematic-letter-section {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: radial-gradient(circle at 50% 50%, #16081d 0%, var(--bg-dark) 100%);
+  padding: 140px 10%;
+  position: relative;
+  overflow: hidden;
+}
+
+.letter-reveal {
+  max-width: 800px;
+  width: 100%;
+  text-align: center;
+  position: relative;
+  z-index: 5;
+}
+
+.letter-content {
+  margin-bottom: 80px;
+}
+
+.letter-paragraph {
+  font-family: var(--font-serif);
+  font-size: clamp(1.15rem, 3.5vw, 1.5rem);
+  color: rgba(254, 240, 245, 0.9);
+  line-height: 2.4; /* Soft breathable line height */
+  margin-bottom: 60px; /* Large paragraph spacing */
+  font-style: italic;
+  font-weight: 300;
+  text-shadow: 0 0 20px rgba(255, 77, 133, 0.12);
+  transition: opacity 2s ease, transform 2s ease;
+}
+
+.letter-footer {
+  margin-top: 60px;
+  opacity: 0.6;
+}
+
+.letter-sign-small {
+  font-family: var(--font-cursive);
+  font-size: 2.2rem;
+  color: var(--primary-color);
+  opacity: 0.4;
+  letter-spacing: 3px;
+}
+
+/* Animations handled by .reveal class mostly, but adding subtle delay for paragraphs */
+.cinematic-letter-section .reveal.active .letter-paragraph:nth-child(1) { transition-delay: 0.3s; }
+.cinematic-letter-section .reveal.active .letter-paragraph:nth-child(2) { transition-delay: 1.2s; }
+.cinematic-letter-section .reveal.active .letter-paragraph:nth-child(3) { transition-delay: 2.1s; }
+
+/* ====== QUIET SECRETS SYSTEM ====== */
+.quiet-secret-text {
+  position: fixed;
+  pointer-events: none;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(0.85rem, 2vw, 1.05rem);
+  color: rgba(255, 182, 210, 0);
+  text-shadow: 0 0 12px rgba(255, 77, 133, 0.3);
+  transition: color 2.5s ease, opacity 2.5s ease;
+  z-index: 9999;
+  text-align: center;
+  width: auto;
+  letter-spacing: 0.05em;
+}
+
+.quiet-secret-text.active {
+  color: rgba(255, 182, 210, 0.45);
+}
+
+.late-night-hint {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  font-style: italic;
+  color: rgba(255, 182, 210, 0);
+  transition: color 4s ease;
+  z-index: 10;
+  pointer-events: none;
+  letter-spacing: 0.1em;
+}
+
+body.late-night-active .late-night-hint {
+  color: rgba(255, 182, 210, 0.25);
+}
+
+/* Subtle shift for particles in late night */
+body.late-night-active #heartCanvas {
+  filter: hue-rotate(280deg) brightness(0.7) saturate(0.8);
+}
+
+.trace-reveal-container {
+  position: relative;
+  display: inline-block;
+}
+
+.trace-reveal-msg {
+  position: absolute;
+  top: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 200px;
+  font-family: var(--font-serif);
+  font-size: 0.85rem;
+  font-style: italic;
+  color: rgba(255, 182, 210, 0);
+  transition: color 1.5s ease;
+  pointer-events: none;
+  text-align: center;
+}
+
+.trace-reveal-msg.visible {
+  color: rgba(255, 182, 210, 0.4);
+}
+
+
 /* ====== ANUSHKA STORY SECTION ====== */
 .story-section { position: relative; overflow: hidden; min-height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 100px 5%; background: radial-gradient(circle at center, #2a081a 0%, var(--bg-dark) 100%); }
 .story-bg-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('https://www.transparenttextures.com/patterns/stardust.png'); opacity: 0.2; pointer-events: none; }
@@ -1488,13 +1590,14 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
   .quotes-carousel { min-height: 350px; }
   .quotes-dots { margin-top: 370px; }
 }
-/* Intermediate breakpoint — shrink text further to fit nav */
+/* Intermediate breakpoint â€” shrink text further to fit nav */
 @media (max-width: 1200px) {
   .nav-links { gap: 2px; }
   .nav-link { font-size: 0.65rem; padding: 5px 7px; }
   .navbar { padding: 10px 25px; }
   .navbar.scrolled { padding: 8px 25px; }
 }
+/* Old mobile CSS disabled */
 @media (max-width: 768px) {
   .hero-name { font-size: 4.5rem; }
   .hero-tagline { font-size: 1.2rem; }
@@ -1728,7 +1831,7 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
 }
 
 /* ====================================================
-   ONE LAST SMILE — FINAL SCREEN
+   ONE LAST SMILE â€” FINAL SCREEN
    ==================================================== */
 
 /* --- Blackout overlay (cinematic exit) --- */
@@ -1770,7 +1873,7 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
   overflow: hidden;
 }
 
-/* Ambient glow blob — slow drift behind text */
+/* Ambient glow blob â€” slow drift behind text */
 .ols-glow-blob {
   position: absolute;
   top: 50%; left: 50%;
@@ -1792,7 +1895,7 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
   100% { transform: translate(-52%, -48%) scale(0.95); opacity: 0.6; }
 }
 
-/* Vignette — darkened edges for cinematic feel */
+/* Vignette â€” darkened edges for cinematic feel */
 .ols-vignette {
   position: absolute;
   inset: 0;
@@ -1852,7 +1955,7 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
   color: rgba(255, 78, 205, 0.55);
 }
 
-/* Heading — extra glow for final screen */
+/* Heading â€” extra glow for final screen */
 .ols-heading {
   font-size: clamp(3rem, 9vw, 6.5rem) !important;
   letter-spacing: -0.5px;
@@ -1861,7 +1964,7 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
                0 0 80px rgba(168, 85, 247, 0.2);
 }
 
-/* Sub text — slightly smaller, softer */
+/* Sub text â€” slightly smaller, softer */
 .ols-sub {
   font-size: clamp(1.05rem, 2.2vw, 1.3rem) !important;
   margin-bottom: 0.8rem;
@@ -1912,7 +2015,7 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
 }
 
 /* ====================================================
-   BIRTHDAY GIFT FLOW — CINEMATIC OVERLAY
+   BIRTHDAY GIFT FLOW â€” CINEMATIC OVERLAY
    ==================================================== */
 
 /* --- Container --- */
@@ -2024,8 +2127,7 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
   font-family: var(--font-body);
   font-size: 1.05rem;
   font-weight: 700;
-  letter-spacing: 0.5px;
-  cursor: none;
+  letter-spacing: 0.5px;  cursor: pointer;
   color: #fff;
   background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
   box-shadow: 0 8px 24px rgba(255, 77, 133, 0.35),
@@ -2093,8 +2195,8 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
 }
 
 @keyframes bdGlowPulse {
-  0%, 100% { box-shadow: 0 8px 24px rgba(255,77,133,0.35), 0 0 0 0 rgba(255,77,133,0); }
-  50%       { box-shadow: 0 12px 32px rgba(255,77,133,0.6), 0 0 20px rgba(162,57,202,0.4); }
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50%       { transform: scale(1.03); opacity: 1; }
 }
 
 /* --- Step counter dots --- */
@@ -2136,7 +2238,7 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
   border-radius: 30px;
   font-size: 0.9rem;
   color: var(--text-muted);
-  cursor: none;
+  cursor: pointer;
   transition: var(--transition);
   animation: bdSlideDown 0.6s ease forwards;
 }
@@ -2169,14 +2271,16 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
 }
 
 /* ====================================================
-   CUSTOM CURSOR — glowing pink/purple circle
+   CUSTOM CURSOR â€” glowing pink/purple circle
    Placed at z-index 999999 so it sits above the
    birthday overlay (#birthdayFlow z-index: 99999)
    ==================================================== */
 
-/* Hide native cursor on all pointer (non-touch) devices */
+/* Hide native cursor on all pointer (non-touch) devices only after JS enables it */
 @media (hover: hover) and (pointer: fine) {
-  html, body, * {
+  html.custom-cursor-active,
+  html.custom-cursor-active body,
+  html.custom-cursor-active * {
     cursor: none !important;
   }
 }
@@ -2198,11 +2302,11 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
     0 0 44px rgba(168, 85, 247, 0.6);
   will-change: transform;
   opacity: 0;          /* starts invisible; JS reveals on first mousemove */
-  /* Only transition glow and opacity — size + position handled by JS */
+  /* Only transition glow and opacity â€” size + position handled by JS */
   transition: box-shadow 0.2s ease, opacity 0.3s ease;
 }
 
-/* Hover: JS lerps scale to 1.7×; CSS only intensifies the glow */
+/* Hover: JS lerps scale to 1.7Ã—; CSS only intensifies the glow */
 .custom-cursor.hovering {
   box-shadow:
     0 0 14px #ff4ecd,
@@ -2210,14 +2314,14 @@ section { padding: 100px 5%; position: relative; overflow: hidden; }
     0 0 64px rgba(168, 85, 247, 0.85);
 }
 
-/* Mobile / touch devices — restore native cursor, hide glow dot */
+/* Mobile / touch devices â€” restore native cursor, hide glow dot */
 @media (hover: none) and (pointer: coarse) {
   html, body, * { cursor: auto !important; }
   .custom-cursor { display: none !important; }
 }
 
 /* ====================================================
-   BIRTHDAY FLOW — button hover glow polish
+   BIRTHDAY FLOW â€” button hover glow polish
    ==================================================== */
 .bd-btn {
   transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease !important;
@@ -2253,12 +2357,12 @@ a, button, [onclick], .trait, .dot, .quote-nav-btn, .music-btn,
   html, body, * {
     cursor: auto !important;
   }
-  .cursor, .cursor-trail, #customCursor, #cursorDot {
+  .cursor, .cursor-trail, #customCursor, #cursorDot, .cursor-trail-dot {
     display: none !important;
   }
 }
 
-/* Small phone extra adjustments (≤380px) */
+/* Small phone extra adjustments (â‰¤380px) */
 @media (max-width: 380px) {
   .hero-name { font-size: 3.8rem; }
   .section-title { font-size: 1.9rem; }
@@ -2274,11 +2378,11 @@ a, button, [onclick], .trait, .dot, .quote-nav-btn, .music-btn,
   .quotes-dots { margin-top: 470px; }
 }
 
-/* ─────────────────────────────────────────────────────────
-    POLISHING — added in stability pass
-───────────────────────────────────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+    POLISHING â€” added in stability pass
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
-/* ── "You stayed till the end." — hidden emotional detail ── */
+/* â”€â”€ "You stayed till the end." â€” hidden emotional detail â”€â”€ */
 #stayMessage {
   position: fixed;
   bottom: 32px;
@@ -2300,7 +2404,7 @@ a, button, [onclick], .trait, .dot, .quote-nav-btn, .music-btn,
   opacity: 1;
 }
 
-/* ── Universal button micro-interactions ── */
+/* â”€â”€ Universal button micro-interactions â”€â”€ */
 /* All clickable buttons get a consistent hover lift + glow */
 button:not(.gi-btn):not(.warning-btn):not(.bd-btn):not(.quote-nav-btn):not(.music-btn):not(#giMusicPrompt):not(#bdMusicPrompt) {
   transition: transform 0.28s cubic-bezier(0.22,1,0.36,1),
@@ -2330,7 +2434,7 @@ button:not(.gi-btn):not(.warning-btn):not(.bd-btn):not(.quote-nav-btn):not(.musi
   filter: brightness(1.1);
 }
 
-/* ── will-change hints for GPU compositing ── */
+/* â”€â”€ will-change hints for GPU compositing â”€â”€ */
 .bd-screen,
 .reveal,
 .fade-in-up,
@@ -2352,7 +2456,7 @@ button:not(.gi-btn):not(.warning-btn):not(.bd-btn):not(.quote-nav-btn):not(.musi
   will-change: auto;
 }
 
-/* ── Smooth scroll only when user navigates; instant for programmatic scroll ── */
+/* â”€â”€ Smooth scroll only when user navigates; instant for programmatic scroll â”€â”€ */
 html {
   scroll-behavior: smooth;
 }
@@ -2362,9 +2466,9 @@ html.instant-scroll {
   scroll-behavior: auto;
 }
 
-/* ─────────────────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     SECRET ENDING SCREEN
-───────────────────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 #secretEndingScreen {
   position: fixed;
   inset: 0;
@@ -2399,11 +2503,11 @@ html.instant-scroll {
   transform: translateY(0);
 }
 
-/* ─────────────────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     ADVANCED INTERACTIONS
-───────────────────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
-/* ── Click Ripple Effect ── */
+/* â”€â”€ Click Ripple Effect â”€â”€ */
 .click-ripple {
   position: fixed;
   width: 20px;
@@ -2422,7 +2526,7 @@ html.instant-scroll {
   100% { transform: translate(-50%, -50%) scale(5); opacity: 0;   border-width: 0px; }
 }
 
-/* ── Breathing Effect on Final Page ── */
+/* â”€â”€ Breathing Effect on Final Page â”€â”€ */
 @keyframes slowBreath {
   0%, 100% { transform: scale(1); }
   50%      { transform: scale(1.01); }
@@ -2432,9 +2536,9 @@ html.instant-scroll {
   animation: slowBreath 7s infinite ease-in-out;
 }
 
-/* ─────────────────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     FADE OUT SCREEN
-───────────────────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .fade-out-screen {
   position: fixed;
   inset: 0;
@@ -2475,22 +2579,22 @@ html.instant-scroll {
   transform: translateY(0);
 }
 
-/* ═══════════════════════════════════════════════════════════
-   CINEMATIC ENHANCEMENT LAYER — Premium Immersive Upgrades
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   CINEMATIC ENHANCEMENT LAYER â€” Premium Immersive Upgrades
    Subtle, emotional, performance-safe.
-═══════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
-/* ──────────────────────────────────────────────
-   1. SUBTLE PARALLAX — hero background drifts
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   1. SUBTLE PARALLAX â€” hero background drifts
    Layers move at different rates via transform.
    No JS needed for the base, hero uses CSS only.
-────────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .hero {
   transform-style: preserve-3d;
   will-change: transform;
 }
 
-/* Parallax bg wrapper — JS adds translateY offset */
+/* Parallax bg wrapper â€” JS adds translateY offset */
 .hero-parallax-bg {
   position: absolute;
   inset: -8%;
@@ -2511,10 +2615,10 @@ html.instant-scroll {
   transition: transform 0.1s linear;
 }
 
-/* ──────────────────────────────────────────────
-   2. GLASS / SOFT BLUR — text section depth
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   2. GLASS / SOFT BLUR â€” text section depth
    Very low opacity glass panels behind key text.
-────────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .glass-panel {
   background: rgba(15, 5, 20, 0.14);
   backdrop-filter: blur(6px);
@@ -2533,11 +2637,11 @@ html.instant-scroll {
   padding: 28px 32px;
 }
 
-/* ──────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    3. CINEMATIC LIGHT SWEEP
    One slow, translucent diagonal highlight.
    Repeats every ~12s via animation-delay trick.
-────────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .light-sweep-layer {
   position: fixed;
   inset: 0;
@@ -2574,11 +2678,11 @@ html.instant-scroll {
   100% { left: 130%; opacity: 0; }
 }
 
-/* ──────────────────────────────────────────────
+/* ───────────────────────────────────────────────────────
    4. TEXT EMPHASIS SYSTEM
    Key phrases glow softly on a slow pulse.
    Use class .glow-word or .glow-phrase on spans.
-────────────────────────────────────────────── */
+─────────────────────────────────────────────────────── */
 .glow-word {
   color: #ffcce0;
   font-weight: 600;
@@ -2613,19 +2717,13 @@ html.instant-scroll {
 
 /* Brighter version for hero name */
 .hero-name {
-  animation: heroNameGlow 6s ease-in-out infinite;
 }
 
-@keyframes heroNameGlow {
-  0%, 100% { filter: drop-shadow(0 0 10px rgba(255, 77, 133, 0.30)); }
-  50%       { filter: drop-shadow(0 0 24px rgba(255, 77, 133, 0.55)); }
-}
-
-/* ──────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    5. SECTION TRANSITIONS
    Reveal: fade + 22px rise, 0.7s smooth ease.
    Replaces instant snap with organic motion.
-────────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .reveal {
   opacity: 0;
   transform: translateY(22px);
@@ -2646,24 +2744,24 @@ html.instant-scroll {
 .reveal.active > *:nth-child(4) { transition-delay: 0.24s; }
 .reveal.active > *:nth-child(5) { transition-delay: 0.32s; }
 
-/* ──────────────────────────────────────────────
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
    6. PARTICLE REFINEMENT
    Particles: random fade-in/out via JS.
    CSS: softer look, slower feel overall.
-────────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
-/* Particle canvas opacity pulse — handled per-particle in JS.
+/* Particle canvas opacity pulse â€” handled per-particle in JS.
    CSS: ensure canvas composites correctly */
 #heartCanvas {
-  opacity: 0.85;
+  opacity: 0.92;
   transition: opacity 3s ease;
 }
 
-/* ──────────────────────────────────────────────
-   7. FINAL MOMENT IMPACT — lingering glow
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   7. FINAL MOMENT IMPACT â€” lingering glow
    After secret ending text fades, a soft
    pink glow remains on the screen for ~2s.
-────────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .ols-linger-glow {
   position: fixed;
   inset: 0;
@@ -2686,10 +2784,10 @@ html.instant-scroll {
   opacity: 0;
 }
 
-/* ──────────────────────────────────────────────
-   8. AUDIO IMMERSION — visual pulse on playing
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   8. AUDIO IMMERSION â€” visual pulse on playing
    Subtle ring around music section when active.
-────────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .music-section::before {
   content: '';
   position: absolute;
@@ -2719,10 +2817,10 @@ html.instant-scroll {
   }
 }
 
-/* ──────────────────────────────────────────────
-   9. VISUAL CONSISTENCY — glow / shadow polish
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   9. VISUAL CONSISTENCY â€” glow / shadow polish
    Ensure color palette is locked to pink/purple.
-────────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 /* Cinematic lyrics line emphasis */
 .cinematic-line {
@@ -2749,9 +2847,9 @@ html.instant-scroll {
     0 0 40px rgba(255, 77, 133, 0.08);
 }
 
-/* ──────────────────────────────────────────────
-   10. MOBILE CLEANUP — density & spacing
-────────────────────────────────────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   10. MOBILE CLEANUP â€” density & spacing
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 @media (max-width: 768px) {
   /* Reduce visual density */
   .reasons-grid { gap: 18px; }
@@ -2759,6 +2857,40 @@ html.instant-scroll {
 
   .timeline-item  { padding: 8px 22px; margin-bottom: 28px; }
   .timeline-content { padding: 20px 18px; }
+
+  /* Navbar */
+  .nav-overlay {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 999;
+    opacity: 0; pointer-events: none; transition: opacity 0.4s ease;
+  }
+  .nav-overlay.active { opacity: 1; pointer-events: auto; }
+  .navbar { padding: 12px 20px; }
+  .navbar.scrolled { padding: 10px 20px; }
+  .nav-links {
+    position: fixed; top: 0; right: -100%; width: 80%; height: 100vh;
+    background: rgba(10, 3, 15, 0.97); backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    flex-direction: column; justify-content: center; align-items: center;
+    transition: right 0.5s cubic-bezier(0.25, 0.8, 0.25, 1); gap: 10px;
+    border-left: 1px solid rgba(255, 77, 133, 0.2);
+    box-shadow: -10px 0 40px rgba(0,0,0,0.5);
+    z-index: 1000;
+  }
+  .nav-links.active { right: 0; }
+  .nav-link {
+    font-size: 0.85rem;
+    padding: 12px 24px;
+    width: 210px;
+    justify-content: flex-start;
+    border-radius: 12px;
+    min-height: 44px; /* WCAG touch target */
+  }
+  .nav-link i { font-size: 0.95rem; }
+  .hamburger { display: flex; z-index: 1001; }
+  .hamburger span { width: 28px; height: 3px; } /* bigger touch area */
+  .hamburger.active span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+  .hamburger.active span:nth-child(2) { opacity: 0; }
+  .hamburger.active span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
   /* Cleaner section spacing */
   section { padding: 70px 4%; }
@@ -2797,10 +2929,10 @@ html.instant-scroll {
   .propose-title { font-size: 2.8rem; }
 }
 
-/* ──────────────────────────────────────────────
-   11. PERFORMANCE — GPU-composited layers only
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+   11. PERFORMANCE â€” GPU-composited layers only
    Ensure animated elements stay on compositor.
-────────────────────────────────────────────── */
+â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .hero-parallax-bg,
 .light-sweep-layer::after,
 .ols-linger-glow,
@@ -2823,9 +2955,9 @@ html.instant-scroll {
   }
 }
 
-/* ═══════════════════════════════════════════════════════════
-   BEHAVIORAL INTERACTION LAYER — Natural, emotional responsiveness
-═══════════════════════════════════════════════════════════ */
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   BEHAVIORAL INTERACTION LAYER â€” Natural, emotional responsiveness
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 
 /* --- 1. Scroll Behavior --- */
 body.scroll-fast .reveal {
@@ -2845,8 +2977,7 @@ body.is-idle {
   /* Removed uiBreathe to fix auto-swing vertical layout shift */
 }
 body.is-idle #mainSite {
-  filter: brightness(0.92) contrast(0.98);
-  transition: filter 3s ease;
+  filter: none;
 }
 .idle-prompt {
   position: fixed;
@@ -2880,9 +3011,9 @@ body.high-engagement {
 }
 
 
-/* ═══════════════════════════════════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    DYNAMIC ENDING SCREEN
-═══════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .dynamic-ending-screen {
   position: fixed;
   inset: 0;
@@ -3009,9 +3140,9 @@ body.high-engagement {
   animation: endingPulse 1.5s ease-out forwards;
 }
 @keyframes endingPulse {
-  0% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 255, 255, 0.5); }
-  50% { transform: scale(1.05); box-shadow: 0 0 20px rgba(255, 255, 255, 0.8); }
-  100% { transform: scale(1); box-shadow: 0 0 0 rgba(255, 255, 255, 0); }
+  0% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.05); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.9; }
 }
 
 /* ====== MESSAGE SYSTEM ====== */
@@ -3085,7 +3216,7 @@ body.high-engagement {
 }
 
 /* ====================================================
-   SAVE THIS MEMORY — Keepsake Button
+   SAVE THIS MEMORY â€” Keepsake Button
    Quiet, cinematic, minimal, premium
    ==================================================== */
 
@@ -3166,8 +3297,8 @@ body.high-engagement {
 }
 
 /* ====================================================
-   "BEFORE YOU GO" — Cinematic Final Ending Sequence
-   Fade-to-black · ambient glow · emotional closure
+   "BEFORE YOU GO" â€” Cinematic Final Ending Sequence
+   Fade-to-black Â· ambient glow Â· emotional closure
    ==================================================== */
 
 #beforeYouGo {
@@ -3400,30 +3531,7 @@ body.high-engagement {
   .ci-brand { font-size: 2rem; margin-bottom: 2.2rem; }
 }
 
-/* ====================================================
-   HIDDEN MEMORY SYSTEM
-   ==================================================== */
-.memory-fragment {
-  display: inline; cursor: default;
-  border-bottom: 1px dotted rgba(255,105,160,0.22);
-  transition: border-color 0.3s ease;
-}
-.memory-fragment:hover { border-bottom-color: rgba(255,105,160,0.50); }
-
-.memory-tooltip {
-  position: fixed;
-  background: rgba(8,3,15,0.90);
-  border: 1px solid rgba(255,77,133,0.18);
-  border-radius: 12px; padding: 12px 18px;
-  font-family: 'Playfair Display', Georgia, serif;
-  font-style: italic; font-size: 0.80rem; line-height: 1.75;
-  color: rgba(255,182,210,0.80); max-width: 220px;
-  pointer-events: none; opacity: 0; transform: translateY(8px);
-  transition: opacity 0.35s ease, transform 0.35s ease;
-  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
-  z-index: 9000; text-align: center;
-}
-.memory-tooltip.visible { opacity: 1; transform: translateY(0); }
+/* Hidden Memory System styles removed */
 
 /* ====================================================
    DYNAMIC ATMOSPHERE GLOW
@@ -3482,6 +3590,737 @@ body.atm-story #atmosphereGlow { background: radial-gradient(ellipse at 40% 55%,
   background: rgba(255,77,133,0.70); border: none; cursor: pointer;
 }
 
-/* Before You Go — extra line delays */
+/* Before You Go â€” extra line delays */
 .byg-line-5 { font-size: clamp(0.88rem,2vw,1.05rem); color: rgba(165,120,150,0.35); transition-delay: 10.5s; font-style: normal; letter-spacing: 0.04em; }
 .byg-line-6 { font-size: clamp(0.85rem,1.8vw,0.98rem); color: rgba(148,110,138,0.30); transition-delay: 13s; font-style: normal; letter-spacing: 0.05em; }
+
+/* ====================================================
+   MOBILE POLISH — Comprehensive Fix Layer
+   ==================================================== */
+
+/* === HAMBURGER OVERLAY BACKDROP === */
+.nav-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 999;
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+.nav-overlay.active {
+  display: block;
+  opacity: 1;
+}
+
+@media (max-width: 768px) {
+  /* Fix hamburger cursor */
+  .hamburger { cursor: pointer !important; }
+
+  /* Nav drawer upgrade — premium cinematic feel */
+  .nav-links {
+    width: 75%;
+    max-width: 300px;
+    padding: 100px 0 40px;
+    gap: 4px;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  /* Stagger nav links on open */
+  .nav-links.active .nav-link {
+    animation: navLinkSlide 0.4s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .nav-links.active li:nth-child(1)  .nav-link { animation-delay: 0.06s; }
+  .nav-links.active li:nth-child(2)  .nav-link { animation-delay: 0.10s; }
+  .nav-links.active li:nth-child(3)  .nav-link { animation-delay: 0.14s; }
+  .nav-links.active li:nth-child(4)  .nav-link { animation-delay: 0.18s; }
+  .nav-links.active li:nth-child(5)  .nav-link { animation-delay: 0.22s; }
+  .nav-links.active li:nth-child(6)  .nav-link { animation-delay: 0.26s; }
+  .nav-links.active li:nth-child(7)  .nav-link { animation-delay: 0.30s; }
+  .nav-links.active li:nth-child(8)  .nav-link { animation-delay: 0.34s; }
+  .nav-links.active li:nth-child(9)  .nav-link { animation-delay: 0.38s; }
+  .nav-links.active li:nth-child(10) .nav-link { animation-delay: 0.42s; }
+  .nav-links.active li:nth-child(11) .nav-link { animation-delay: 0.46s; }
+
+  @keyframes navLinkSlide {
+    from { opacity: 0; transform: translateX(20px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  /* Hero fixes */
+  .hero {
+    min-height: 100svh;
+    background-attachment: scroll !important;
+    padding-top: 70px;
+  }
+  .hero-name { font-size: clamp(3.2rem, 16vw, 5rem); }
+  .hero-tagline {
+    font-size: clamp(0.95rem, 4vw, 1.2rem);
+    padding: 0 8px;
+    margin-bottom: 24px;
+  }
+  .hero-subtitle { font-size: clamp(0.75rem, 3.5vw, 1rem); letter-spacing: 2px; }
+  .hero-from { font-size: clamp(1.3rem, 5.5vw, 1.8rem); margin-bottom: 28px; }
+  .scroll-indicator { bottom: 24px; }
+
+  /* Section general */
+  section { padding: 64px 20px; }
+  .section-header { margin-bottom: 36px; }
+  .section-title { font-size: clamp(1.7rem, 7vw, 2.4rem); }
+  .section-label { font-size: 0.78rem; letter-spacing: 2px; }
+
+  /* About section */
+  .about-image-wrap { width: 220px; height: 220px; }
+  .ring2 { width: 108%; height: 108%; } /* Prevent overflow */
+  .about-badge { font-size: 0.8rem; padding: 6px 14px; }
+  .about-text h3 { font-size: 1.8rem; text-align: center; }
+  .about-text p { font-size: 0.98rem; }
+
+  /* Birthday countdown */
+  .birthday-card { padding: 36px 18px; }
+  .birthday-name { font-size: 2.2rem; }
+  .countdown-container { gap: 8px; flex-wrap: nowrap; }
+  .countdown-item { padding: 10px 8px; min-width: 58px; }
+  .countdown-number { font-size: 1.6rem; }
+  .countdown-separator { font-size: 1.6rem; }
+  .countdown-label { font-size: 0.65rem; }
+
+  /* Letter */
+  .letter-paper { padding: 36px 18px 30px; }
+  .letter-seal { margin: -60px auto 16px; width: 50px; height: 50px; font-size: 1.2rem; }
+  .letter-greeting { font-size: clamp(1.5rem, 6vw, 2rem); }
+  .letter-body { font-size: 0.98rem; }
+  .letter-sign { font-size: 1.6rem; }
+
+  /* Quotes carousel — dynamic min-height fix */
+  .quotes-carousel { min-height: 320px; }
+  .quote-card { padding: 32px 20px 70px; }
+  .quotes-dots { position: static; margin-top: 20px; transform: none; }
+  .quotes-nav { position: static; width: 100%; margin-top: 16px; padding: 0; pointer-events: auto; display: flex; justify-content: center; gap: 16px; }
+  .quote-nav-btn { margin: 0; }
+
+  /* Music player */
+  .music-player { flex-direction: column; padding: 24px 18px; gap: 20px; }
+  .vinyl-wrap { width: 140px; height: 140px; }
+  .song-title { font-size: 1.3rem; }
+  .song-artist { font-size: 0.88rem; }
+  .lyrics-box { height: 180px; }
+  .music-controls { justify-content: center; gap: 20px; }
+  .music-controls-enhanced { justify-content: center; }
+
+  /* Timeline */
+  .timeline::after { left: 20px; }
+  .timeline-item { width: 100%; padding-left: 56px; padding-right: 12px; }
+  .timeline-item.left .timeline-dot,
+  .timeline-item.right .timeline-dot { left: 0; right: auto; }
+  .timeline-dot { width: 36px; height: 36px; }
+  .timeline-content { padding: 18px 16px; }
+  .timeline-content h4 { font-size: 1rem; }
+  .timeline-content p { font-size: 0.88rem; }
+  .timeline-date { font-size: 0.78rem; }
+
+  /* Reasons grid */
+  .reasons-grid { grid-template-columns: 1fr; gap: 16px; }
+  .reason-card { padding: 28px 18px; }
+  .reason-card h4 { font-size: 1.15rem; }
+  .reason-icon { width: 64px; height: 64px; font-size: 1.6rem; }
+
+  /* Story */
+  .story-container { padding: 28px 16px; }
+  .story-scroll-box { max-height: 280px; font-size: 0.96rem; padding-right: 8px; }
+  .bengali-title { font-size: clamp(1.2rem, 5vw, 1.6rem) !important; }
+
+  /* Confession */
+  .confession-container { padding: 36px 18px; }
+  .confession-title { font-size: clamp(1.5rem, 6vw, 2.2rem); }
+  .confession-content p { font-size: 0.98rem; }
+  .confession-promise { font-size: 1.1rem !important; padding: 16px; }
+
+  /* Propose */
+  .propose-section { padding: 60px 0; }
+  .propose-container { padding: 36px 18px; margin: 0 16px; max-width: calc(100vw - 32px); }
+  .propose-title { font-size: clamp(2.2rem, 9vw, 3.5rem); }
+  .propose-message p { font-size: 0.98rem; }
+  .propose-big-text { font-size: 1.3rem !important; }
+  .propose-big-text span { font-size: 1.5rem; }
+  .propose-buttons { flex-direction: column; align-items: center; height: auto; gap: 14px; }
+  .btn-yes { min-height: 50px; font-size: 1rem; }
+  .ring-animation { width: 80px; height: 80px; }
+
+  /* Final choice */
+  .final-choice-container { padding: 36px 18px; margin: 0 16px; }
+  .final-choice-title { font-size: clamp(1.6rem, 6vw, 2.2rem); }
+  .final-choice-content p { font-size: 0.98rem; }
+  .final-buttons { flex-direction: column; align-items: center; gap: 14px; }
+  .btn-keep, .btn-fade { width: 100%; max-width: 240px; min-height: 48px; }
+
+  /* Footer */
+  .footer { padding: 36px 16px; }
+  .footer-text { font-size: 1rem; }
+
+  /* Birthday flow screens */
+  .bd-screen { padding: 2rem 1.2rem 5.5rem; overflow-y: auto; }
+  .bd-heading { font-size: clamp(1.7rem, 7vw, 2.4rem); }
+  .bd-text { font-size: clamp(0.95rem, 4vw, 1.15rem); }
+  .bd-btn { min-height: 52px; padding: 14px 32px; cursor: pointer; }
+  .ols-btn { padding: 14px 32px !important; font-size: 0.95rem !important; }
+
+  /* Prevent overflow */
+  .about-container,
+  .music-player,
+  .propose-container,
+  .confession-container,
+  .final-choice-container,
+  .birthday-card,
+  .letter-paper,
+  .story-container {
+    overflow: hidden;
+  }
+
+  /* Disable expensive blur on mobile */
+  .reason-card,
+  .timeline-content,
+  .birthday-card,
+  .letter-paper {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+
+  /* Disable light sweep on mobile (expensive) */
+  .light-sweep-layer::after { display: none; }
+
+  /* Hearts divider compact */
+  .hearts-divider { padding: 32px 0; gap: 18px; }
+
+
+}
+
+/* === Extra small phones = 390px === */
+@media (max-width: 768px) {
+  .hero-name { font-size: clamp(2.8rem, 14vw, 3.5rem); }
+  .section-title { font-size: 1.6rem; }
+  .propose-title { font-size: 2rem; }
+  .countdown-container { gap: 4px; }
+  .countdown-item { min-width: 50px; padding: 8px 6px; }
+  .countdown-number { font-size: 1.4rem; }
+  .bd-heading { font-size: 1.6rem; }
+  .ols-heading { font-size: 2rem !important; }
+  .nav-links { width: 88%; }
+  .about-image-wrap { width: 190px; height: 190px; }
+}
+
+/* === Landscape mobile === */
+@media (max-width: 768px) and (orientation: landscape) and (max-height: 500px) {
+  .hero { min-height: 100lvh; padding-top: 60px; }
+  .hero-name { font-size: clamp(2.4rem, 8vw, 3.5rem); }
+  .bd-screen { padding: 1.2rem 1.2rem 4rem; }
+  .bd-heading { font-size: clamp(1.4rem, 5vw, 2rem); }
+  section { padding: 48px 20px; }
+}
+
+
+
+
+/* === QUOTES CAROUSEL MOBILE — switch active card to relative flow === */
+@media (max-width: 768px) {
+  .quotes-section { padding: 64px 20px; }
+
+  .quotes-carousel {
+    min-height: unset;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Active card flows normally, drives container height */
+  .quote-card {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+  }
+
+  /* Invisible placeholder that gives the carousel height equal to active card */
+  .quotes-carousel::before {
+    content: '';
+    display: block;
+    min-height: 240px;
+  }
+
+  .quote-card { padding: 28px 20px 28px; border-radius: 18px; }
+  .quote-text { font-size: 1.05rem; }
+
+  .quotes-dots {
+    position: static;
+    transform: none;
+    margin-top: 260px;
+    bottom: auto;
+    left: auto;
+  }
+
+  .quotes-nav {
+    position: static;
+    width: 100%;
+    transform: none;
+    padding: 0;
+    margin-top: 16px;
+    pointer-events: auto;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+
+  .quote-nav-btn { margin: 0; width: 44px; height: 44px; min-height: 44px; }
+}
+
+@media (max-width: 768px) {
+  .quotes-dots { margin-top: 240px; }
+}
+
+/* ====================================================
+   🎬 CINEMATIC FEATURES (MEMORY FRAGMENTS & REPLY)
+   ==================================================== */
+
+/* --- Atmosphere Moods --- */
+body {
+  transition: background-color 2.5s ease-in-out, box-shadow 2.5s ease-in-out;
+}
+body.atmosphere-midnight {
+  background-color: #040108;
+}
+body.atmosphere-warm {
+  background-color: #0d0416;
+}
+body.atmosphere-deep {
+  background-color: #06020c;
+}
+
+/* --- Soft Text Reveal --- */
+.word-reveal-wrap {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+}
+.word-span {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(12px) scale(0.98);
+  transition: opacity 1.2s cubic-bezier(0.22, 1, 0.36, 1), transform 1.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.word-span.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* --- Memory Fragments (Polaroids) --- */
+
+/* Memory Fragments styles removed */
+
+
+/* --- One Last Reply Section --- */
+.reply-section {
+  position: relative;
+  padding: 100px 5%;
+  background: radial-gradient(circle at center, rgba(255, 77, 133, 0.05) 0%, transparent 80%);
+  text-align: center;
+}
+.reply-container {
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 2;
+}
+.reply-icon {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 10px rgba(255, 77, 133, 0.4));
+  animation: float 4s ease-in-out infinite;
+}
+.reply-title {
+  font-family: var(--font-heading);
+  font-size: 3rem;
+  color: #fff;
+  margin-bottom: 30px;
+  text-shadow: 0 0 15px rgba(255, 77, 133, 0.3);
+}
+.reply-intro {
+  margin-bottom: 40px;
+}
+.reply-intro p {
+  font-family: var(--font-serif);
+  font-size: 1.2rem;
+  color: #ccc;
+  line-height: 1.6;
+  font-style: italic;
+}
+.reply-form-wrapper {
+  position: relative;
+  transition: opacity 1s ease, transform 1s ease;
+}
+.reply-form-wrapper.submitted {
+  opacity: 0;
+  transform: translateY(20px);
+  pointer-events: none;
+}
+.reply-textarea {
+  width: 100%;
+  height: 150px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  color: #fff;
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  resize: none;
+  outline: none;
+  transition: all 0.4s ease;
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+}
+.reply-textarea:focus {
+  border-color: rgba(255, 77, 133, 0.5);
+  background: rgba(255, 255, 255, 0.05);
+  box-shadow: 0 0 20px rgba(255, 77, 133, 0.15), inset 0 0 10px rgba(0,0,0,0.5);
+}
+.reply-textarea::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+  font-style: italic;
+}
+.btn-reply {
+  margin-top: 20px;
+  background: transparent;
+  border: 1px solid rgba(255, 77, 133, 0.4);
+  color: #fff;
+  padding: 14px 32px;
+  border-radius: 30px;
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.4s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+.btn-reply:hover {
+  background: rgba(255, 77, 133, 0.1);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 20px rgba(255, 77, 133, 0.2);
+  transform: translateY(-2px);
+}
+.reply-success {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 1s ease 0.5s, transform 1s ease 0.5s;
+  pointer-events: none;
+}
+.reply-success.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+.reply-success-icon {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: 20px;
+  filter: drop-shadow(0 0 15px rgba(255, 77, 133, 0.4));
+}
+.reply-success p {
+  font-family: var(--font-serif);
+  font-size: 1.3rem;
+  color: #ddd;
+  margin-bottom: 10px;
+  font-style: italic;
+}
+.reply-success .reply-success-thanks {
+  color: var(--primary-color);
+  margin-top: 15px;
+}
+
+/* ====================================================
+   📱 NEW PREMIUM MOBILE RESPONSIVENESS & CINEMATIC POLISH
+   ==================================================== */
+@media (max-width: 768px) {
+  html, body {
+    overflow-x: hidden;
+    width: 100vw;
+    max-width: 100%;
+    overscroll-behavior-x: none;
+    box-sizing: border-box;
+  }
+
+  *, *::before, *::after {
+    box-sizing: inherit;
+  }
+
+  /* 🍔 Cinematic Hamburger Menu */
+  .hamburger {
+    display: flex;
+    z-index: 1001;
+    padding: 10px; /* larger touch target */
+    margin-right: -10px;
+  }
+  .hamburger span {
+    width: 32px;
+    height: 3px;
+    background: #fff;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 4px;
+    box-shadow: 0 0 10px rgba(255, 77, 133, 0.4);
+  }
+  .hamburger.active span:nth-child(1) { transform: translateY(8px) rotate(45deg); background: var(--primary-color); box-shadow: 0 0 15px var(--primary-color); }
+  .hamburger.active span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+  .hamburger.active span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); background: var(--primary-color); box-shadow: 0 0 15px var(--primary-color); }
+
+  /* Premium Nav Overlay & Drawer */
+  .nav-overlay {
+    display: block;
+    position: fixed;
+    inset: 0;
+    background: rgba(8, 2, 14, 0.7);
+    z-index: 999;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .nav-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 280px;
+    height: 100dvh;
+    background: linear-gradient(135deg, rgba(20, 5, 30, 0.95), rgba(10, 3, 15, 0.98));
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: right 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+    gap: 12px;
+    border-left: 1px solid rgba(255, 77, 133, 0.2);
+    box-shadow: -15px 0 50px rgba(0,0,0,0.6);
+    z-index: 1000;
+    padding: 60px 0;
+    overflow-y: auto;
+  }
+  .nav-links.active { right: 0; }
+
+  /* Staggered entry for links */
+  .nav-links.active .nav-link {
+    animation: navLinkSlide 0.5s cubic-bezier(0.22,1,0.36,1) both;
+  }
+  .nav-links.active li:nth-child(1) .nav-link { animation-delay: 0.1s; }
+  .nav-links.active li:nth-child(2) .nav-link { animation-delay: 0.15s; }
+  .nav-links.active li:nth-child(3) .nav-link { animation-delay: 0.2s; }
+  .nav-links.active li:nth-child(4) .nav-link { animation-delay: 0.25s; }
+  .nav-links.active li:nth-child(5) .nav-link { animation-delay: 0.3s; }
+  .nav-links.active li:nth-child(6) .nav-link { animation-delay: 0.35s; }
+  .nav-links.active li:nth-child(7) .nav-link { animation-delay: 0.4s; }
+  .nav-links.active li:nth-child(8) .nav-link { animation-delay: 0.45s; }
+  .nav-links.active li:nth-child(9) .nav-link { animation-delay: 0.5s; }
+  .nav-links.active li:nth-child(10) .nav-link { animation-delay: 0.55s; }
+  .nav-links.active li:nth-child(11) .nav-link { animation-delay: 0.6s; }
+
+  @keyframes navLinkSlide {
+    from { opacity: 0; transform: translateX(30px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .nav-link {
+    font-size: 0.95rem;
+    padding: 14px 28px;
+    width: 220px;
+    justify-content: flex-start;
+    border-radius: 12px;
+    min-height: 48px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid transparent;
+  }
+  .nav-link:hover, .nav-link:active {
+    background: rgba(255, 77, 133, 0.15);
+    border-color: rgba(255, 77, 133, 0.4);
+    box-shadow: 0 0 20px rgba(255, 77, 133, 0.2);
+    transform: translateX(-5px);
+  }
+  .nav-link i { font-size: 1.1rem; color: var(--primary-color); margin-right: 12px; opacity: 1; }
+  .nav-link::after { display: none; }
+
+  /* Navbar */
+  .navbar { padding: 16px 20px; }
+  .navbar.scrolled { padding: 12px 20px; }
+
+  /* Typography & Layout Spacing */
+  section { padding: 80px 20px; width: 100vw; max-width: 100%; overflow: hidden; }
+  .section-header { margin-bottom: 40px; }
+  .section-title { font-size: clamp(2rem, 8vw, 2.8rem); line-height: 1.2; text-shadow: 0 0 8px rgba(255, 255, 255, 0.1); }
+
+  /* Hero */
+  .hero { min-height: 100dvh; background-attachment: scroll; padding-top: 80px; }
+  .hero-name { font-size: clamp(3rem, 14vw, 4.8rem); padding: 0 10px; word-break: break-word; }
+  .hero-tagline { font-size: clamp(1rem, 4.5vw, 1.3rem); padding: 0 15px; margin-bottom: 24px; line-height: 1.6; }
+  .hero-from { font-size: clamp(1.2rem, 5vw, 1.8rem); margin-bottom: 30px; }
+  .hero-buttons { flex-direction: column; width: 100%; padding: 0 20px; gap: 16px; }
+  .btn-primary, .btn-secondary { width: 100%; justify-content: center; min-height: 54px; font-size: 1.1rem; }
+
+  /* About */
+  .about-container { flex-direction: column; gap: 40px; text-align: center; }
+  .about-image-wrap { width: 240px; height: 240px; margin: 0 auto; }
+  .ring2 { width: 108%; height: 108%; } /* Fix overlap */
+  .about-text { padding: 0 10px; }
+  .about-traits { justify-content: center; gap: 12px; }
+
+  /* Music */
+  .music-section { background-attachment: scroll; }
+  .music-player { flex-direction: column; padding: 30px 20px; gap: 24px; max-width: calc(100vw - 40px); }
+  .vinyl-wrap { width: 180px; height: 180px; margin: 0 auto; }
+  .song-title { font-size: 1.6rem; }
+  .lyrics-box { height: 220px; padding: 16px; }
+  .music-controls { justify-content: center; gap: 24px; }
+  .music-btn { width: 64px; height: 64px; font-size: 1.4rem; }
+
+  /* Birthday */
+  .birthday-card { padding: 40px 20px; margin: 0 10px; width: calc(100% - 20px); max-width: none; }
+  .birthday-name { font-size: 2.5rem; }
+  .countdown-container { gap: 8px; flex-wrap: nowrap; }
+  .countdown-item { padding: 12px 10px; min-width: 60px; }
+  .countdown-number { font-size: 1.6rem; }
+  .countdown-separator { font-size: 1.6rem; margin-top: 15px; }
+
+  /* Letter */
+  .letter-container { padding: 0 10px; width: 100%; }
+  .letter-paper { padding: 45px 20px 30px; }
+  .letter-greeting { font-size: 1.8rem; }
+  .letter-body { font-size: 1.05rem; }
+
+  /* Reasons */
+  .reasons-grid { grid-template-columns: 1fr; padding: 0 10px; }
+  .reason-card { padding: 35px 20px; }
+
+  /* Quotes Carousel */
+  .quotes-carousel { min-height: unset; display: flex; flex-direction: column; position: relative; }
+  .quotes-carousel::before { content: ''; display: block; min-height: 280px; }
+  .quote-card { position: absolute; top: 0; left: 0; right: 0; padding: 35px 20px; }
+  .quotes-dots { position: static; transform: none; margin-top: 260px; bottom: auto; left: auto; }
+  .quotes-nav { position: static; width: 100%; transform: none; padding: 0; margin-top: 20px; display: flex; justify-content: center; gap: 24px; }
+  .quote-nav-btn { margin: 0; width: 50px; height: 50px; }
+
+  /* Timeline */
+  .timeline::after { left: 24px; }
+  .timeline-item { width: 100%; padding-left: 60px; padding-right: 10px; }
+  .timeline-item.left .timeline-dot, .timeline-item.right .timeline-dot { left: 4px; right: auto; }
+  .timeline-dot { width: 40px; height: 40px; }
+  .timeline-content { padding: 24px 16px; }
+
+  /* Story */
+  .story-container { padding: 35px 20px; margin: 0 10px; width: calc(100% - 20px); }
+  .story-scroll-box { max-height: 300px; font-size: 1.05rem; }
+  .bengali-title { font-size: clamp(1.4rem, 6vw, 1.8rem) !important; }
+
+  /* Confession */
+  .confession-container { padding: 45px 20px; margin: 0 10px; width: calc(100% - 20px); }
+  .confession-title { font-size: 2.2rem; }
+  .confession-content p { font-size: 1.05rem; }
+
+  /* Propose */
+  .propose-container { padding: 45px 20px; margin: 0 10px; width: calc(100% - 20px); }
+  .propose-title { font-size: clamp(2.4rem, 10vw, 3.8rem); }
+  .propose-big-text { font-size: 1.4rem !important; margin: 30px 0 !important; }
+  .propose-big-text span { font-size: 1.6rem; }
+  .propose-buttons { flex-direction: column; height: auto; gap: 16px; margin-top: 30px; }
+  .btn-yes, .btn-no { width: 100%; justify-content: center; padding: 16px; min-height: 54px; position: static; }
+
+  /* Final Choice */
+  .final-choice-container { padding: 45px 20px; margin: 0 10px; width: calc(100% - 20px); }
+  .final-buttons { flex-direction: column; gap: 16px; }
+  .btn-keep, .btn-fade { width: 100%; min-height: 54px; max-width: none; }
+
+  /* Birthday Flow Screens */
+  .bd-screen { padding: 2rem 1.2rem 6rem; overflow-y: auto; overflow-x: hidden; }
+  .bd-heading { font-size: clamp(1.8rem, 8vw, 2.6rem); }
+  .bd-text { font-size: clamp(1rem, 4.5vw, 1.2rem); }
+  .bd-btn { min-height: 54px; padding: 15px 32px; width: 100%; max-width: 280px; }
+
+  /* Performance: Optimize blur effects for mobile */
+  .music-player, .birthday-card, .letter-paper, .reason-card, .timeline-content,
+  .story-container, .confession-container, .propose-container, .final-choice-container {
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+  }
+}
+
+@media (max-width: 390px) {
+  .hero-name { font-size: clamp(2.5rem, 12vw, 3.2rem); }
+  .countdown-item { padding: 10px 8px; min-width: 54px; }
+  .countdown-number { font-size: 1.4rem; }
+  .quotes-carousel::before { min-height: 320px; }
+  .quotes-dots { margin-top: 300px; }
+}
+
+@media (max-width: 768px) and (orientation: landscape) and (max-height: 500px) {
+  .hero { min-height: 100dvh; padding-top: 60px; }
+  .bd-screen { padding: 1.5rem 1.2rem 4rem; }
+  section { padding: 50px 20px; }
+}
+
+/* Final mobile stability pass: keep nav and bottom controls inside the viewport. */
+@media (max-width: 768px) {
+  .navbar {
+    z-index: 1200;
+  }
+
+  .nav-overlay {
+    z-index: 1190;
+  }
+
+  .nav-links {
+    width: min(84vw, 320px);
+    height: 100dvh;
+    justify-content: flex-start;
+    align-items: stretch;
+    gap: 8px;
+    padding: calc(76px + env(safe-area-inset-top, 0px)) 18px calc(28px + env(safe-area-inset-bottom, 0px));
+    z-index: 1210;
+    overscroll-behavior: contain;
+  }
+
+  .nav-link {
+    width: 100%;
+    min-height: 46px;
+    padding: 12px 18px;
+  }
+
+  .hamburger {
+    z-index: 1220;
+  }
+
+  .scroll-indicator {
+    bottom: calc(22px + env(safe-area-inset-bottom, 0px));
+  }
+
+  #bdDots {
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+  }
+}
+
+@media (hover: none), (pointer: coarse), (max-width: 768px) {
+  #customCursor,
+  #cursorDot,
+  .cursor-trail-dot {
+    display: none !important;
+  }
+}

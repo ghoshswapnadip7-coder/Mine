@@ -3,7 +3,7 @@
   if (localStorage.getItem("final_decision_locked") === "true") {
     let showEpilogue = false;
     let decision = localStorage.getItem("final_decision");
-    
+
     if (localStorage.getItem("epilogue_ready") === "true" && localStorage.getItem("epilogue_shown") !== "true") {
       const epilogueTime = parseInt(localStorage.getItem("epilogue_time") || "0", 10);
       const hours12 = 12 * 60 * 60 * 1000;
@@ -17,7 +17,7 @@
 
     if (showEpilogue) {
       localStorage.setItem("epilogue_shown", "true");
-      
+
       let l1, l2, l3;
       if (decision === 'keep') {
         l1 = "Some things stayed.";
@@ -252,90 +252,7 @@ function startCiParticles() {
   _ciAnimId = requestAnimationFrame(loop);
 }
 
-// ====== HIDDEN MEMORY FRAGMENTS ======
-function initMemoryFragments() {
-  var memories = [
-    { sel: '.about-text p:first-of-type', word: 'daily life',
-      text: 'You always stayed longer in my mind\nthan you probably knew.' },
-    { sel: '.about-text p:nth-of-type(2)', word: 'silently and patiently',
-      text: 'Some conversations never really end.' },
-    { sel: '.timeline-content p', word: 'quiet feeling',
-      text: 'I still remember small things\nI probably shouldn\'t.' },
-    { sel: '.confession-content p:nth-of-type(2)', word: 'completely silent',
-      text: 'Maybe silence also says something.' },
-    { sel: '.reason-card:nth-child(3) p', word: 'stayed in my thoughts',
-      text: 'You became part of my ordinary days\nwithout even trying.' },
-    { sel: '.reason-card:nth-child(6) p', word: 'slow down',
-      text: 'Some feelings stay unfinished forever.' },
-    { sel: '.story-scroll-box p:first-of-type', word: 'quietly watch',
-      text: 'The ordinary moments were\nthe ones I kept.' },
-    { sel: '.propose-message p:first-of-type', word: 'final memory',
-      text: 'I never told you how often\nI thought about this.' }
-  ];
 
-  var tooltip = document.getElementById('memoryTooltip');
-  var activeFragment = null;
-  var hideTimer = null;
-
-  function showTip(el, text) {
-    if (!tooltip) return;
-    tooltip.textContent = text;
-    var r = el.getBoundingClientRect();
-    var tipX = r.left + r.width / 2;
-    var tipY = r.top - 14;
-    // Keep in viewport
-    tipX = Math.min(Math.max(tipX, 120), window.innerWidth - 120);
-    tooltip.style.left = tipX + 'px';
-    tooltip.style.top  = tipY + 'px';
-    tooltip.style.transform = 'translateX(-50%) translateY(-100%) translateY(8px)';
-    tooltip.classList.add('visible');
-  }
-  function hideTip() {
-    if (tooltip) tooltip.classList.remove('visible');
-    activeFragment = null;
-  }
-
-  memories.forEach(function(m) {
-    var els = document.querySelectorAll(m.sel);
-    els.forEach(function(el) {
-      var html = el.innerHTML;
-      // Only wrap if the word exists and we haven't already wrapped it
-      if (html.indexOf('memory-fragment') === -1 && html.indexOf(m.word) !== -1) {
-        el.innerHTML = html.replace(
-          m.word,
-          '<span class="memory-fragment" data-memory="' + m.text.replace(/"/g, '&quot;') + '">' + m.word + '</span>'
-        );
-      }
-    });
-  });
-
-  // Delegate events for performance
-  var isMob = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-  document.addEventListener('mouseover', function(e) {
-    if (isMob) return;
-    var f = e.target && e.target.closest && e.target.closest('.memory-fragment');
-    if (f) { clearTimeout(hideTimer); showTip(f, f.dataset.memory); activeFragment = f; }
-  }, { passive: true });
-  document.addEventListener('mouseout', function(e) {
-    if (isMob) return;
-    var f = e.target && e.target.closest && e.target.closest('.memory-fragment');
-    if (f) { hideTimer = setTimeout(hideTip, 250); }
-  }, { passive: true });
-
-  // Mobile tap to reveal
-  document.addEventListener('click', function(e) {
-    if (!isMob) return;
-    var f = e.target && e.target.closest && e.target.closest('.memory-fragment');
-    if (f && activeFragment !== f) {
-      showTip(f, f.dataset.memory);
-      activeFragment = f;
-      clearTimeout(hideTimer);
-      hideTimer = setTimeout(hideTip, 3000);
-    } else {
-      hideTip();
-    }
-  }, { passive: true });
-}
 
 // ====== DYNAMIC ATMOSPHERE SYSTEM ======
 function initAtmosphereSystem() {
@@ -433,7 +350,6 @@ function restartMusic() {
     if (!mainSite || mainSite.style.display === 'none') return;
     _featureInited = true;
     setTimeout(function() {
-      initMemoryFragments();
       initAtmosphereSystem();
     }, 1200); // slight delay so DOM is fully painted
   }
@@ -502,6 +418,25 @@ const navbar = document.getElementById('navbar');
 const hamburger = document.getElementById('hamburger');
 const navLinks = document.getElementById('navLinks');
 
+// Mobile overlay backdrop for cinematic nav close
+const navOverlay = document.createElement('div');
+navOverlay.className = 'nav-overlay';
+document.body.appendChild(navOverlay);
+
+function openMobileNav() {
+  hamburger && hamburger.classList.add('active');
+  navLinks  && navLinks.classList.add('active');
+  navOverlay.classList.add('active');
+  document.body.style.overflowY = 'hidden'; // prevent scroll-behind
+}
+
+function closeMobileNav() {
+  hamburger && hamburger.classList.remove('active');
+  navLinks  && navLinks.classList.remove('active');
+  navOverlay.classList.remove('active');
+  document.body.style.overflowY = '';
+}
+
 let isScrolling = false;
 window.addEventListener('scroll', () => {
   if (!isScrolling) {
@@ -513,16 +448,28 @@ window.addEventListener('scroll', () => {
   }
 }, { passive: true });
 
-if (hamburger) hamburger.addEventListener('click', () => {
-  hamburger.classList.toggle('active');
-  if (navLinks) navLinks.classList.toggle('active');
-});
-
-if (navLinks) navLinks.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', () => {
-    if (hamburger) hamburger.classList.remove('active');
-    navLinks.classList.remove('active');
+if (hamburger) {
+  hamburger.addEventListener('click', () => {
+    const isOpen = navLinks && navLinks.classList.contains('active');
+    isOpen ? closeMobileNav() : openMobileNav();
   });
+}
+
+// Close on overlay tap
+navOverlay.addEventListener('click', closeMobileNav);
+
+// Close nav links when a link is tapped
+if (navLinks) {
+  navLinks.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      closeMobileNav();
+    });
+  });
+}
+
+// Close nav on Escape key
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeMobileNav();
 });
 
 // ====== REVEAL ANIMATIONS ======
@@ -556,8 +503,8 @@ class Particle {
     this.twinkleSpeed = Math.random() * 0.02 + 0.01;
     this.twinklePhase = Math.random() * Math.PI * 2;
   }
-  draw() {
-    this.twinklePhase += this.twinkleSpeed;
+  draw(frame = 1) {
+    this.twinklePhase += this.twinkleSpeed * frame;
     const alpha = this.opacity * (0.5 + 0.5 * Math.sin(this.twinklePhase));
     if (this.type === 'heart') {
       ctx.fillStyle = `rgba(255, 77, 133, ${alpha})`;
@@ -568,31 +515,40 @@ class Particle {
     ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
     ctx.fill();
   }
-  update() {
-    this.y -= this.speed;
-    this.x += Math.sin(this.y * 0.008) * 0.3;
+  update(frame = 1) {
+    this.y -= this.speed * frame;
+    this.x += Math.sin(this.y * 0.008) * 0.3 * frame;
     if (this.y < -10) {
       this.y = canvas.height + 10;
       this.x = Math.random() * canvas.width;
     }
-    this.draw();
+    this.draw(frame);
   }
 }
 
 // Fewer particles on mobile for better FPS
 const _isMobilePerfMode = ('ontouchstart' in window) || navigator.maxTouchPoints > 0;
-const _particleCount = _isMobilePerfMode ? 25 : 60;
+const _particleCount = _isMobilePerfMode ? 30 : 64;
 for (let i = 0; i < _particleCount; i++) particles.push(new Particle());
 
 let _heartAnimId = null;
-function animateParticles() {
+let _heartLastTs = 0;
+function animateParticles(ts) {
+  if (!_heartLastTs) _heartLastTs = ts;
+  const dt = Math.min(ts - _heartLastTs, 50);
+  _heartLastTs = ts;
+  const frame = dt * 0.06;
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  particles.forEach(p => p.update());
+  particles.forEach(p => p.update(frame));
   _heartAnimId = requestAnimationFrame(animateParticles);
 }
-animateParticles();
+_heartAnimId = requestAnimationFrame(animateParticles);
 
+let _heartResizeRaf = null;
 window.addEventListener('resize', () => {
+  if (_heartResizeRaf) return;
+  _heartResizeRaf = requestAnimationFrame(() => {
+    _heartResizeRaf = null;
   // Resize without interrupting the loop — canvas clears automatically next frame
   canvas.width  = window.innerWidth;
   canvas.height = window.innerHeight;
@@ -600,6 +556,7 @@ window.addEventListener('resize', () => {
   particles.forEach(p => {
     if (p.x > canvas.width)  p.x = Math.random() * canvas.width;
     if (p.y > canvas.height) p.y = Math.random() * canvas.height;
+  });
   });
 }, { passive: true });
 
@@ -651,7 +608,9 @@ When I finally told you how I felt, the misunderstanding that followed hurt more
 
 Then the gym brought us close again. It was the only place I could see you every day, and I held onto that routine because, outside of it, you never really needed me. I know you know how I feel. And I know sometimes my presence bothers you, like when you complained about me just looking at you. I never meant to make you uncomfortable.
 
-I just loved you—silently and patiently. I never asked you to love me back. I only wished to stay somewhere in your world.`;
+I just loved you—silently and patiently. I never asked you to love me back. I only wished to stay somewhere in your world.
+
+If you ever feel like reaching out, you can find me at justgothecked108@gmil.com.`;
 
 let letterIndex = 0;
 let letterStarted = false;
@@ -864,6 +823,12 @@ function createFireworks(container) {
     setTimeout(() => { h.style.top = '100%'; h.style.opacity = '0'; }, 50);
     setTimeout(() => h.remove(), 3050);
   }, 300);
+  setTimeout(() => {
+    if (_fireworksInterval) {
+      clearInterval(_fireworksInterval);
+      _fireworksInterval = null;
+    }
+  }, 12000);
 }
 
 // ====== HESITATION TRACKING ======
@@ -1065,48 +1030,25 @@ function handleEndingDecision(decision) {
 function keepStory() { handleEndingDecision('keep'); }
 function fadeAway()  { handleEndingDecision('fade'); }
 function triggerSecretEnding() { /* Safely deprecated */ }
-// Auto Scroll Lyrics logic integrated into music player
 
-// ====== SAVE THIS MEMORY — Cinematic HTML Keepsake ======
-function saveThisMemory() {
-  const btn = document.getElementById('saveMemoryBtn');
-  if (btn) {
-    btn.style.opacity = '0.45';
-    btn.style.pointerEvents = 'none';
-    setTimeout(() => {
-      btn.style.opacity = '';
-      btn.style.pointerEvents = '';
-    }, 2200);
-  }
-
-  const now = new Date();
-  const dateStr = now.toLocaleDateString('en-GB', {
-    day: 'numeric', month: 'long', year: 'numeric'
-  });
-
-  // Self-contained cinematic HTML keepsake — no external dependencies
+// ====== KEEPSAKE SYSTEM — Downloadable Memory HTML ======
+function saveMemoryKeepsake() {
+  const dateStr = new Date().toLocaleDateString();
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>OneLastSmile — A Kept Memory</title>
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Great+Vibes&family=Playfair+Display:ital,wght@0,400;1,400&family=Lato:wght@300;400&display=swap');
-
-  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  html, body {
-    width: 100%; min-height: 100vh;
-    background: #06030d;
-    color: rgba(255, 210, 225, 0.82);
-    font-family: 'Playfair Display', Georgia, serif;
-    display: flex; align-items: center; justify-content: center;
-    overflow-x: hidden;
-  }
-
-  body::before {
-    content: '';
+  <meta charset="UTF-8">
+  <title>OneLastSmile — Memory Keepsake</title>
+  <style>
+    :root { --bg: #040108; --p: #ff4e8d; --s: #a855f7; }
+    body {
+      margin: 0; background: var(--bg); color: #fff;
+      font-family: 'Playfair Display', serif; min-height: 100vh;
+      display: flex; align-items: center; justify-content: center;
+      overflow-x: hidden;
+    }
+    /* Glow Background */
+    .glow {
     position: fixed; inset: 0;
     background: radial-gradient(ellipse at 50% 40%,
       rgba(255, 78, 205, 0.06) 0%,
@@ -1472,10 +1414,15 @@ function _cursorHoverOff() { if (cursor) cursor.classList.remove('hovering'); }
     if (heroContent) heroContent.classList.add('parallax-fg');
 
     var _pRaf = null;
+    var heroLimit = hero.offsetTop + hero.offsetHeight;
+    window.addEventListener('resize', function () {
+      heroLimit = hero.offsetTop + hero.offsetHeight;
+    }, { passive: true });
+
     function applyParallax() {
       _pRaf = null;
       var sy = window.scrollY;
-      if (sy > hero.offsetTop + hero.offsetHeight) return;
+      if (sy > heroLimit) return;
       parallaxBg.style.transform  = 'translateY(' + (sy * 0.25) + 'px)';
       if (heroContent) heroContent.style.transform = 'translateY(' + (-sy * 0.06) + 'px)';
     }
@@ -1493,17 +1440,15 @@ function _cursorHoverOff() { if (cursor) cursor.classList.remove('hovering'); }
   document.body.appendChild(sweepLayer);
 
   // ─────────────────────────────────────────────────────────────
-  //  3. PARTICLE REFINEMENT — fewer, slower, softer
+  //  3. PARTICLE REFINEMENT - preserve ambience without extra load
   // ─────────────────────────────────────────────────────────────
   setTimeout(function () {
     if (typeof particles !== 'undefined' && Array.isArray(particles)) {
-      // Remove ~20 particles (down from 80 → ~60)
-      particles.splice(0, 20);
-      // Slow + soften survivors
+      // Keep the field full, but soften motion enough to stay smooth.
       particles.forEach(function (p) {
-        p.speed        = p.speed        * 0.55;
-        p.opacity      = Math.max(0.04, p.opacity * 0.72);
-        p.twinkleSpeed = p.twinkleSpeed * 0.60;
+        p.speed        = p.speed * 0.72;
+        p.opacity      = Math.min(0.68, Math.max(0.12, p.opacity * 1.08));
+        p.twinkleSpeed = p.twinkleSpeed * 0.82;
         p.twinklePhase = Math.random() * Math.PI * 2;
       });
     }
@@ -1789,7 +1734,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const formData = new FormData(form);
       
       // Use FormSubmit AJAX endpoint
-      const url = "https://formsubmit.co/ajax/ghoshswapnadip7@gmail.com";
+      const url = "https://formsubmit.co/ajax/justgothacked108@gmail.com";
       
       btn.innerHTML = "Sending... <i class='fas fa-spinner fa-spin'></i>";
       btn.style.opacity = "0.7";
@@ -1820,3 +1765,301 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 });
+
+// ====================================================
+// 🎬 CINEMATIC FEATURES (MEMORY FRAGMENTS & REPLY)
+// ====================================================
+
+// --- 1. Dynamic Atmosphere Observer ---
+(function() {
+  const sections = document.querySelectorAll('section');
+  const body = document.body;
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const id = entry.target.id;
+
+        // Atmosphere transitions based on current section
+        body.classList.remove('atmosphere-warm', 'atmosphere-midnight', 'atmosphere-deep');
+
+        if (id === 'music' || id === 'anushka-story') {
+          body.classList.add('atmosphere-warm');
+        } else if (id === 'things-i-never-said' || id === 'if-you-never-read-this') {
+          body.classList.add('atmosphere-midnight');
+        } else if (id === 'one-last-reply' || id === 'propose' || id === 'final-choice') {
+          body.classList.add('atmosphere-deep');
+        }
+      }
+    });
+  }, { threshold: 0.4 });
+
+  sections.forEach(sec => observer.observe(sec));
+})();
+
+// --- 2. Tiny Ambient Sounds (Synthesized) ---
+(function() {
+  let audioCtx = null;
+
+  function initAudio() {
+    if (audioCtx) return;
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    } catch(e) {}
+  }
+
+  function playSoftWhoosh() {
+    if (!audioCtx || audioCtx.state === 'suspended') return;
+    const t = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    const filter = audioCtx.createBiquadFilter();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(120, t);
+    osc.frequency.exponentialRampToValueAtTime(50, t + 1.2);
+
+    filter.type = 'lowpass';
+    filter.frequency.setValueAtTime(300, t);
+    filter.frequency.linearRampToValueAtTime(80, t + 1.2);
+
+    gain.gain.setValueAtTime(0, t);
+    gain.gain.linearRampToValueAtTime(0.015, t + 0.2);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + 1.2);
+
+    osc.connect(filter);
+    filter.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start(t);
+    osc.stop(t + 1.2);
+  }
+
+  document.addEventListener('click', () => {
+    initAudio();
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+  }, { once: true });
+
+  const hoverTargets = document.querySelectorAll('.btn-primary, .btn-secondary, .btn-reply, .nav-link');
+  hoverTargets.forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      initAudio();
+      playSoftWhoosh();
+    });
+  });
+})();
+
+// --- 3. Soft Text Reveal ---
+(function() {
+  // Only target the cinematic lyrics or story text that feels emotional
+  const reveals = document.querySelectorAll('.cinematic-line, .confession-content p');
+  reveals.forEach(el => {
+    // Skip if it contains inner HTML tags to avoid breaking layout
+    if (el.children.length > 0) return;
+
+    const text = el.innerText;
+    if (!text.trim()) return;
+
+    el.innerHTML = '';
+    const words = text.split(' ');
+    words.forEach(word => {
+      const wrap = document.createElement('span');
+      wrap.className = 'word-reveal-wrap';
+      const span = document.createElement('span');
+      span.className = 'word-span';
+      span.innerText = word + ' ';
+      wrap.appendChild(span);
+      el.appendChild(wrap);
+    });
+  });
+
+  const wordObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const spans = entry.target.querySelectorAll('.word-span');
+        spans.forEach((span, i) => {
+          setTimeout(() => {
+            span.classList.add('visible');
+          }, i * 50 + Math.random() * 30); // natural pacing
+        });
+        wordObserver.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+
+  reveals.forEach(el => wordObserver.observe(el));
+})();
+
+// --- 4. One Last Reply Submission ---
+window.submitReply = function() {
+  const text = document.getElementById('replyText').value.trim();
+  const btn = document.getElementById('btnReplySubmit');
+  const wrapper = document.getElementById('replyFormWrapper');
+  const success = document.getElementById('replySuccess');
+
+  if (!text) {
+    btn.innerHTML = '<i class="fas fa-exclamation-circle"></i> Please write something...';
+    setTimeout(() => {
+      btn.innerHTML = '<i class="fas fa-paper-plane"></i> Leave A Memory Behind';
+    }, 2500);
+    return;
+  }
+
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending silently...';
+  btn.style.pointerEvents = 'none';
+
+  // Real private delivery
+  const formData = new FormData();
+  formData.append("message", text);
+  formData.append("_subject", "OneLastSmile - A New Memory Fragment");
+  formData.append("_captcha", "false");
+  formData.append("timestamp", new Date().toLocaleString());
+
+  fetch("https://formsubmit.co/ajax/justgothacked108@gmail.com", {
+    method: "POST",
+    body: formData
+  })
+  .then(res => res.json())
+  .then(() => {
+    // Cinematic Fold Away
+    wrapper.classList.add('submitted');
+    setTimeout(() => {
+      success.style.display = 'flex';
+      success.offsetHeight; // Trigger layout
+      success.classList.add('active');
+    }, 800);
+  })
+  .catch(err => {
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Try again...';
+    btn.style.pointerEvents = 'auto';
+  });
+};
+
+// ====================================================
+// 🌌 QUIET SECRETS SYSTEM — Hidden Emotional Layer
+// ====================================================
+
+function initQuietSecrets() {
+  const body = document.body;
+  const now = new Date();
+  const hour = now.getHours();
+
+  // 1. Late Night Mode Detection (12AM - 5AM)
+  if (hour >= 0 && hour < 5) {
+    body.classList.add('late-night-active');
+  }
+
+  // 2. Hero Name Trace Reveal
+  const trigger = document.getElementById('heroTraceTrigger');
+  const msg = document.getElementById('heroTraceMsg');
+  if (trigger && msg) {
+    let traceTimer;
+    const showMsg = () => {
+      clearTimeout(traceTimer);
+      msg.classList.add('visible');
+      traceTimer = setTimeout(() => msg.classList.remove('visible'), 4000);
+    };
+    trigger.addEventListener('mousemove', (e) => {
+      // Only reveal if moving slowly
+      const speed = Math.abs(e.movementX) + Math.abs(e.movementY);
+      if (speed < 5) showMsg();
+    });
+    trigger.addEventListener('touchstart', showMsg, { passive: true });
+  }
+
+  // 3. Stay Detection (Anushka Story Section)
+  const storySec = document.getElementById('anushka-story');
+  if (storySec) {
+    let stayTimer;
+    const observer = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        stayTimer = setTimeout(() => {
+          showFloatingSecret("Thank you for listening to my silence.", storySec);
+        }, 40000); // 40 seconds of quiet reading
+      } else {
+        clearTimeout(stayTimer);
+      }
+    }, { threshold: 0.5 });
+    observer.observe(storySec);
+  }
+
+  // 4. Long Press on Reply Button
+  const replyBtn = document.getElementById('btnReplySubmit');
+  if (replyBtn) {
+    let pressTimer;
+    const start = () => {
+      pressTimer = setTimeout(() => {
+        showFloatingSecret("Some words were meant to stay in the silence.", replyBtn);
+      }, 2500);
+    };
+    const cancel = () => clearTimeout(pressTimer);
+    replyBtn.addEventListener('mousedown', start);
+    replyBtn.addEventListener('mouseup', cancel);
+    replyBtn.addEventListener('mouseleave', cancel);
+    replyBtn.addEventListener('touchstart', start, { passive: true });
+    replyBtn.addEventListener('touchend', cancel, { passive: true });
+  }
+
+  // 5. Signature Reveal
+  const footerSign = document.querySelector('.footer-text strong:last-child');
+  if (footerSign) {
+    footerSign.addEventListener('mouseenter', () => {
+      if (Math.random() > 0.7) {
+        showFloatingSecret("If you found this, thank you for staying.", footerSign);
+      }
+    });
+  }
+
+  // 6. Random Rare Message (0.3% chance on scroll stop)
+  let scrollStopTimer;
+  window.addEventListener('scroll', () => {
+    clearTimeout(scrollStopTimer);
+    scrollStopTimer = setTimeout(() => {
+      if (Math.random() < 0.003 && window.scrollY > 500) {
+        showFloatingSecret("You found a quiet moment.", null);
+      }
+    }, 2000);
+  }, { passive: true });
+}
+
+function showFloatingSecret(text, anchor) {
+  const existing = document.querySelector('.quiet-secret-text.active');
+  if (existing) return; // Only one at a time
+
+  const secret = document.createElement('div');
+  secret.className = 'quiet-secret-text';
+  secret.textContent = text;
+  
+  if (anchor) {
+    const rect = anchor.getBoundingClientRect();
+    secret.style.left = (rect.left + rect.width / 2) + 'px';
+    secret.style.top = (rect.top - 50) + 'px';
+  } else {
+    secret.style.left = '50%';
+    secret.style.top = '30%';
+  }
+  secret.style.transform = 'translateX(-50%)';
+  
+  document.body.appendChild(secret);
+  
+  // Minimal delay for CSS transition
+  requestAnimationFrame(() => {
+    secret.classList.add('active');
+  });
+
+  setTimeout(() => {
+    secret.classList.remove('active');
+    setTimeout(() => secret.remove(), 3000);
+  }, 4500);
+}
+
+// Initialise when ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initQuietSecrets);
+} else {
+  initQuietSecrets();
+}
+
+
