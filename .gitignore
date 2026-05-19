@@ -8,3 +8,10 @@ Thumbs.db
 
 # Ignore large media files if you don't want to push the song
 # song.mp3
+
+# Ignore environment variables
+.env
+.env.local
+.env.development
+.env.production
+

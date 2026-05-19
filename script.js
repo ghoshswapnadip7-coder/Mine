@@ -1910,18 +1910,21 @@ window.submitReply = function() {
   btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending silently...';
   btn.style.pointerEvents = 'none';
 
-  // Real private delivery
-  const formData = new FormData();
-  formData.append("message", text);
-  formData.append("_subject", "OneLastSmile - A New Memory Fragment");
-  formData.append("_captcha", "false");
-  formData.append("timestamp", new Date().toLocaleString());
-
-  fetch("https://formsubmit.co/ajax/justgothacked108@gmail.com", {
+  // Real private delivery via secure Vercel API endpoint
+  fetch("/api/submit-reply", {
     method: "POST",
-    body: formData
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      message: text,
+      timestamp: new Date().toLocaleString()
+    })
   })
-  .then(res => res.json())
+  .then(res => {
+    if (!res.ok) throw new Error("Secure API submission failure");
+    return res.json();
+  })
   .then(() => {
     // Cinematic Fold Away
     wrapper.classList.add('submitted');
@@ -1932,6 +1935,7 @@ window.submitReply = function() {
     }, 800);
   })
   .catch(err => {
+    console.error("Submission failed:", err);
     btn.innerHTML = '<i class="fas fa-paper-plane"></i> Try again...';
     btn.style.pointerEvents = 'auto';
   });
