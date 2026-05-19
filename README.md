@@ -23,14 +23,28 @@ Created by **Swapnadip Ghosh** for **Anushka**.
 ## Setup & Usage 🚀
 1. Clone this repository:
    ```bash
-   git clone https://github.com/ghoshswapnadip7-coder/Mine.git
+   git clone https://github.com/Aethron-fr/OneLastSmile.git
    ```
 2. Navigate to the project folder:
    ```bash
-   cd Mine/AnushkaWebsite
+   cd OneLastSmile
    ```
-3. **Important:** To make the music player work, add your audio file and name it `song.mp3` in the root of the `AnushkaWebsite` folder.
-4. Open `index.html` in your favorite web browser.
+3. **Important:** To make the music player work, ensure you have your audio file named `song.mp3` in the root directory.
+4. Open `index.html` directly in your favorite web browser, or serve it using a local development server.
+
+## 🚀 Deploying to Vercel
+This repository is pre-configured for a flawless, high-performance static hosting experience on **Vercel** with optimized caching.
+
+### How to Deploy:
+1. Go to [Vercel](https://vercel.com) and log in (or sign up).
+2. Click **Add New** and choose **Project**.
+3. Import your GitHub repository: **`Aethron-fr/OneLastSmile`**.
+4. In the configuration window:
+   - **Framework Preset**: Choose **Other** (since this is a high-performance vanilla HTML/CSS/JS site).
+   - **Root Directory**: Select `.` (Root).
+   - Click **Deploy**!
+5. Within seconds, Vercel will build and serve your site globally under a secure `https://` domain. Future pushes to your `main` branch will deploy automatically!
 
 ## Designed with Love ❤️
-Code by **Swapnadip Ghosh** — Coder, Singer, and Lover.
+Code by **Swapnadip Ghosh** — Coder, Singer, and Forever Devoted.
+
