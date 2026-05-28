@@ -20,9 +20,6 @@ export default memo(function StorySection() {
           <p style={{ fontSize:'1.15rem', marginTop:'2rem', textAlign:'center', color:'var(--accent)' }}>
             তোকে পাওয়াই আমার ভালোবাসা ছিল না,<br/>তোকে ভালোবাসাটাই ছিল আমার পাওয়া।
           </p>
-          <p className="story-hidden-note">
-            “আর হ্যা-<br/>আমি লিখেছি এটা অনেক ভেবে ভেবে🤧🙌🏻 ”
-          </p>
         </div>
       </div>
     </section>

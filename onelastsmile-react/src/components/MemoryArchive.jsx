@@ -7,18 +7,34 @@ export default memo(function MemoryArchive() {
   return (
     <section className="memory-archive" id="memory-archive" ref={ref}>
       <div className="memory-grain"></div>
-      <div className="memory-content reveal">
-        <p className="memory-text">
-          The day I met you, I was just looking for a familiar face in the crowd.
+      
+      <div className="memory-content">
+        <p className="memory-line reveal">
+          The day I met you, I was just looking for a familiar face.
         </p>
-        <p className="memory-text">
-          I had no idea that a single quiet moment would anchor itself so deeply into my life.
+        
+        <div className="memory-gap"></div>
+
+        <p className="memory-line reveal">
+          I had no idea that a single quiet moment would stay with me this long.
         </p>
-        <p className="memory-text">
-          As time passed, without me even noticing, you became more than just a person I loved.
+        
+        <div className="memory-gap"></div>
+
+        <p className="memory-line reveal">
+          Without me even noticing, you became more than just someone I cared about.
         </p>
-        <p className="memory-text">
-          You became the quiet comfort in my everyday life... my light in the dark.
+        
+        <div className="memory-gap"></div>
+
+        <p className="memory-line reveal">
+          You just became my quiet comfort... <span className="memory-handwritten">my light in the dark.</span>
+        </p>
+        
+        <div className="memory-long-gap"></div>
+
+        <p className="memory-note reveal">
+          aar hee ami likhechi eta onek bhebe bhebe🤧🙌🏻
         </p>
       </div>
     </section>

@@ -1778,14 +1778,16 @@ html, body, * {
   -webkit-tap-highlight-color: transparent;
 }
 
+
 /* ====== MEMORY ARCHIVE ====== */
 .memory-archive {
-  min-height: 80vh;
+  margin-top: 15vh;
+  min-height: 120vh;
   display: flex;
   justify-content: center;
   align-items: center;
   position: relative;
-  background: var(--bg-dark);
+  background: #08030b;
   overflow: hidden;
 }
 
@@ -1793,7 +1795,7 @@ html, body, * {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
   background-image: url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E");
-  opacity: 0.04;
+  opacity: 0.03;
   pointer-events: none;
   z-index: 1;
 }
@@ -1801,45 +1803,59 @@ html, body, * {
 .memory-content {
   position: relative;
   z-index: 2;
-  max-width: 650px;
+  max-width: 600px;
+  width: 90%;
   text-align: center;
-  padding: 40px;
 }
 
-.memory-text {
+.memory-line {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 2;
+  margin: 0;
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 2.5s ease, transform 2.5s ease;
+  will-change: opacity, transform;
+}
+
+.memory-line.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.memory-handwritten {
   font-family: var(--font-handwriting);
-  font-size: 2.2rem;
+  font-size: 1.4rem;
   color: rgba(255, 255, 255, 0.4);
-  line-height: 1.8;
-  margin-bottom: 25px;
-  transition: opacity 1.5s ease;
+  font-style: italic;
+  margin-left: 8px;
 }
 
-.memory-archive:hover .memory-text {
-  opacity: 0.8;
+.memory-gap {
+  height: 12vh;
+}
+
+.memory-long-gap {
+  height: 25vh;
+}
+
+.memory-note {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: #f4f4f4;
+  opacity: 0;
+  transition: opacity 3s ease;
+  will-change: opacity;
+}
+
+.memory-note.active {
+  opacity: 0.25;
 }
 
 @media (max-width: 768px) {
-  .memory-text {
-    font-size: 1.8rem;
-  }
-}
-
-
-/* ====== STORY HIDDEN NOTE ====== */
-.story-hidden-note {
-  font-size: 0.78rem;
-  font-weight: 300;
-  font-style: italic;
-  color: #f4f4f4;
-  margin-top: 60px;
-  text-align: center;
-  opacity: 0;
-  transition: opacity 2s ease;
-}
-
-.story-container.reveal.active .story-hidden-note {
-  opacity: 0.38;
-  transition-delay: 1.5s;
+  .memory-line { font-size: 1rem; }
+  .memory-handwritten { font-size: 1.2rem; }
 }
 
