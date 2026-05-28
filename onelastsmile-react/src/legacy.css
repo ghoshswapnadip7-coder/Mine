@@ -1902,6 +1902,10 @@ html, body, * {
   background: radial-gradient(circle at 50% 20%, #1a1525 0%, #0f0514 60%);
 }
 
+.final-sequence-overlay.crimson-glow {
+  background: radial-gradient(circle at 50% 80%, rgba(30, 5, 10, 0.4) 0%, #0f0514 50%);
+}
+
 .final-sequence-overlay.rain-distortion .sequence-grain {
   opacity: 0.08;
   filter: blur(1px);
@@ -1954,20 +1958,6 @@ html, body, * {
 
 .signature.hidden { opacity: 0; }
 .signature.visible { opacity: 1; }
-
-.still-waiting {
-  font-family: var(--font-body);
-  font-size: 0.75rem;
-  color: #fff;
-  position: absolute;
-  bottom: -40px;
-  left: 50%;
-  transform: translateX(-50%);
-  transition: opacity 4s ease;
-}
-
-.still-waiting.hidden { opacity: 0; }
-.still-waiting.visible { opacity: 0.06; }
 
 .sequence-controls {
   position: absolute;
