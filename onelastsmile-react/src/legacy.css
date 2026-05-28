@@ -1825,3 +1825,21 @@ html, body, * {
   }
 }
 
+
+/* ====== STORY HIDDEN NOTE ====== */
+.story-hidden-note {
+  font-size: 0.78rem;
+  font-weight: 300;
+  font-style: italic;
+  color: #f4f4f4;
+  margin-top: 60px;
+  text-align: center;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+.story-container.reveal.active .story-hidden-note {
+  opacity: 0.38;
+  transition-delay: 1.5s;
+}
+
