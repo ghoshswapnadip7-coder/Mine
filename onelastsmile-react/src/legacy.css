@@ -2011,15 +2011,15 @@ html, body, * {
   background: none;
   border: none;
   font-family: monospace;
-  font-size: 0.72rem;
-  color: #fff;
-  opacity: 0.28;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  opacity: 0.6;
   cursor: pointer;
   transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
 .final-trigger-btn:hover {
-  opacity: 0.5;
+  opacity: 1;
   text-decoration: underline;
   transform: translateX(2px);
 }
