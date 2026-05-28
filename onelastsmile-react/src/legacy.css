@@ -1985,3 +1985,35 @@ html, body, * {
   .sequence-text { font-size: 1.15rem; }
 }
 
+
+/* ====== FINAL TRIGGER ====== */
+.final-trigger-container {
+  width: 100%;
+  height: 40vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding-bottom: 10vh;
+}
+
+.final-trigger-btn {
+  background: none;
+  border: none;
+  font-family: monospace;
+  font-size: 0.72rem;
+  color: #fff;
+  opacity: 0.28;
+  cursor: pointer;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.final-trigger-btn:hover {
+  opacity: 0.5;
+  text-decoration: underline;
+  transform: translateX(2px);
+}
+
+.final-trigger-btn.watched {
+  opacity: 0.12;
+}
+

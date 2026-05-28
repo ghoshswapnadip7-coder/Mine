@@ -18,22 +18,13 @@ export default function FinalLetterSequence() {
   const [finished, setFinished] = useState(false)
   const [showSignature, setShowSignature] = useState(false)
   const [showWaiting, setShowWaiting] = useState(false)
-  const [forceSkip, setForceSkip] = useState(false)
+  const [hasWatched, setHasWatched] = useState(false)
 
-  // Start sequence when user scrolls to the bottom anchor
   useEffect(() => {
-    if (forceSkip) return
-    const el = document.getElementById('final-trigger-point')
-    if (!el) return
-    const obs = new IntersectionObserver(entries => {
-      if (entries[0].isIntersecting && !isActive) {
-        setIsActive(true)
-        document.body.style.overflow = 'hidden' // lock scrolling
-      }
-    }, { threshold: 0.1 })
-    obs.observe(el)
-    return () => obs.disconnect()
-  }, [isActive, forceSkip])
+    if (localStorage.getItem('watchedFinalSequence') === 'true') {
+      setHasWatched(true)
+    }
+  }, [])
 
   useEffect(() => {
     if (!isActive || finished) return
@@ -73,23 +64,43 @@ export default function FinalLetterSequence() {
       const t1 = setTimeout(() => setShowSignature(true), 4000) // wait for black screen
       const t2 = setTimeout(() => setShowSignature(false), 9000) // fade out signature
       const t3 = setTimeout(() => setShowWaiting(true), 13000) // show waiting
-      return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3) }
+      const t4 = setTimeout(() => {
+        // Restore original page seamlessly
+        setShowWaiting(false)
+        setIsActive(false)
+        setFinished(false)
+        setCurrentPage(-1)
+        setHasWatched(true)
+        localStorage.setItem('watchedFinalSequence', 'true')
+        document.body.style.overflow = ''
+      }, 20000)
+      return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4) }
     }
   }, [finished])
 
   const exitSequence = () => {
     document.body.style.overflow = ''
     setIsActive(false)
-    setForceSkip(true)
+    setFinished(false)
+    setCurrentPage(-1)
+  }
+
+  const triggerSequence = () => {
+    setIsActive(true)
+    document.body.style.overflow = 'hidden' // lock scrolling
   }
 
   if (!isActive) {
-    if (forceSkip) return null;
-    return <div id="final-trigger-point" style={{ height: '20vh', width: '100%', position: 'relative' }}>
-      <p style={{ position: 'absolute', bottom: '20px', left: '50%', transform: 'translateX(-50%)', opacity: 0.2, fontSize: '0.8rem', fontStyle: 'italic' }}>
-        Scroll deeper...
-      </p>
-    </div>
+    return (
+      <div className="final-trigger-container">
+        <button 
+          className={`final-trigger-btn ${hasWatched ? 'watched' : ''}`} 
+          onClick={triggerSequence}
+        >
+          {hasWatched ? 'you stayed.' : 'one last thing.'}
+        </button>
+      </div>
+    )
   }
 
   const page = currentPage >= 0 && currentPage < PAGES.length ? PAGES[currentPage] : null
