@@ -10,6 +10,7 @@ import HeartsDivider from './HeartsDivider'
 import Timeline from './Timeline'
 import MusicSection from './MusicSection'
 import StorySection from './StorySection'
+import MemoryArchive from './MemoryArchive'
 import ThingsINeverSaid from './ThingsINeverSaid'
 import IfYouNeverReadThis from './IfYouNeverReadThis'
 import ProposeSection from './ProposeSection'
@@ -67,6 +68,7 @@ export default function MainSite({ isPlaying, setIsPlaying }) {
       <Timeline />
       <MusicSection audioRef={audioRef} isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
       <StorySection />
+      <MemoryArchive />
       <ThingsINeverSaid />
       <IfYouNeverReadThis />
       <ProposeSection isPlaying={isPlaying} setIsPlaying={setIsPlaying} audioRef={audioRef} />
