@@ -3,6 +3,7 @@ import Navbar from './Navbar'
 import Hero from './Hero'
 import AboutSection from './AboutSection'
 import BirthdayCountdown from './BirthdayCountdown'
+import LoveLetter from './LoveLetter'
 import ReasonsSection from './ReasonsSection'
 import QuotesCarousel from './QuotesCarousel'
 import HeartsDivider from './HeartsDivider'
@@ -12,6 +13,8 @@ import StorySection from './StorySection'
 import MemoryArchive from './MemoryArchive'
 import ThingsINeverSaid from './ThingsINeverSaid'
 import IfYouNeverReadThis from './IfYouNeverReadThis'
+import ProposeSection from './ProposeSection'
+import FinalChoice from './FinalChoice'
 import FinalLetterSequence from './FinalLetterSequence'
 import SiteFooter from './SiteFooter'
 import HeartCanvas from './HeartCanvas'
@@ -59,6 +62,7 @@ export default function MainSite({ isPlaying, setIsPlaying }) {
       <Hero />
       <AboutSection />
       <BirthdayCountdown />
+      <LoveLetter />
       <ReasonsSection />
       <QuotesCarousel />
       <HeartsDivider />
@@ -68,6 +72,8 @@ export default function MainSite({ isPlaying, setIsPlaying }) {
       <MemoryArchive />
       <ThingsINeverSaid />
       <IfYouNeverReadThis />
+      <ProposeSection isPlaying={isPlaying} setIsPlaying={setIsPlaying} audioRef={audioRef} />
+      <FinalChoice isPlaying={isPlaying} setIsPlaying={setIsPlaying} audioRef={audioRef} />
       <FinalLetterSequence />
       <SiteFooter />
     </div>
