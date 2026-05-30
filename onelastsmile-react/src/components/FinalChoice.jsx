@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
 
 function sendDecisionEmail(type) {
-  const templateID = type === 'keep' ? 'template_4j2me57' : 'template_lsiglrr'
+  const serviceID = import.meta.env.VITE_EMAILJS_SERVICE_ID
+  const templateID = import.meta.env.VITE_EMAILJS_TEMPLATE_DECISION_ID
   if (window.emailjs) {
-    window.emailjs.send('service_k6r37m4', templateID, {
-      decision: type,
+    window.emailjs.send(serviceID, templateID, {
+      decision: type === 'keep' ? 'KEEP THIS STORY' : 'LET IT FADE AWAY',
       time: new Date().toLocaleString(),
-    }).then(() => console.log('Email sent')).catch(e => console.log('Email failed', e))
+      session_id: crypto.randomUUID()
+    }).catch(() => {})
   }
 }
 
