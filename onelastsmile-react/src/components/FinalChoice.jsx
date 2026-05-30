@@ -17,6 +17,11 @@ export default function FinalChoice({ isPlaying, setIsPlaying, audioRef }) {
   const ref = useRef(null)
 
   useEffect(() => {
+    // Restore permanence if previously decided
+    const stored = localStorage.getItem('decision')
+    if (stored === 'keep') setChoice('keep')
+    if (stored === 'fade') setChoice('fade') // but we don't fade actively on return, just show they faded it
+
     const obs = new IntersectionObserver(entries => {
       entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('active') })
     }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' })
@@ -52,6 +57,49 @@ export default function FinalChoice({ isPlaying, setIsPlaying, audioRef }) {
 
   const showConfirmation = () => setConfirmation(true)
 
+  const saveMemoryKeepsake = () => {
+    const htmlContent = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>One Last Smile - Memory</title>
+  <style>
+    body { background: #0f0514; color: #f4f4f4; font-family: monospace; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; margin: 0; padding: 20px; text-align: center; }
+    .memory-card { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05); border-radius: 10px; padding: 50px 40px; max-width: 600px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .title { opacity: 0.5; font-size: 0.85rem; margin-bottom: 30px; letter-spacing: 3px; text-transform: uppercase; }
+    .message { font-size: 1.1rem; line-height: 2; opacity: 0.9; margin-bottom: 40px; white-space: pre-line; }
+    .timestamp { font-size: 0.75rem; opacity: 0.4; }
+    .note { margin-top: 40px; font-size: 0.85rem; opacity: 0.5; font-style: italic; }
+  </style>
+</head>
+<body>
+  <div class="memory-card">
+    <div class="title">A Preserved Memory</div>
+    <div class="message">
+      "Thank you for taking the time to read my true feelings.
+      
+      Even if life takes us in different directions, 
+      a part of my story will always carry your name."
+      
+      — Swapnadip
+    </div>
+    <div class="timestamp">Memory kept on: ${new Date().toLocaleString()}</div>
+    <div class="note">Some memories stay, even after the page is closed.</div>
+  </div>
+</body>
+</html>`
+
+    const blob = new Blob([htmlContent], { type: 'text/html' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = 'OneLastSmile-memory.html'
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <>
       <section className="final-choice-section" id="final-choice" ref={ref}>
@@ -71,7 +119,36 @@ export default function FinalChoice({ isPlaying, setIsPlaying, audioRef }) {
           {choice === 'keep' && (
             <div className="keep-message" id="keepMessage">
               <p>Then this story stays —<br/>quietly,<br/>without expectations.</p>
+              
+              <div className="keepsake-sequence" style={{ marginTop: '80px', opacity: 0, animation: 'fadeIn 3s ease 2s forwards' }}>
+                <p style={{ opacity: 0.5, fontSize: '0.85rem', marginBottom: '15px', letterSpacing: '1px' }}>Before You Go...</p>
+                <p style={{ fontSize: '1rem', marginBottom: '35px', opacity: 0.8 }}>Thank you for staying until the end.</p>
+                <button 
+                  onClick={saveMemoryKeepsake} 
+                  className="keepsake-btn"
+                  style={{ 
+                    background: 'none', 
+                    border: '1px solid rgba(255,255,255,0.1)', 
+                    color: 'rgba(255,255,255,0.7)', 
+                    padding: '12px 28px', 
+                    borderRadius: '30px', 
+                    cursor: 'pointer', 
+                    fontFamily: 'var(--font-body)', 
+                    fontSize: '0.9rem', 
+                    transition: 'all 0.4s ease' 
+                  }}
+                  onMouseOver={(e) => { e.target.style.background = 'rgba(255,255,255,0.05)'; e.target.style.color = '#fff'; e.target.style.border = '1px solid rgba(255,255,255,0.2)' }}
+                  onMouseOut={(e) => { e.target.style.background = 'none'; e.target.style.color = 'rgba(255,255,255,0.7)'; e.target.style.border = '1px solid rgba(255,255,255,0.1)' }}
+                >
+                  Take This With You
+                </button>
+              </div>
             </div>
+          )}
+          {choice === 'fade' && !fadeActive && (
+             <div className="keep-message" id="keepMessage">
+               <p style={{ opacity: 0.5 }}>This story was allowed to fade away.</p>
+             </div>
           )}
         </div>
       </section>

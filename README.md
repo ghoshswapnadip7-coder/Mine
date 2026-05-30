@@ -13,6 +13,9 @@ Created by **Swapnadip Ghosh** for **Anushka**.
 - **Runaway "No" Button**: In the proposal section, the "No" button runs away from the cursor, making it impossible to click!
 - **Fireworks Celebration**: When "Yes" is clicked, magical fireworks and falling hearts fill the screen.
 
+### KEY FEATURES - SYSTEMS BEHIND THE EXPERIENCE
+- **Keepsake Download System**: OneLastSmile creates a downloadable keepsake artifact at the very end of the experience. After choosing to "Keep This Story," visitors are presented with a subtle "Take This With You" option. This generates and downloads `OneLastSmile-memory.html`—a permanent, offline artifact preserving the final goodbye, selected memories, and a timestamp, allowing visitors to preserve part of the emotional experience even after the page is closed.
+
 ## Technologies Used 💻
 - **HTML5**
 - **CSS3** (Custom properties, Keyframe animations, Glassmorphism)
