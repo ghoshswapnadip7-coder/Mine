@@ -117,12 +117,14 @@ export default function FinalChoice({ isPlaying, setIsPlaying, audioRef }) {
             )}
           </div>
           {choice === 'keep' && (
-            <div className="keep-message" id="keepMessage">
-              <p>Then this story stays —<br/>quietly,<br/>without expectations.</p>
+            <>
+              <div className="keep-message" id="keepMessage">
+                <p>Then this story stays —<br/>quietly,<br/>without expectations.</p>
+              </div>
               
-              <div className="keepsake-sequence" style={{ marginTop: '80px', opacity: 0, animation: 'fadeIn 3s ease 2s forwards' }}>
-                <p style={{ opacity: 0.5, fontSize: '0.85rem', marginBottom: '15px', letterSpacing: '1px' }}>Before You Go...</p>
-                <p style={{ fontSize: '1rem', marginBottom: '35px', opacity: 0.8 }}>Thank you for staying until the end.</p>
+              <div className="keepsake-sequence" style={{ marginTop: '60px', textAlign: 'center', animation: 'fadeInUp 1s ease forwards' }}>
+                <p style={{ opacity: 0.5, fontSize: '0.85rem', marginBottom: '15px', letterSpacing: '1px', fontFamily: 'monospace', color: '#fff' }}>Before You Go...</p>
+                <p style={{ fontSize: '1rem', marginBottom: '35px', opacity: 0.8, fontFamily: 'monospace', color: '#fff' }}>Thank you for staying until the end.</p>
                 <button 
                   onClick={saveMemoryKeepsake} 
                   className="keepsake-btn"
@@ -133,7 +135,7 @@ export default function FinalChoice({ isPlaying, setIsPlaying, audioRef }) {
                     padding: '12px 28px', 
                     borderRadius: '30px', 
                     cursor: 'pointer', 
-                    fontFamily: 'var(--font-body)', 
+                    fontFamily: 'monospace', 
                     fontSize: '0.9rem', 
                     transition: 'all 0.4s ease' 
                   }}
@@ -143,7 +145,7 @@ export default function FinalChoice({ isPlaying, setIsPlaying, audioRef }) {
                   Take This With You
                 </button>
               </div>
-            </div>
+            </>
           )}
           {choice === 'fade' && !fadeActive && (
              <div className="keep-message" id="keepMessage">
