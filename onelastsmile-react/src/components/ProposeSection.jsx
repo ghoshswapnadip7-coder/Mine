@@ -21,6 +21,18 @@ export default function ProposeSection({ isPlaying, setIsPlaying, audioRef }) {
     }
   }
 
+  const handleNoHover = (e) => {
+    const btn = e.target
+    const maxX = window.innerWidth - btn.offsetWidth - 20
+    const maxY = window.innerHeight - btn.offsetHeight - 20
+    const x = Math.random() * maxX
+    const y = Math.random() * maxY
+    btn.style.position = 'fixed'
+    btn.style.left = `${x}px`
+    btn.style.top = `${y}px`
+    btn.style.zIndex = 9999
+  }
+
   const createFireworks = () => {
     const container = document.getElementById('fireworks')
     if (!container) return
@@ -52,37 +64,40 @@ export default function ProposeSection({ isPlaying, setIsPlaying, audioRef }) {
       <div className="propose-particles" id="proposeParticles"></div>
       <div className="propose-container reveal">
         <div className="ring-animation">
-          <div className="ring-outer"><i className="fas fa-dove ring-icon"></i></div>
+          <div className="ring-outer"><i className="fas fa-ring ring-icon"></i></div>
           <div className="ring-glow"></div>
         </div>
-        <p className="propose-from"><i className="fas fa-leaf"></i> With silent strength</p>
-        <h2 className="propose-title">Before I Leave</h2>
+        <p className="propose-from"><i className="fas fa-heart"></i> One Last Smile</p>
+        <h2 className="propose-title">Will you be mine?</h2>
         <div className="propose-message">
-          <p>This website is a final memory for you before I leave for university. I just wanted to leave behind something meaningful.</p>
-          <p>I am not doing this to force you into anything. I just wanted a place to preserve these memories before I go.</p>
+          <p>I know I'm not perfect, but my love for you is true.</p>
+          <p>I've waited for this moment to finally ask you.</p>
           <p className="propose-big-text">
-            <span>Even if life takes us in different directions,<br/>a part of my story will always carry your name.</span>
+            <span>Will you let me hold your hand forever?</span>
           </p>
         </div>
         {!accepted ? (
-          <div className="propose-buttons" id="proposeButtons">
+          <div className="propose-buttons" id="proposeButtons" style={{ position: 'relative' }}>
             <button className="btn-yes" id="yesBtn" onClick={sayYes}>
-              <i className="fas fa-heart"></i> I Understand
+              <i className="fas fa-heart"></i> Yes!
+            </button>
+            <button className="btn-no" id="noBtn" onMouseOver={handleNoHover} onClick={handleNoHover} style={{ background: '#333', color: '#fff', padding: '12px 30px', borderRadius: '25px', border: 'none', cursor: 'pointer', fontFamily: 'var(--font-body)', fontSize: '1.2rem', fontWeight: 'bold' }}>
+              <i className="fas fa-heart-broken"></i> No
             </button>
           </div>
         ) : (
           <div className="celebrate-message" id="celebrateMessage" style={{ display: 'block' }}>
             <div className="firework-container" id="fireworks"></div>
             <div className="celebrate-text">
-              <i className="fas fa-leaf"></i>
-              <h3>Thank You</h3>
-              <p>Thank you for taking the time to read my true feelings. That is all I ever wanted.</p>
+              <i className="fas fa-heart"></i>
+              <h3>I Love You!</h3>
+              <p>You just made me the happiest person in the world.</p>
               <div className="celebrate-icons">
-                <i className="fas fa-dove"></i>
+                <i className="fas fa-kiss-wink-heart"></i>
                 <i className="fas fa-star"></i>
                 <i className="fas fa-heart"></i>
               </div>
-              <p className="forever-text">— With silent respect, Swapnadip</p>
+              <p className="forever-text">— Yours forever, Swapnadip</p>
             </div>
           </div>
         )}

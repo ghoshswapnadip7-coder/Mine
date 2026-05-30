@@ -7,10 +7,9 @@ export default memo(function StorySection() {
   return (
     <section className="story-section" id="anushka-story" ref={ref}>
       <div className="story-bg-overlay"></div>
-      <div className="section-header reveal">
-        <p className="section-label"><i className="fas fa-pen-fancy"></i> A Quiet Truth</p>
-        <h2 className="section-title">শুধু তোকে দেখেই যেতে চেয়েছি—</h2>
-        <div className="title-ornament"><i className="fas fa-heart"></i></div>
+      <div className="section-header reveal cinematic-header">
+        <p className="section-label">[ The Quiet ]</p>
+        <h2 className="section-title">“Some people quietly become part of everything.”</h2>
       </div>
       <div className="story-container reveal">
         <div className="story-scroll-box">

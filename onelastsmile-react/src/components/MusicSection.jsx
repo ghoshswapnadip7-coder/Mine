@@ -66,7 +66,7 @@ export default function MusicSection({ audioRef, isPlaying, setIsPlaying }) {
       audio.pause()
       cancelAnimationFrame(rafId.current)
     } else {
-      audio.play().catch(e => console.log('Audio blocked', e))
+      audio.play().catch(() => {})
       if (lyricsBoxRef.current) exactScrollRef.current = lyricsBoxRef.current.scrollTop
       startLyricsScroll()
     }

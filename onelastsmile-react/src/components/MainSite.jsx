@@ -10,10 +10,14 @@ import HeartsDivider from './HeartsDivider'
 import Timeline from './Timeline'
 import MusicSection from './MusicSection'
 import StorySection from './StorySection'
+import MemoryArchive from './MemoryArchive'
 import ThingsINeverSaid from './ThingsINeverSaid'
 import IfYouNeverReadThis from './IfYouNeverReadThis'
+import OneLastReply from './OneLastReply'
 import ProposeSection from './ProposeSection'
 import FinalChoice from './FinalChoice'
+import FinalLetterSequence from './FinalLetterSequence'
+import ContactSection from './ContactSection'
 import SiteFooter from './SiteFooter'
 import HeartCanvas from './HeartCanvas'
 
@@ -66,11 +70,15 @@ export default function MainSite({ isPlaying, setIsPlaying }) {
       <HeartsDivider />
       <Timeline />
       <MusicSection audioRef={audioRef} isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
+      <ContactSection />
       <StorySection />
+      <MemoryArchive />
       <ThingsINeverSaid />
       <IfYouNeverReadThis />
+      <OneLastReply />
       <ProposeSection isPlaying={isPlaying} setIsPlaying={setIsPlaying} audioRef={audioRef} />
       <FinalChoice isPlaying={isPlaying} setIsPlaying={setIsPlaying} audioRef={audioRef} />
+      <FinalLetterSequence />
       <SiteFooter />
     </div>
   )

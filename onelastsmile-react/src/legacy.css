@@ -12,6 +12,7 @@
   --font-heading: 'Cinzel Decorative', serif;
   --font-body: 'Lato', sans-serif;
   --font-serif: 'Playfair Display', serif;
+  --font-handwriting: 'La Belle Aurore', cursive;
   --transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 }
 
@@ -251,7 +252,7 @@ body {
   align-items: center;
   text-align: center;
   position: relative;
-  background: url('romantic_bg.png') no-repeat center center/cover;
+  background-color: var(--bg-dark);
   z-index: 1;
 }
 .hero-overlay {
@@ -380,9 +381,27 @@ section { padding: 100px 5%; position: relative; }
 }
 .section-title {
   font-family: var(--font-heading);
-  font-size: 3.5rem;
-  color: #fff;
-  text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  font-size: 3rem;
+  font-weight: 300;
+  letter-spacing: 2px;
+  color: rgba(255, 255, 255, 0.85);
+  text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+.cinematic-header .section-title {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 2.2rem;
+  opacity: 0.7;
+  font-weight: 400;
+  text-transform: none;
+}
+
+.cinematic-header .section-label {
+  color: var(--text-muted);
+  opacity: 0.6;
+  font-size: 0.8rem;
+  letter-spacing: 5px;
 }
 .title-ornament {
   margin-top: 15px;
@@ -784,8 +803,7 @@ section { padding: 100px 5%; position: relative; }
 /* ====== MUSIC SECTION ====== */
 .music-section {
   position: relative;
-  background: url('couple_silhouette.png') no-repeat center center/cover;
-  background-attachment: fixed;
+  background-color: var(--bg-dark);
 }
 .music-bg-overlay {
   position: absolute;
@@ -914,7 +932,7 @@ section { padding: 100px 5%; position: relative; }
 }
 .propose-bg-overlay {
   position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  background: url('https://www.transparenttextures.com/patterns/stardust.png');
+  background: none;
   opacity: 0.3;
 }
 .propose-particles { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; }
@@ -1048,7 +1066,7 @@ section { padding: 100px 5%; position: relative; }
 
 /* ====== CONFESSION ====== */
 .confession-section { position: relative; overflow: hidden; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 100px 5%; background: radial-gradient(circle at 50% 50%, #1a0520 0%, var(--bg-dark) 100%); }
-.confession-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: url('night_sky_bg.png') no-repeat center center/cover; opacity: 0.15; }
+.confession-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: none; opacity: 0.15; }
 .confession-container { max-width: 750px; background: var(--glass-bg); border: 1px solid rgba(255,77,133,0.15); border-radius: 30px; padding: 60px 45px; backdrop-filter: blur(20px); box-shadow: 0 20px 50px rgba(0,0,0,0.5), 0 0 60px rgba(255,77,133,0.08); position: relative; z-index: 2; }
 .confession-icon { text-align: center; font-size: 3rem; color: var(--primary-color); margin-bottom: 15px; animation: heartbeat 2s infinite; }
 .confession-title { font-family: var(--font-heading); font-size: 3rem; text-align: center; color: #fff; margin-bottom: 30px; }
@@ -1148,7 +1166,18 @@ section { padding: 100px 5%; position: relative; }
 .final-choice-title { font-family: var(--font-heading); font-size: 3rem; color: #fff; margin-bottom: 20px; text-shadow: 0 0 15px rgba(255, 77, 133, 0.4); }
 .final-choice-content p { font-family: var(--font-serif); font-size: 1.2rem; color: #ddd; line-height: 1.8; margin-bottom: 30px; font-style: italic; }
 .final-buttons { display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
-.btn-keep, .btn-fade { padding: 12px 30px; border-radius: 25px; font-family: var(--font-body); font-size: 1.1rem; border: none; cursor: pointer; transition: var(--transition); font-weight: bold; }
+.btn-keep, .btn-fade {
+  padding: 12px 30px;
+  border-radius: 25px;
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  font-weight: bold;
+  position: relative;
+  z-index: 100;
+}
 .btn-keep { background: linear-gradient(45deg, #a239ca, #ff4d85); color: #fff; box-shadow: 0 5px 15px rgba(162, 57, 202, 0.4); }
 .btn-keep:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(162, 57, 202, 0.6); }
 .btn-fade { background: transparent; border: 1px solid rgba(255, 255, 255, 0.3); color: var(--text-muted); }
@@ -1758,3 +1787,233 @@ html, body, * {
 .bd-btn {
   -webkit-tap-highlight-color: transparent;
 }
+
+
+/* ====== MEMORY ARCHIVE ====== */
+.memory-archive {
+  margin-top: 15vh;
+  min-height: 120vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: #08030b;
+  overflow: hidden;
+}
+
+.memory-grain {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E");
+  opacity: 0.03;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.memory-content {
+  position: relative;
+  z-index: 2;
+  max-width: 600px;
+  width: 90%;
+  text-align: center;
+}
+
+.memory-line {
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 2;
+  margin: 0;
+  opacity: 0;
+  transform: translateY(15px);
+  transition: opacity 2.5s ease, transform 2.5s ease;
+  will-change: opacity, transform;
+}
+
+.memory-line.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.memory-handwritten {
+  font-family: var(--font-handwriting);
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-style: italic;
+  margin-left: 8px;
+}
+
+.memory-gap {
+  height: 12vh;
+}
+
+.memory-long-gap {
+  height: 25vh;
+}
+
+.memory-note {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  color: #f4f4f4;
+  opacity: 0;
+  transition: opacity 3s ease;
+  will-change: opacity;
+}
+
+.memory-note.active {
+  opacity: 0.25;
+}
+
+@media (max-width: 768px) {
+  .memory-line { font-size: 1rem; }
+  .memory-handwritten { font-size: 1.2rem; }
+}
+
+
+/* ====== FINAL LETTER SEQUENCE ====== */
+.final-sequence-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: #0f0514;
+  z-index: 10000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 3s ease;
+  overflow: hidden;
+}
+
+.final-sequence-overlay.fully-black {
+  background: #000;
+}
+
+.sequence-grain {
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.85%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E");
+  opacity: 0.05;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Background Effects */
+.final-sequence-overlay.moon-glow {
+  background: radial-gradient(circle at 50% 20%, #1a1525 0%, #0f0514 60%);
+}
+
+.final-sequence-overlay.crimson-glow {
+  background: radial-gradient(circle at 50% 80%, rgba(30, 5, 10, 0.4) 0%, #0f0514 50%);
+}
+
+.final-sequence-overlay.rain-distortion .sequence-grain {
+  opacity: 0.08;
+  filter: blur(1px);
+}
+
+.sequence-content {
+  position: relative;
+  z-index: 2;
+  max-width: 800px;
+  width: 90%;
+  text-align: center;
+}
+
+.sequence-text {
+  font-family: var(--font-body);
+  font-size: 1.4rem;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 300;
+  line-height: 2;
+  margin: 0;
+  transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1), transform 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: opacity, transform;
+}
+
+.sequence-text.hidden {
+  opacity: 0;
+  transform: translateY(15px);
+}
+
+.sequence-text.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.sequence-ending {
+  position: relative;
+  height: 200px;
+}
+
+.signature {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.4);
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  transition: opacity 2s ease;
+}
+
+.signature.hidden { opacity: 0; }
+.signature.visible { opacity: 1; }
+
+.sequence-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  z-index: 10;
+  display: flex;
+  gap: 15px;
+}
+
+.sequence-controls button {
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.2);
+  font-size: 0.8rem;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.sequence-controls button:hover {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+@media (max-width: 768px) {
+  .sequence-text { font-size: 1.15rem; }
+}
+
+
+/* ====== FINAL TRIGGER ====== */
+.final-trigger-container {
+  width: 100%;
+  height: 40vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding-bottom: 10vh;
+}
+
+.final-trigger-btn {
+  background: none;
+  border: none;
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.8);
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.final-trigger-btn:hover {
+  opacity: 1;
+  text-decoration: underline;
+  transform: translateX(2px);
+}
+
+.final-trigger-btn.watched {
+  opacity: 0.12;
+}
+
